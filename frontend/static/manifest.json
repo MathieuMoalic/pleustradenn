@@ -1,0 +1,18 @@
+{
+    "short_name": "Groceries",
+    "name": "Groceries",
+    "start_url": "https://groceries.matmoa.xyz/",
+    "icons": [
+        {
+            "src": "icon-512x512.png",
+            "type": "image/png",
+            "sizes": "512x512"
+        }
+    ],
+    "background_color": "#5f1717",
+    "display": "standalone",
+    "scope": "/",
+    "theme_color": "#5f1717",
+    "shortcuts": [],
+    "description": "Groceries"
+}

@@ -1,0 +1,52 @@
+[project]
+name = "groceries"
+version = "5.0.8"
+description = "Grocery list"
+authors = [{ name = "Mathieu Moalic", email = "matmoa@amu.edu.pl" }]
+license = { file = "LICENSE" }
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "fastapi==0.115.6",
+    "uvicorn==0.32.1",
+    "sqlmodel==0.0.22",
+    "websockets==14.1",
+    "pytest==8.3.4",
+    "httpx==0.28.1",
+    "pyjwt==2.10.1",
+    "python-multipart==0.0.20",
+    "bcrypt==4.0.1",
+    "passlib==1.7.4",
+    "alembic==1.14.0",
+]
+
+[build-system]
+requires = ["setuptools==75.6", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+exclude = ["htmlcov"]
+
+[tool.pytest.ini_options]
+testpaths = ["backend/tests"]
+
+[tool.mypy]
+disable_error_code = "unused-ignore"
+mypy_path = "groceries"
+check_untyped_defs = true
+disallow_any_generics = true
+ignore_missing_imports = true
+no_implicit_optional = true
+show_error_codes = true
+strict_equality = true
+warn_redundant_casts = true
+warn_return_any = true
+warn_unreachable = true
+warn_unused_configs = true
+no_implicit_reexport = true
+disallow_untyped_calls = false
+strict = true
+plugins = "numpy.typing.mypy_plugin"
+
+[tool.pyright]
+reportOptionalMemberAccess = false
