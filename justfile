@@ -28,16 +28,16 @@ release:
 
     
 staging:
-    podman build -t localhost/groceries-staging:latest .
+    podman build -t localhost/workouts-staging:latest .
 
     podman run --rm --replace \
-        --name groceries-staging \
+        --name workouts-staging \
         --network tmp-proxy \
         -v /tmp/data:/data \
         -p 6001:6001 \
         -e ADMIN_USERNAME=${ADMIN_USERNAME} \
         -e ADMIN_PASSWORD=${ADMIN_PASSWORD} \
-        localhost/groceries-staging:latest 
+        localhost/workouts-staging:latest 
     
 caddy:
     podman run --rm -d --replace \
@@ -49,7 +49,7 @@ caddy:
         caddy:latest
 
 backend:
-    scp homeserver:podman/groceries/db1.sqlite /tmp/data/
+    scp homeserver:podman/workouts/db1.sqlite /tmp/data/
     
     cd backend/migrations && DATABASE_URL=sqlite:////tmp/data/db1.sqlite alembic upgrade head && cd -
 

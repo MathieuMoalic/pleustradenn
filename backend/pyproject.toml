@@ -1,7 +1,7 @@
 [project]
-name = "groceries"
+name = "workouts"
 version = "5.0.8"
-description = "Grocery list"
+description = "workouts"
 authors = [{ name = "Mathieu Moalic", email = "matmoa@amu.edu.pl" }]
 license = { file = "LICENSE" }
 readme = "README.md"
@@ -32,7 +32,6 @@ testpaths = ["backend/tests"]
 
 [tool.mypy]
 disable_error_code = "unused-ignore"
-mypy_path = "groceries"
 check_untyped_defs = true
 disallow_any_generics = true
 ignore_missing_imports = true

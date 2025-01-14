@@ -1,7 +1,7 @@
 {
-    "short_name": "Groceries",
-    "name": "Groceries",
-    "start_url": "https://groceries.matmoa.xyz/",
+    "short_name": "Workouts",
+    "name": "Workouts",
+    "start_url": "https://workouts.matmoa.xyz/",
     "icons": [
         {
             "src": "icon-512x512.png",
@@ -14,5 +14,5 @@
     "scope": "/",
     "theme_color": "#5f1717",
     "shortcuts": [],
-    "description": "Groceries"
+    "description": "Workouts"
 }
