@@ -8,8 +8,10 @@ from fastapi.security import OAuth2PasswordRequestForm
 from fastapi.staticfiles import StaticFiles
 
 from backend.jwt import jwt_login
-from backend.router.categories import router as categories_router
-from backend.router.items import router as items_router
+from backend.router.exercise import router as exercises_router
+from backend.router.user import router as users_router
+from backend.router.workout import router as workouts_router
+from backend.router.workout_exercise import router as workout_exercises_router
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("database")
@@ -23,8 +25,10 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends()):
     return jwt_login(form_data.username, form_data.password)
 
 
-app.include_router(items_router)
-app.include_router(categories_router)
+app.include_router(exercises_router)
+app.include_router(users_router)
+app.include_router(workouts_router)
+app.include_router(workout_exercises_router)
 
 
 # handle all ValueErrors

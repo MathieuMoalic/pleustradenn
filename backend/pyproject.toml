@@ -29,6 +29,7 @@ exclude = ["htmlcov"]
 
 [tool.pytest.ini_options]
 testpaths = ["backend/tests"]
+filterwarnings = ["ignore:.*crypt.*:DeprecationWarning"]
 
 [tool.mypy]
 disable_error_code = "unused-ignore"
