@@ -1,5 +1,4 @@
 def test_create_workout_exercise(auth_client, test_user):
-    # Create a workout first
     workout = auth_client.post(
         "/api/workouts",
         json={
@@ -10,7 +9,6 @@ def test_create_workout_exercise(auth_client, test_user):
     )
     workout_id = workout.json()["id"]
 
-    # Create an exercise
     exercise = auth_client.post(
         "/api/exercises",
         json={
@@ -23,7 +21,6 @@ def test_create_workout_exercise(auth_client, test_user):
     )
     exercise_id = exercise.json()["id"]
 
-    # Create a workout exercise
     workout_exercise_data = {
         "workout_id": workout_id,
         "exercise_id": exercise_id,
@@ -47,14 +44,12 @@ def test_create_workout_exercise(auth_client, test_user):
 
 
 def test_read_workout_exercises(auth_client, test_user):
-    # Get all workout exercises
     response = auth_client.get("/api/workout-exercises")
     assert response.status_code == 200
     assert isinstance(response.json(), list)
 
 
 def test_update_workout_exercise(auth_client, test_user):
-    # Create a workout and exercise
     workout = auth_client.post(
         "/api/workouts",
         json={
@@ -77,7 +72,6 @@ def test_update_workout_exercise(auth_client, test_user):
     )
     exercise_id = exercise.json()["id"]
 
-    # Create a workout exercise
     workout_exercise = auth_client.post(
         "/api/workout-exercises",
         json={
@@ -91,7 +85,6 @@ def test_update_workout_exercise(auth_client, test_user):
     )
     workout_exercise_id = workout_exercise.json()["id"]
 
-    # Update the workout exercise
     response = auth_client.put(
         f"/api/workout-exercises/{workout_exercise_id}",
         json={"sets": 5, "reps": 15, "weight": 65.0},
@@ -105,7 +98,6 @@ def test_update_workout_exercise(auth_client, test_user):
 
 
 def test_delete_workout_exercise(auth_client, test_user):
-    # Create a workout and exercise
     workout = auth_client.post(
         "/api/workouts",
         json={
@@ -128,7 +120,6 @@ def test_delete_workout_exercise(auth_client, test_user):
     )
     exercise_id = exercise.json()["id"]
 
-    # Create a workout exercise
     workout_exercise = auth_client.post(
         "/api/workout-exercises",
         json={
@@ -142,7 +133,6 @@ def test_delete_workout_exercise(auth_client, test_user):
     )
     workout_exercise_id = workout_exercise.json()["id"]
 
-    # Delete the workout exercise
     response = auth_client.delete(f"/api/workout-exercises/{workout_exercise_id}")
     assert response.status_code == 200
     deleted_workout_exercise = response.json()

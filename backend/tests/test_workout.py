@@ -8,8 +8,8 @@ def test_read_workouts(auth_client):
 
 def test_create_workout(auth_client, test_user):
     workout_data = {
-        "user_id": test_user.id,  # Include the required user_id
-        "date": "2025-01-24",  # Optional field, but you can provide a value for completeness
+        "user_id": test_user.id,
+        "date": "2025-01-24",  # Optional field
         "notes": "Morning workout session with focus on full body",
     }
     response = auth_client.post(
@@ -22,7 +22,6 @@ def test_create_workout(auth_client, test_user):
 
 
 def test_update_workout(auth_client, test_user):
-    # Create a workout first
     workout = auth_client.post(
         "/api/workouts",
         json={
@@ -33,7 +32,6 @@ def test_update_workout(auth_client, test_user):
     )
     workout_id = workout.json()["id"]
 
-    # Update the workout
     response = auth_client.put(
         f"/api/workouts/{workout_id}",
         json={"notes": "Updated workout notes"},
@@ -44,7 +42,6 @@ def test_update_workout(auth_client, test_user):
 
 
 def test_delete_workout(auth_client, test_user):
-    # Create a workout first
     workout = auth_client.post(
         "/api/workouts",
         json={
@@ -55,7 +52,6 @@ def test_delete_workout(auth_client, test_user):
     )
     workout_id = workout.json()["id"]
 
-    # Delete the workout
     response = auth_client.delete(
         f"/api/workouts/{workout_id}",
     )

@@ -3,6 +3,7 @@ from typing import Any, Sequence
 from sqlmodel import Session, select
 
 from backend.models import User
+from backend.passlib import hash_password
 
 
 def create_user(session: Session, data: dict[str, Any]) -> User:
@@ -11,8 +12,7 @@ def create_user(session: Session, data: dict[str, Any]) -> User:
     ).first()
     if existing_user:
         raise ValueError("Username already taken.")
-
-    # No more hashing here, just create a User
+    data["hashed_password"] = hash_password(data.pop("password"))
     user = User(**data)
     session.add(user)
     session.commit()

@@ -6,7 +6,6 @@ from sqlmodel import Session
 from backend.crud.user import create_user, delete_user, read_users, update_user
 from backend.database import get_session
 from backend.jwt import get_current_user
-from backend.passlib import hash_password
 from backend.schemas.user import UserCreate, UserRead, UserUpdate
 
 router = APIRouter(
@@ -23,9 +22,7 @@ def create_user_endpoint(
     """
     Create a new user.
     """
-    user_dict = user_data.model_dump()
-    user_dict["hashed_password"] = hash_password(user_dict.pop("password"))
-    user = create_user(session, user_dict)
+    user = create_user(session, user_data.model_dump())
     return user
 
 

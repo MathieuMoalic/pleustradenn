@@ -1,7 +1,7 @@
 def test_create_user(auth_client):
     user_data = {
         "username": "test_user",
-        "password": "password123",  # Send plain password
+        "password": "password123",
     }
     response = auth_client.post(
         "/api/users",
@@ -14,13 +14,12 @@ def test_create_user(auth_client):
     assert "id" in created_user
 
 
-def test_read_users(auth_client, test_user):
-    # Create a second user to test the read functionality
+def test_read_users(auth_client):
     auth_client.post(
         "/api/users",
         json={
             "username": "test_user_2",
-            "password": "password123",  # Use plain password
+            "password": "password123",
         },
     )
 
@@ -28,12 +27,11 @@ def test_read_users(auth_client, test_user):
     assert response.status_code == 200
     users = response.json()
     assert isinstance(users, list)
-    assert len(users) >= 2  # At least test_user and the new user
+    assert len(users) >= 2
     assert any(user["username"] == "test_user_2" for user in users)
 
 
 def test_update_user(auth_client, test_user):
-    # Update the test_user's username
     user_id = test_user.id
     updated_data = {
         "username": "updated_user",
@@ -50,25 +48,22 @@ def test_update_user(auth_client, test_user):
     assert updated_user["username"] == "updated_user"
 
 
-def test_delete_user(auth_client, test_user):
-    # Create another user to delete
+def test_delete_user(auth_client):
     user_to_delete = auth_client.post(
         "/api/users",
         json={
             "username": "delete_user",
-            "password": "password123",  # Use plain password
+            "password": "password123",
         },
     ).json()
 
     user_id = user_to_delete["id"]
 
-    # Delete the user
     response = auth_client.delete(f"/api/users/{user_id}")
     assert response.status_code == 200
     deleted_user = response.json()
     assert deleted_user["id"] == user_id
     assert deleted_user["username"] == "delete_user"
 
-    # Verify the user no longer exists
     response = auth_client.get("/api/users")
     assert not any(user["id"] == user_id for user in response.json())
