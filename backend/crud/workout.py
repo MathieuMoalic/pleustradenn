@@ -10,6 +10,14 @@ def read_workouts(session: Session) -> Sequence[Workout]:
     return session.exec(select(Workout)).all()
 
 
+def read_workout(session: Session, workout_id: int) -> Workout:
+    """Return a workout by ID."""
+    workout = session.get(Workout, workout_id)
+    if not workout:
+        raise ValueError("Workout not found.")
+    return workout
+
+
 def create_workout(session: Session, data: dict[str, Any]) -> Workout:
     """Create a new workout."""
     if "user_id" not in data or not data["user_id"]:

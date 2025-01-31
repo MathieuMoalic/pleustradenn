@@ -3,7 +3,12 @@ from typing import List
 from fastapi import APIRouter, Depends
 from sqlmodel import Session
 
-from backend.crud.workout import create_workout, delete_workout, read_workouts, update_workout
+from backend.crud.workout import (
+    create_workout,
+    delete_workout,
+    read_workouts,
+    update_workout,
+)
 from backend.database import get_session
 from backend.jwt import get_current_user
 from backend.schemas.workout import WorkoutCreate, WorkoutRead, WorkoutUpdate
@@ -48,7 +53,9 @@ def update_workout_endpoint(
     return workout
 
 
-@router.delete("/{workout_id}", response_model=WorkoutRead, operation_id="workoutDelete")
+@router.delete(
+    "/{workout_id}", response_model=WorkoutRead, operation_id="workoutDelete"
+)
 def delete_workout_endpoint(workout_id: int, session: Session = Depends(get_session)):
     """
     Delete a workout by ID.
