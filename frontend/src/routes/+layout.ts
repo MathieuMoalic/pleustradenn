@@ -1,22 +1,25 @@
 import { goto } from "$app/navigation";
-import { api, apiInner } from "$lib/auth";
+import { createApiClient } from "$lib/auth";
 import { workouts, exercises, workoutExercises } from "$lib/store";
 
 export const ssr = false;
 export const prerender = true;
 
-export async function load() {
+export async function load({ fetch }) {
+    const api = createApiClient(fetch);
+
     const token = localStorage.getItem("token");
     if (!token) {
         goto("/login");
+        return;
     } else {
-        apiInner.setSecurityData({ accessToken: token });
+        api.setSecurityData({ accessToken: token });
     }
 
     const [workoutsa, exercisesa, workoutExercisesa] = await Promise.all([
-        api.workoutReadAll(),
-        api.exerciseReadAll(),
-        api.workoutExerciseReadAll(),
+        api.api.workoutReadAll(),
+        api.api.exerciseReadAll(),
+        api.api.workoutExerciseReadAll(),
     ]);
 
     workouts.set(workoutsa.data);

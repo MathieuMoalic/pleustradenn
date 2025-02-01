@@ -2,6 +2,7 @@
     import { workoutExercises, workouts, exercises } from "$lib/store";
     import { page } from "$app/state";
     import type { ExerciseRead, WorkoutExerciseRead } from "$lib/Api";
+    import { getApi } from "$lib/auth";
 
     let workout = $workouts[Number(page.params.id) - 1];
 
@@ -14,9 +15,17 @@
             thisExercise.push($exercises[$workoutExercises[i].exercise_id]);
         }
     }
+    function onclick() {
+        getApi()
+            .exerciseReadAll()
+            .then((res) => {
+                console.log(res);
+            });
+    }
 </script>
 
 <main>
+    <button on:click={onclick}> Get </button>
     <div class="block">
         {workout.notes}
     </div>
