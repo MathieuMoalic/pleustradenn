@@ -70,4 +70,4 @@ test:
     DATABASE_URL=sqlite:///./data/db1.sqlite \
     ADMIN_USERNAME=${ADMIN_USERNAME} \
     ADMIN_PASSWORD=${ADMIN_PASSWORD} \
-    pytest backend/tests
+    pytest -rP backend/tests

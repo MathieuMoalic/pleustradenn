@@ -1,46 +1,174 @@
-from typing import List, Optional
 import datetime
-from sqlmodel import Field, SQLModel, Relationship
+
+from pydantic import BaseModel, ConfigDict
+from sqlmodel import Field, Relationship, SQLModel
+
+##############################
+############ User ############
+##############################
 
 
 class User(SQLModel, table=True):
-    id: Optional[int] = Field(default=None, primary_key=True)
+    id: int = Field(primary_key=True)
     username: str = Field(index=True, unique=True)
     hashed_password: str
-    workouts: List["Workout"] = Relationship(back_populates="user")
+    sessions: list["Session"] = Relationship(
+        back_populates="user",
+        sa_relationship_kwargs={"cascade": "all, delete", "lazy": "selectin"},
+    )
+
+
+class UserBase(BaseModel):
+    username: str
+
+
+class UserCreate(BaseModel):
+    username: str
+    password: str
+
+
+class UserUpdate(BaseModel):
+    username: str | None = None
+    password: str | None = None
+
+
+class UserRead(UserBase):
+    id: int
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+##############################
+########## Exercise ##########
+##############################
 
 
 class Exercise(SQLModel, table=True):
-    id: Optional[int] = Field(default=None, primary_key=True)
+    id: int = Field(primary_key=True)
     name: str = Field(index=True, unique=True)
-    description: Optional[str] = Field(default=None)
-    category: Optional[str] = Field(default=None)  # e.g., strength, cardio
-    muscle_group: Optional[str] = Field(default=None)
-    equipment: Optional[str] = Field(default=None)
+    notes: str = Field(default="")
+    session_exercises: list["SessionExercise"] = Relationship(
+        back_populates="exercise",
+        sa_relationship_kwargs={"cascade": "all, delete", "lazy": "selectin"},
+    )
 
 
-class Workout(SQLModel, table=True):
-    id: Optional[int] = Field(default=None, primary_key=True)
+class ExerciseBase(BaseModel):
+    name: str
+    notes: str
+
+
+class ExerciseCreate(ExerciseBase):
+    pass
+
+
+class ExerciseUpdate(ExerciseBase):
+    name: str | None = None
+    notes: str | None = None
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+class ExerciseRead(ExerciseBase):
+    id: int
+    model_config = ConfigDict(from_attributes=True)
+
+
+##############################
+########## Session ###########
+##############################
+
+
+class Session(SQLModel, table=True):
+    id: int = Field(primary_key=True)
     user_id: int = Field(foreign_key="user.id")
-    date: Optional[datetime.date] = Field(default=None)  # ISO format date
-    notes: Optional[str] = Field(default=None)
+    date: datetime.date = Field(default=datetime.date.today)
+    notes: str = Field(default="")
 
-    user: Optional["User"] = Relationship(back_populates="workouts")
-    exercises: List["WorkoutExercise"] = Relationship(back_populates="workout")
+    user: "User" = Relationship(
+        back_populates="sessions",
+        sa_relationship_kwargs={"lazy": "selectin"},
+    )
+    session_exercises: list["SessionExercise"] = Relationship(
+        back_populates="session",
+        sa_relationship_kwargs={"cascade": "all, delete", "lazy": "selectin"},
+    )
 
 
-class WorkoutExercise(SQLModel, table=True):
-    id: Optional[int] = Field(default=None, primary_key=True)
-    workout_id: int = Field(foreign_key="workout.id")
+class SessionBase(BaseModel):
+    user_id: int
+    date: datetime.date
+    notes: str
+
+
+class SessionCreate(SessionBase):
+    pass
+
+
+class SessionUpdate(SessionBase):
+    user_id: int | None = None
+    date: datetime.date | None = None
+    notes: str | None = None
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+class SessionRead(SessionBase):
+    id: int
+    model_config = ConfigDict(from_attributes=True)
+
+
+##############################
+###### SessionExercise #######
+##############################
+
+
+class SessionExercise(SQLModel, table=True):
+    id: int = Field(primary_key=True)
+    session_id: int = Field(foreign_key="session.id")
     exercise_id: int = Field(foreign_key="exercise.id")
-    sets: Optional[int] = Field(default=None)
-    reps: Optional[int] = Field(default=None)
-    weight: Optional[float] = Field(default=None)  # kg or lbs
-    rest_time: Optional[int] = Field(default=None)  # seconds
+    sets: int = Field(default=1)
+    reps: int = Field(default=1)
+    weight: float = Field(default=0.0)
+    rest_seconds: int = Field(default=60)
+    count: int = Field(default=0)
 
-    workout: Optional["Workout"] = Relationship(back_populates="exercises")
-    exercise: Optional["Exercise"] = Relationship()
+    session: "Session" = Relationship(
+        back_populates="session_exercises",
+        sa_relationship_kwargs={"lazy": "selectin"},
+    )
+    exercise: "Exercise" = Relationship(
+        back_populates="session_exercises",
+        sa_relationship_kwargs={"lazy": "selectin"},
+    )
 
-# Back-populate relationships
-User.workouts = Relationship(back_populates="user", sa_relationship_kwargs={"cascade": "all, delete"})
-Workout.exercises = Relationship(back_populates="workout", sa_relationship_kwargs={"cascade": "all, delete"})
+
+class SessionExerciseBase(BaseModel):
+    session_id: int
+    exercise_id: int
+    sets: int
+    reps: int
+    weight: float
+    rest_seconds: int
+    count: int
+
+
+class SessionExerciseCreate(SessionExerciseBase):
+    pass
+
+
+class SessionExerciseUpdate(SessionExerciseBase):
+    session_id: int | None = None
+    exercise_id: int | None = None
+    sets: int | None = None
+    reps: int | None = None
+    weight: float | None = None
+    rest_seconds: int | None = None
+    count: int | None = None
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+class SessionExerciseRead(SessionExerciseBase):
+    id: int
+    model_config = ConfigDict(from_attributes=True)

@@ -1,17 +1,9 @@
-from typing import List
-
 from fastapi import APIRouter, Depends
-from sqlmodel import Session
+from sqlmodel import Session, select
 
-from backend.crud.exercise import (
-    create_exercise,
-    delete_exercise,
-    read_exercises,
-    update_exercise,
-)
 from backend.database import get_session
 from backend.jwt import get_current_user
-from backend.schemas.exercise import ExerciseCreate, ExerciseRead, ExerciseUpdate
+from backend.models import Exercise, ExerciseCreate, ExerciseRead, ExerciseUpdate
 
 router = APIRouter(
     prefix="/api/exercises",
@@ -27,36 +19,66 @@ def create_exercise_endpoint(
     """
     Create a new exercise.
     """
-    exercise = create_exercise(session, exercise_data.model_dump())
-    return exercise
+    existing_exercise = session.exec(
+        select(Exercise).where(Exercise.name == exercise_data.name)
+    ).first()
+    if existing_exercise:
+        raise ValueError("Exercise with this name already exists.")
+
+    new_exercise = Exercise(
+        **exercise_data.model_dump()
+    )  # Convert Pydantic model to dict
+    session.add(new_exercise)
+    session.commit()
+    session.refresh(new_exercise)
+    return new_exercise
 
 
-@router.get("", response_model=List[ExerciseRead], operation_id="exerciseReadAll")
+@router.get("", response_model=list[ExerciseRead], operation_id="exerciseReadAll")
 def read_exercises_endpoint(session: Session = Depends(get_session)):
     """
     Read all exercises.
     """
-    exercises = read_exercises(session)
-    return exercises
+    return session.exec(select(Exercise)).all()
 
 
-@router.put("/{exercise_id}", response_model=ExerciseRead, operation_id="exerciseUpdate")
+@router.put(
+    "/{exercise_id}", response_model=ExerciseRead, operation_id="exerciseUpdate"
+)
 def update_exercise_endpoint(
-    exercise_id: int, update_data: ExerciseUpdate, session: Session = Depends(get_session)
+    exercise_id: int,
+    update_data: ExerciseUpdate,
+    session: Session = Depends(get_session),
 ):
     """
     Update an existing exercise by ID.
     """
-    exercise = update_exercise(
-        session, exercise_id, update_data.model_dump(exclude_unset=True)
-    )
+    exercise = session.get(Exercise, exercise_id)
+    if not exercise:
+        raise ValueError("Exercise not found.")
+
+    update_data = update_data.model_dump(exclude_unset=True)  # Ignore unset fields
+
+    for key, value in update_data.items():
+        setattr(exercise, key, value)
+
+    session.add(exercise)
+    session.commit()
+    session.refresh(exercise)
     return exercise
 
 
-@router.delete("/{exercise_id}", response_model=ExerciseRead, operation_id="exerciseDelete")
+@router.delete(
+    "/{exercise_id}", response_model=ExerciseRead, operation_id="exerciseDelete"
+)
 def delete_exercise_endpoint(exercise_id: int, session: Session = Depends(get_session)):
     """
     Delete an exercise by ID.
     """
-    exercise = delete_exercise(session, exercise_id)
+    exercise = session.get(Exercise, exercise_id)
+    if not exercise:
+        raise ValueError("Exercise not found.")
+
+    session.delete(exercise)
+    session.commit()
     return exercise

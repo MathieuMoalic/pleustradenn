@@ -9,11 +9,9 @@ def test_read_exercises(auth_client):
 def test_create_exercise(auth_client):
     exercise_data = {
         "name": "Squat",
-        "description": "Strength exercise",
-        "category": "Strength",
-        "muscle_group": "Legs",
-        "equipment": "Barbell",
+        "notes": "Strength exercise",
     }
+
     response = auth_client.post(
         "/api/exercises",
         json=exercise_data,
@@ -25,7 +23,7 @@ def test_create_exercise(auth_client):
 def test_update_exercise(auth_client):
     exercise = auth_client.post(
         "/api/exercises",
-        json={"name": "Push-Up"},
+        json={"name": "Push-Up", "notes": ""},
     )
     exercise_id = exercise.json()["id"]
     response = auth_client.put(
@@ -39,7 +37,7 @@ def test_update_exercise(auth_client):
 def test_delete_exercise(auth_client):
     exercise = auth_client.post(
         "/api/exercises",
-        json={"name": "Deadlift"},
+        json={"name": "Deadlift", "notes": ""},
     )
     exercise_id = exercise.json()["id"]
     response = auth_client.delete(
