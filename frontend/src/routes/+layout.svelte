@@ -1,18 +1,13 @@
 <script lang="ts">
     import "../app.css";
-    import { Navbar, NavBrand } from "flowbite-svelte";
+    import Navbar from "../components/Navbar.svelte";
 </script>
 
-<div class="bg-gray-700 h-screen">
-    <Navbar>
-        <NavBrand href="/">
-            <span class="self-center whitespace-nowrap text-xl font-semibold">
-                Home
-            </span>
-        </NavBrand>
-    </Navbar>
-
-    <div class="max-w-[500px] mx-auto font-['Segoe_UI',sans-serif]">
+<!-- min-h-screen ensures the container fills at least the full viewport height -->
+<div class="min-h-screen bg-gray-700 flex flex-col">
+    <Navbar />
+    <!-- flex-grow ensures this inner area expands to fill remaining vertical space -->
+    <div class="max-w-[500px] mx-auto font-['Segoe_UI',sans-serif] flex-grow">
         <slot></slot>
     </div>
 </div>
