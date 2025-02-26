@@ -9,10 +9,7 @@
 
     let editData: ExerciseUpdate = {
         name: ex.name,
-        category: ex.category,
-        description: ex.description,
-        equipment: ex.equipment,
-        muscle_group: ex.muscle_group,
+        notes: ex.notes,
     };
 
     function saveEdits(exerciseId: number) {
@@ -41,23 +38,8 @@
             />
             <input
                 class="border p-2 rounded"
-                placeholder="Category"
-                bind:value={editData.category}
-            />
-            <input
-                class="border p-2 rounded"
-                placeholder="Description"
-                bind:value={editData.description}
-            />
-            <input
-                class="border p-2 rounded"
-                placeholder="Equipment"
-                bind:value={editData.equipment}
-            />
-            <input
-                class="border p-2 rounded"
-                placeholder="Muscle Group"
-                bind:value={editData.muscle_group}
+                placeholder="notes"
+                bind:value={editData.notes}
             />
         </div>
         <div class="flex space-x-2">

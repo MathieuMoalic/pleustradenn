@@ -1,7 +1,7 @@
 import { writable } from "svelte/store";
-import { type WorkoutExerciseRead, type ExerciseRead, type WorkoutRead } from "./Api";
+import { type SessionExerciseRead, type ExerciseRead, type SessionRead } from "./Api";
 
-export const workouts = writable<WorkoutRead[]>([]);
+export const workouts = writable<SessionRead[]>([]);
 export const exercises = writable<ExerciseRead[]>([]);
-export const workoutExercises = writable<WorkoutExerciseRead[]>([]);
+export const workoutExercises = writable<SessionExerciseRead[]>([]);
 export const workoutId = writable<number | null>(null);

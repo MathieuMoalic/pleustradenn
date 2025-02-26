@@ -32,28 +32,16 @@ export interface BodyLoginTokenPost {
 export interface ExerciseCreate {
   /** Name */
   name: string;
-  /** Description */
-  description?: string | null;
-  /** Category */
-  category?: string | null;
-  /** Muscle Group */
-  muscle_group?: string | null;
-  /** Equipment */
-  equipment?: string | null;
+  /** Notes */
+  notes: string;
 }
 
 /** ExerciseRead */
 export interface ExerciseRead {
   /** Name */
   name: string;
-  /** Description */
-  description?: string | null;
-  /** Category */
-  category?: string | null;
-  /** Muscle Group */
-  muscle_group?: string | null;
-  /** Equipment */
-  equipment?: string | null;
+  /** Notes */
+  notes: string;
   /** Id */
   id: number;
 }
@@ -62,20 +50,108 @@ export interface ExerciseRead {
 export interface ExerciseUpdate {
   /** Name */
   name?: string | null;
-  /** Description */
-  description?: string | null;
-  /** Category */
-  category?: string | null;
-  /** Muscle Group */
-  muscle_group?: string | null;
-  /** Equipment */
-  equipment?: string | null;
+  /** Notes */
+  notes?: string | null;
 }
 
 /** HTTPValidationError */
 export interface HTTPValidationError {
   /** Detail */
   detail?: ValidationError[];
+}
+
+/** SessionCreate */
+export interface SessionCreate {
+  /** User Id */
+  user_id: number;
+  /**
+   * Date
+   * @format date
+   */
+  date: string;
+  /** Notes */
+  notes: string;
+}
+
+/** SessionExerciseCreate */
+export interface SessionExerciseCreate {
+  /** Session Id */
+  session_id: number;
+  /** Exercise Id */
+  exercise_id: number;
+  /** Sets */
+  sets: number;
+  /** Reps */
+  reps: number;
+  /** Weight */
+  weight: number;
+  /** Rest Seconds */
+  rest_seconds: number;
+  /** Count */
+  count: number;
+}
+
+/** SessionExerciseRead */
+export interface SessionExerciseRead {
+  /** Session Id */
+  session_id: number;
+  /** Exercise Id */
+  exercise_id: number;
+  /** Sets */
+  sets: number;
+  /** Reps */
+  reps: number;
+  /** Weight */
+  weight: number;
+  /** Rest Seconds */
+  rest_seconds: number;
+  /** Count */
+  count: number;
+  /** Id */
+  id: number;
+}
+
+/** SessionExerciseUpdate */
+export interface SessionExerciseUpdate {
+  /** Session Id */
+  session_id?: number | null;
+  /** Exercise Id */
+  exercise_id?: number | null;
+  /** Sets */
+  sets?: number | null;
+  /** Reps */
+  reps?: number | null;
+  /** Weight */
+  weight?: number | null;
+  /** Rest Seconds */
+  rest_seconds?: number | null;
+  /** Count */
+  count?: number | null;
+}
+
+/** SessionRead */
+export interface SessionRead {
+  /** User Id */
+  user_id: number;
+  /**
+   * Date
+   * @format date
+   */
+  date: string;
+  /** Notes */
+  notes: string;
+  /** Id */
+  id: number;
+}
+
+/** SessionUpdate */
+export interface SessionUpdate {
+  /** User Id */
+  user_id?: number | null;
+  /** Date */
+  date?: string | null;
+  /** Notes */
+  notes?: string | null;
 }
 
 /** UserCreate */
@@ -110,88 +186,6 @@ export interface ValidationError {
   msg: string;
   /** Error Type */
   type: string;
-}
-
-/** WorkoutCreate */
-export interface WorkoutCreate {
-  /** User Id */
-  user_id: number;
-  /** Date */
-  date?: string | null;
-  /** Notes */
-  notes?: string | null;
-}
-
-/** WorkoutExerciseCreate */
-export interface WorkoutExerciseCreate {
-  /** Workout Id */
-  workout_id: number;
-  /** Exercise Id */
-  exercise_id: number;
-  /** Sets */
-  sets?: number | null;
-  /** Reps */
-  reps?: number | null;
-  /** Weight */
-  weight?: number | null;
-  /** Rest Time */
-  rest_time?: number | null;
-}
-
-/** WorkoutExerciseRead */
-export interface WorkoutExerciseRead {
-  /** Workout Id */
-  workout_id: number;
-  /** Exercise Id */
-  exercise_id: number;
-  /** Sets */
-  sets?: number | null;
-  /** Reps */
-  reps?: number | null;
-  /** Weight */
-  weight?: number | null;
-  /** Rest Time */
-  rest_time?: number | null;
-  /** Id */
-  id: number;
-}
-
-/** WorkoutExerciseUpdate */
-export interface WorkoutExerciseUpdate {
-  /** Workout Id */
-  workout_id?: number | null;
-  /** Exercise Id */
-  exercise_id?: number | null;
-  /** Sets */
-  sets?: number | null;
-  /** Reps */
-  reps?: number | null;
-  /** Weight */
-  weight?: number | null;
-  /** Rest Time */
-  rest_time?: number | null;
-}
-
-/** WorkoutRead */
-export interface WorkoutRead {
-  /** User Id */
-  user_id: number;
-  /** Date */
-  date?: string | null;
-  /** Notes */
-  notes?: string | null;
-  /** Id */
-  id: number;
-}
-
-/** WorkoutUpdate */
-export interface WorkoutUpdate {
-  /** User Id */
-  user_id?: number | null;
-  /** Date */
-  date?: string | null;
-  /** Notes */
-  notes?: string | null;
 }
 
 export type QueryParamsType = Record<string | number, any>;
@@ -429,7 +423,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
   };
   api = {
     /**
-     * @description Read all exercises.
+     * No description
      *
      * @tags exercises
      * @name ExerciseReadAll
@@ -447,7 +441,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
       }),
 
     /**
-     * @description Create a new exercise.
+     * No description
      *
      * @tags exercises
      * @name ExerciseCreate
@@ -467,7 +461,25 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
       }),
 
     /**
-     * @description Update an existing exercise by ID.
+     * No description
+     *
+     * @tags exercises
+     * @name ExerciseRead
+     * @summary Read Exercise Endpoint
+     * @request GET:/api/exercises/{exercise_id}
+     * @secure
+     */
+    exerciseRead: (exerciseId: number, params: RequestParams = {}) =>
+      this.request<ExerciseRead, HTTPValidationError>({
+        path: `/api/exercises/${exerciseId}`,
+        method: "GET",
+        secure: true,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
      *
      * @tags exercises
      * @name ExerciseUpdate
@@ -487,7 +499,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
       }),
 
     /**
-     * @description Delete an exercise by ID.
+     * No description
      *
      * @tags exercises
      * @name ExerciseDelete
@@ -505,7 +517,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
       }),
 
     /**
-     * @description Read all users.
+     * No description
      *
      * @tags users
      * @name UserReadAll
@@ -523,7 +535,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
       }),
 
     /**
-     * @description Create a new user.
+     * No description
      *
      * @tags users
      * @name UserCreate
@@ -543,7 +555,25 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
       }),
 
     /**
-     * @description Update an existing user by ID.
+     * No description
+     *
+     * @tags users
+     * @name UserRead
+     * @summary Read User Endpoint
+     * @request GET:/api/users/{user_id}
+     * @secure
+     */
+    userRead: (userId: number, params: RequestParams = {}) =>
+      this.request<UserRead, HTTPValidationError>({
+        path: `/api/users/${userId}`,
+        method: "GET",
+        secure: true,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
      *
      * @tags users
      * @name UserUpdate
@@ -563,7 +593,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
       }),
 
     /**
-     * @description Delete a user by ID.
+     * No description
      *
      * @tags users
      * @name UserDelete
@@ -581,17 +611,17 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
       }),
 
     /**
-     * @description Read all workouts.
+     * No description
      *
-     * @tags workouts
-     * @name WorkoutReadAll
-     * @summary Read Workouts Endpoint
-     * @request GET:/api/workouts
+     * @tags sessions
+     * @name SessionReadAll
+     * @summary Read Sessions Endpoint
+     * @request GET:/api/sessions
      * @secure
      */
-    workoutReadAll: (params: RequestParams = {}) =>
-      this.request<WorkoutRead[], any>({
-        path: `/api/workouts`,
+    sessionReadAll: (params: RequestParams = {}) =>
+      this.request<SessionRead[], any>({
+        path: `/api/sessions`,
         method: "GET",
         secure: true,
         format: "json",
@@ -599,17 +629,17 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
       }),
 
     /**
-     * @description Create a new workout.
+     * No description
      *
-     * @tags workouts
-     * @name WorkoutCreate
-     * @summary Create Workout Endpoint
-     * @request POST:/api/workouts
+     * @tags sessions
+     * @name SessionCreate
+     * @summary Create Session Endpoint
+     * @request POST:/api/sessions
      * @secure
      */
-    workoutCreate: (data: WorkoutCreate, params: RequestParams = {}) =>
-      this.request<WorkoutRead, HTTPValidationError>({
-        path: `/api/workouts`,
+    sessionCreate: (data: SessionCreate, params: RequestParams = {}) =>
+      this.request<SessionRead, HTTPValidationError>({
+        path: `/api/sessions`,
         method: "POST",
         body: data,
         secure: true,
@@ -619,17 +649,17 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
       }),
 
     /**
-     * @description Read one workout.
+     * No description
      *
-     * @tags workouts
-     * @name WorkoutRead
-     * @summary Read Workout Endpoint
-     * @request GET:/api/workouts/{workout_id}
+     * @tags sessions
+     * @name SessionRead
+     * @summary Read Session Endpoint
+     * @request GET:/api/sessions/{session_id}
      * @secure
      */
-    workoutRead: (workoutId: number, params: RequestParams = {}) =>
-      this.request<WorkoutRead, HTTPValidationError>({
-        path: `/api/workouts/${workoutId}`,
+    sessionRead: (sessionId: number, params: RequestParams = {}) =>
+      this.request<SessionRead, HTTPValidationError>({
+        path: `/api/sessions/${sessionId}`,
         method: "GET",
         secure: true,
         format: "json",
@@ -637,17 +667,17 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
       }),
 
     /**
-     * @description Update an existing workout by ID.
+     * No description
      *
-     * @tags workouts
-     * @name WorkoutUpdate
-     * @summary Update Workout Endpoint
-     * @request PUT:/api/workouts/{workout_id}
+     * @tags sessions
+     * @name SessionUpdate
+     * @summary Update Session Endpoint
+     * @request PUT:/api/sessions/{session_id}
      * @secure
      */
-    workoutUpdate: (workoutId: number, data: WorkoutUpdate, params: RequestParams = {}) =>
-      this.request<WorkoutRead, HTTPValidationError>({
-        path: `/api/workouts/${workoutId}`,
+    sessionUpdate: (sessionId: number, data: SessionUpdate, params: RequestParams = {}) =>
+      this.request<SessionRead, HTTPValidationError>({
+        path: `/api/sessions/${sessionId}`,
         method: "PUT",
         body: data,
         secure: true,
@@ -657,17 +687,17 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
       }),
 
     /**
-     * @description Delete a workout by ID.
+     * No description
      *
-     * @tags workouts
-     * @name WorkoutDelete
-     * @summary Delete Workout Endpoint
-     * @request DELETE:/api/workouts/{workout_id}
+     * @tags sessions
+     * @name SessionDelete
+     * @summary Delete Session Endpoint
+     * @request DELETE:/api/sessions/{session_id}
      * @secure
      */
-    workoutDelete: (workoutId: number, params: RequestParams = {}) =>
-      this.request<WorkoutRead, HTTPValidationError>({
-        path: `/api/workouts/${workoutId}`,
+    sessionDelete: (sessionId: number, params: RequestParams = {}) =>
+      this.request<SessionRead, HTTPValidationError>({
+        path: `/api/sessions/${sessionId}`,
         method: "DELETE",
         secure: true,
         format: "json",
@@ -675,17 +705,17 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
       }),
 
     /**
-     * @description Read all workout exercises.
+     * No description
      *
-     * @tags workout-exercises
-     * @name WorkoutExerciseReadAll
-     * @summary Read Workout Exercises Endpoint
-     * @request GET:/api/workout-exercises
+     * @tags session-exercises
+     * @name SessionExerciseReadAll
+     * @summary Read Session Exercises Endpoint
+     * @request GET:/api/session-exercises
      * @secure
      */
-    workoutExerciseReadAll: (params: RequestParams = {}) =>
-      this.request<WorkoutExerciseRead[], any>({
-        path: `/api/workout-exercises`,
+    sessionExerciseReadAll: (params: RequestParams = {}) =>
+      this.request<SessionExerciseRead[], any>({
+        path: `/api/session-exercises`,
         method: "GET",
         secure: true,
         format: "json",
@@ -693,17 +723,17 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
       }),
 
     /**
-     * @description Create a new workout exercise.
+     * No description
      *
-     * @tags workout-exercises
-     * @name WorkoutExerciseCreate
-     * @summary Create Workout Exercise Endpoint
-     * @request POST:/api/workout-exercises
+     * @tags session-exercises
+     * @name SessionExerciseCreate
+     * @summary Create Session Exercise Endpoint
+     * @request POST:/api/session-exercises
      * @secure
      */
-    workoutExerciseCreate: (data: WorkoutExerciseCreate, params: RequestParams = {}) =>
-      this.request<WorkoutExerciseRead, HTTPValidationError>({
-        path: `/api/workout-exercises`,
+    sessionExerciseCreate: (data: SessionExerciseCreate, params: RequestParams = {}) =>
+      this.request<SessionExerciseRead, HTTPValidationError>({
+        path: `/api/session-exercises`,
         method: "POST",
         body: data,
         secure: true,
@@ -713,17 +743,35 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
       }),
 
     /**
-     * @description Update an existing workout exercise by ID.
+     * No description
      *
-     * @tags workout-exercises
-     * @name WorkoutExerciseUpdate
-     * @summary Update Workout Exercise Endpoint
-     * @request PUT:/api/workout-exercises/{workout_exercise_id}
+     * @tags session-exercises
+     * @name SessionExerciseRead
+     * @summary Read Session Exercise Endpoint
+     * @request GET:/api/session-exercises/{session_exercise_id}
      * @secure
      */
-    workoutExerciseUpdate: (workoutExerciseId: number, data: WorkoutExerciseUpdate, params: RequestParams = {}) =>
-      this.request<WorkoutExerciseRead, HTTPValidationError>({
-        path: `/api/workout-exercises/${workoutExerciseId}`,
+    sessionExerciseRead: (sessionExerciseId: number, params: RequestParams = {}) =>
+      this.request<SessionExerciseRead, HTTPValidationError>({
+        path: `/api/session-exercises/${sessionExerciseId}`,
+        method: "GET",
+        secure: true,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags session-exercises
+     * @name SessionExerciseUpdate
+     * @summary Update Session Exercise Endpoint
+     * @request PUT:/api/session-exercises/{session_exercise_id}
+     * @secure
+     */
+    sessionExerciseUpdate: (sessionExerciseId: number, data: SessionExerciseUpdate, params: RequestParams = {}) =>
+      this.request<SessionExerciseRead, HTTPValidationError>({
+        path: `/api/session-exercises/${sessionExerciseId}`,
         method: "PUT",
         body: data,
         secure: true,
@@ -733,17 +781,17 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
       }),
 
     /**
-     * @description Delete a workout exercise by ID.
+     * No description
      *
-     * @tags workout-exercises
-     * @name WorkoutExerciseDelete
-     * @summary Delete Workout Exercise Endpoint
-     * @request DELETE:/api/workout-exercises/{workout_exercise_id}
+     * @tags session-exercises
+     * @name SessionExerciseDelete
+     * @summary Delete Session Exercise Endpoint
+     * @request DELETE:/api/session-exercises/{session_exercise_id}
      * @secure
      */
-    workoutExerciseDelete: (workoutExerciseId: number, params: RequestParams = {}) =>
-      this.request<WorkoutExerciseRead, HTTPValidationError>({
-        path: `/api/workout-exercises/${workoutExerciseId}`,
+    sessionExerciseDelete: (sessionExerciseId: number, params: RequestParams = {}) =>
+      this.request<SessionExerciseRead, HTTPValidationError>({
+        path: `/api/session-exercises/${sessionExerciseId}`,
         method: "DELETE",
         secure: true,
         format: "json",

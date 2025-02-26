@@ -6,10 +6,7 @@
 
     let newExercise: ExerciseCreate = {
         name: "",
-        description: "",
-        category: "",
-        muscle_group: "",
-        equipment: "",
+        notes: "",
     };
 
     function createExercise() {
@@ -19,10 +16,7 @@
                 exercises.update((exs) => [...exs, res.data]);
                 newExercise = {
                     name: "",
-                    description: "",
-                    category: "",
-                    muscle_group: "",
-                    equipment: "",
+                    notes: "",
                 };
                 addAlert("Exercise created successfully!", "success");
             })
@@ -40,23 +34,8 @@
         />
         <input
             class="border p-2 rounded bg-seal-brown"
-            bind:value={newExercise.category}
+            bind:value={newExercise.notes}
             placeholder="Category"
-        />
-        <input
-            class="border p-2 rounded bg-seal-brown"
-            bind:value={newExercise.description}
-            placeholder="Description"
-        />
-        <input
-            class="border p-2 rounded bg-seal-brown"
-            bind:value={newExercise.equipment}
-            placeholder="Equipment"
-        />
-        <input
-            class="border p-2 rounded bg-seal-brown"
-            bind:value={newExercise.muscle_group}
-            placeholder="Muscle Group"
         />
     </div>
     <button

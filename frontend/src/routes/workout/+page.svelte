@@ -5,18 +5,20 @@
         exercises,
         workoutId,
     } from "$lib/store";
-    import type { ExerciseRead, WorkoutExerciseRead } from "$lib/Api";
+    import type { SessionExerciseCreate, SessionExerciseRead } from "$lib/Api";
+    import { getApi } from "$lib/auth";
+    import { addAlert } from "$lib/alert";
 
     // Identify which workout we want
     const wId = Number($workoutId) - 1;
     let workout = $workouts[wId];
 
-    // Build a dictionary keyed by the exercise name, storing an array of WorkoutExerciseRead objects
-    let workoutExercisesDict: Record<string, WorkoutExerciseRead[]> = {};
+    // Build a dictionary keyed by the exercise name, storing an array of SessionExerciseRead objects
+    let workoutExercisesDict: Record<string, SessionExerciseRead[]> = {};
 
     for (let i = 0; i < $workoutExercises.length; i++) {
         const we = $workoutExercises[i];
-        if (we.workout_id === workout.id) {
+        if (we.session_id === workout.id) {
             const exercise = $exercises[we.exercise_id];
             const { name } = exercise;
 
@@ -30,33 +32,33 @@
         }
     }
 
-    // Form fields for adding a new exercise
-    let newExerciseName = "";
-    let newExerciseReps: number | null = null;
-    let newExerciseRest: number | null = null;
-    let newExerciseSets: number | null = null;
-    let newExerciseWeight: number | null = null;
+    let newSessionExercise: SessionExerciseCreate = {
+        exercise_id: 0,
+        session_id: workout?.id,
+        reps: 0,
+        rest_seconds: 0,
+        sets: 0,
+        weight: 0,
+        count: 0,
+    };
 
     function addExercise() {
-        // Here you’d typically create a new exercise in $exercises
-        // and/or a new WorkoutExercise in $workoutExercises.
-        // The logic will depend on how your store is structured,
-        // whether you have an API call, etc.
-        console.log("Add exercise:", {
-            name: newExerciseName,
-            reps: newExerciseReps,
-            rest_time: newExerciseRest,
-            sets: newExerciseSets,
-            weight: newExerciseWeight,
-            workout_id: workout?.id,
-        });
-
-        // Clear fields (for demo)
-        newExerciseName = "";
-        newExerciseReps = null;
-        newExerciseRest = null;
-        newExerciseSets = null;
-        newExerciseWeight = null;
+        getApi()
+            .sessionExerciseCreate(newSessionExercise)
+            .then((res) => {
+                workoutExercises.update((exs) => [...exs, res.data]);
+                newSessionExercise = {
+                    exercise_id: 0,
+                    session_id: workout?.id,
+                    reps: 0,
+                    rest_seconds: 0,
+                    sets: 0,
+                    weight: 0,
+                    count: 0,
+                };
+                addAlert("Exercise created successfully!", "success");
+            })
+            .catch((err) => addAlert(err, "error"));
     }
 </script>
 
@@ -95,7 +97,7 @@
                             <span class="font-semibold text-plum"
                                 >Rest time:</span
                             >
-                            {ex.rest_time}
+                            {ex.rest_seconds} seconds
                         </p>
                         <p>
                             <span class="font-semibold text-plum">Sets:</span>
@@ -117,32 +119,43 @@
 
         <input
             type="text"
-            placeholder="Exercise name"
-            bind:value={newExerciseName}
+            placeholder="exercise_id"
+            bind:value={newSessionExercise.exercise_id}
             class="w-full border-2 border-thistle p-2 rounded"
         />
+
         <input
             type="number"
             placeholder="Reps"
-            bind:value={newExerciseReps}
+            bind:value={newSessionExercise.reps}
             class="w-full border-2 border-thistle p-2 rounded"
         />
+
         <input
             type="number"
-            placeholder="Rest time"
-            bind:value={newExerciseRest}
+            placeholder="Rest time (seconds)"
+            bind:value={newSessionExercise.rest_seconds}
             class="w-full border-2 border-thistle p-2 rounded"
         />
+
         <input
             type="number"
             placeholder="Sets"
-            bind:value={newExerciseSets}
+            bind:value={newSessionExercise.sets}
             class="w-full border-2 border-thistle p-2 rounded"
         />
+
         <input
             type="number"
             placeholder="Weight"
-            bind:value={newExerciseWeight}
+            bind:value={newSessionExercise.weight}
+            class="w-full border-2 border-thistle p-2 rounded"
+        />
+
+        <input
+            type="number"
+            placeholder="Count"
+            bind:value={newSessionExercise.count}
             class="w-full border-2 border-thistle p-2 rounded"
         />
 
