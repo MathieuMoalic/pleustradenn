@@ -1,63 +1,49 @@
-import os
-
 import pytest
 from fastapi.testclient import TestClient
-from sqlmodel import Session, SQLModel, create_engine
+from sqlmodel import Session, SQLModel
 
-from backend.database import get_session
+from backend.database import engine, get_session
 from backend.main import app
 from backend.models import User
 from backend.passlib import hash_password
 
-DB_PATH = "./test.db"
 
-
-@pytest.fixture(name="session")
-def session_fixture():
-    if os.path.exists(DB_PATH):
-        os.remove(DB_PATH)
-    engine = create_engine(f"sqlite:///{DB_PATH}")
+@pytest.fixture(scope="function", autouse=True)
+def setup_test_db():
+    SQLModel.metadata.drop_all(engine)
     SQLModel.metadata.create_all(engine)
+    yield
+    SQLModel.metadata.drop_all(engine)
+
+
+@pytest.fixture(scope="function")
+def session():
     with Session(engine) as session:
         yield session
 
 
-@pytest.fixture(name="client")
-def client_fixture(session):
-    # Override the DB session dependency
-    def override_get_session():
-        yield session
-
-    app.dependency_overrides[get_session] = override_get_session
-
-    return TestClient(app)
-
-
-@pytest.fixture
+@pytest.fixture(scope="function")
 def test_user(session):
-    # Create user "a" with password "a" in the DB (hashed)
-    user = User(
-        username="a",
-        hashed_password=hash_password("a"),  # must match your passlib approach
-    )
+    user = User(username="a", hashed_password=hash_password("a"))
     session.add(user)
     session.commit()
     session.refresh(user)
     return user
 
 
-@pytest.fixture
-def token(client, test_user):
-    # Call /token to get a real JWT
-    resp = client.post("/token", data={"username": "a", "password": "a"})
-    assert resp.status_code == 200, resp.text
-    return resp.json()["access_token"]
+@pytest.fixture(scope="function")
+def client(session, test_user):
+    def override_get_session():
+        yield session
 
+    app.dependency_overrides[get_session] = override_get_session
 
-@pytest.fixture
-def auth_client(client, token):
-    """
-    Fixture that provides a TestClient with the Authorization header included.
-    """
+    client = TestClient(app)
+
+    response = client.post("/token", data={"username": "a", "password": "a"})
+    assert response.status_code == 200, response.text
+    token = response.json()["access_token"]
+
     client.headers.update({"Authorization": f"Bearer {token}"})
+
     return client

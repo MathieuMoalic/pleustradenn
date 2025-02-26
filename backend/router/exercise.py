@@ -16,18 +16,13 @@ router = APIRouter(
 def create_exercise_endpoint(
     exercise_data: ExerciseCreate, session: Session = Depends(get_session)
 ):
-    """
-    Create a new exercise.
-    """
     existing_exercise = session.exec(
         select(Exercise).where(Exercise.name == exercise_data.name)
     ).first()
     if existing_exercise:
         raise ValueError("Exercise with this name already exists.")
 
-    new_exercise = Exercise(
-        **exercise_data.model_dump()
-    )  # Convert Pydantic model to dict
+    new_exercise = Exercise(**exercise_data.model_dump())
     session.add(new_exercise)
     session.commit()
     session.refresh(new_exercise)
@@ -36,10 +31,15 @@ def create_exercise_endpoint(
 
 @router.get("", response_model=list[ExerciseRead], operation_id="exerciseReadAll")
 def read_exercises_endpoint(session: Session = Depends(get_session)):
-    """
-    Read all exercises.
-    """
     return session.exec(select(Exercise)).all()
+
+
+@router.get("/{exercise_id}", response_model=ExerciseRead, operation_id="exerciseRead")
+def read_exercise_endpoint(exercise_id: int, session: Session = Depends(get_session)):
+    exercise = session.get(Exercise, exercise_id)
+    if not exercise:
+        raise ValueError("Exercise not found.")
+    return exercise
 
 
 @router.put(
@@ -50,14 +50,11 @@ def update_exercise_endpoint(
     update_data: ExerciseUpdate,
     session: Session = Depends(get_session),
 ):
-    """
-    Update an existing exercise by ID.
-    """
     exercise = session.get(Exercise, exercise_id)
     if not exercise:
         raise ValueError("Exercise not found.")
 
-    update_data = update_data.model_dump(exclude_unset=True)  # Ignore unset fields
+    update_data = update_data.model_dump(exclude_unset=True)
 
     for key, value in update_data.items():
         setattr(exercise, key, value)
@@ -72,9 +69,6 @@ def update_exercise_endpoint(
     "/{exercise_id}", response_model=ExerciseRead, operation_id="exerciseDelete"
 )
 def delete_exercise_endpoint(exercise_id: int, session: Session = Depends(get_session)):
-    """
-    Delete an exercise by ID.
-    """
     exercise = session.get(Exercise, exercise_id)
     if not exercise:
         raise ValueError("Exercise not found.")

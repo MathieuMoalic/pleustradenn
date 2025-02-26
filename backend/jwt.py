@@ -1,5 +1,4 @@
 from datetime import datetime, timedelta
-from os import environ
 
 import jwt
 from fastapi import Depends, HTTPException, status
@@ -7,14 +6,9 @@ from fastapi.security import OAuth2PasswordBearer
 from sqlmodel import Session, select
 
 from backend.database import engine
+from backend.env import SECRET_KEY
 from backend.models import User
 from backend.passlib import verify_password
-
-if "ADMIN_PASSWORD" not in environ:
-    print("No ADMIN_PASSWORD")
-    SECRET_KEY = "test"
-else:
-    SECRET_KEY = environ["ADMIN_PASSWORD"]
 
 ALGORITHM = "HS256"
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")

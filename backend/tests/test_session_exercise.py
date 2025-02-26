@@ -1,5 +1,5 @@
-def test_create_session_exercise(auth_client, test_user):
-    session = auth_client.post(
+def test_create_session_exercise(client, test_user):
+    session = client.post(
         "/api/sessions",
         json={
             "user_id": test_user.id,
@@ -9,7 +9,7 @@ def test_create_session_exercise(auth_client, test_user):
     )
     session_id = session.json()["id"]
 
-    exercise = auth_client.post(
+    exercise = client.post(
         "/api/exercises",
         json={
             "name": "Push-Up",
@@ -27,7 +27,7 @@ def test_create_session_exercise(auth_client, test_user):
         "rest_seconds": 60,
         "count": 1,
     }
-    response = auth_client.post(
+    response = client.post(
         "/api/session-exercises",
         json=session_exercise_data,
     )
@@ -42,14 +42,14 @@ def test_create_session_exercise(auth_client, test_user):
     assert session_exercise["count"] == 1
 
 
-def test_read_session_exercises(auth_client):
-    response = auth_client.get("/api/session-exercises")
+def test_read_session_exercises(client):
+    response = client.get("/api/session-exercises")
     assert response.status_code == 200
     assert isinstance(response.json(), list)
 
 
-def test_update_session_exercise(auth_client, test_user):
-    session = auth_client.post(
+def test_update_session_exercise(client, test_user):
+    session = client.post(
         "/api/sessions",
         json={
             "user_id": test_user.id,
@@ -59,7 +59,7 @@ def test_update_session_exercise(auth_client, test_user):
     )
     session_id = session.json()["id"]
 
-    exercise = auth_client.post(
+    exercise = client.post(
         "/api/exercises",
         json={
             "name": "Squat",
@@ -68,7 +68,7 @@ def test_update_session_exercise(auth_client, test_user):
     )
     exercise_id = exercise.json()["id"]
 
-    session_exercise = auth_client.post(
+    session_exercise = client.post(
         "/api/session-exercises",
         json={
             "session_id": session_id,
@@ -82,7 +82,7 @@ def test_update_session_exercise(auth_client, test_user):
     )
     session_exercise_id = session_exercise.json()["id"]
 
-    response = auth_client.put(
+    response = client.put(
         f"/api/session-exercises/{session_exercise_id}",
         json={"sets": 5, "reps": 15, "weight": 65.0, "count": 3},
     )
@@ -95,8 +95,8 @@ def test_update_session_exercise(auth_client, test_user):
     assert updated_session_exercise["count"] == 3
 
 
-def test_delete_session_exercise(auth_client, test_user):
-    session = auth_client.post(
+def test_delete_session_exercise(client, test_user):
+    session = client.post(
         "/api/sessions",
         json={
             "user_id": test_user.id,
@@ -106,7 +106,7 @@ def test_delete_session_exercise(auth_client, test_user):
     )
     session_id = session.json()["id"]
 
-    exercise = auth_client.post(
+    exercise = client.post(
         "/api/exercises",
         json={
             "name": "Bench Press",
@@ -115,7 +115,7 @@ def test_delete_session_exercise(auth_client, test_user):
     )
     exercise_id = exercise.json()["id"]
 
-    session_exercise = auth_client.post(
+    session_exercise = client.post(
         "/api/session-exercises",
         json={
             "session_id": session_id,
@@ -129,7 +129,7 @@ def test_delete_session_exercise(auth_client, test_user):
     )
     session_exercise_id = session_exercise.json()["id"]
 
-    response = auth_client.delete(f"/api/session-exercises/{session_exercise_id}")
+    response = client.delete(f"/api/session-exercises/{session_exercise_id}")
     assert response.status_code == 200
     deleted_session_exercise = response.json()
     assert deleted_session_exercise["id"] == session_exercise_id

@@ -23,10 +23,7 @@ def create_session_endpoint(
     session_data: SessionCreate,
     session: DBSession = Depends(get_session),
 ):
-    """
-    Create a new session.
-    """
-    new_session = Session(**session_data.model_dump())  # Convert Pydantic model to dict
+    new_session = Session(**session_data.model_dump())
     session.add(new_session)
     session.commit()
     session.refresh(new_session)
@@ -35,10 +32,15 @@ def create_session_endpoint(
 
 @router.get("", response_model=list[SessionRead], operation_id="sessionReadAll")
 def read_sessions_endpoint(session: DBSession = Depends(get_session)):
-    """
-    Read all sessions.
-    """
     return session.exec(select(Session)).all()
+
+
+@router.get("/{session_id}", response_model=SessionRead, operation_id="sessionRead")
+def read_session_endpoint(session_id: int, session: DBSession = Depends(get_session)):
+    db_session = session.get(Session, session_id)
+    if not db_session:
+        raise ValueError("DBSession not found.")
+    return db_session
 
 
 @router.put(
@@ -51,9 +53,6 @@ def update_session_endpoint(
     update_data: SessionUpdate,
     session: DBSession = Depends(get_session),
 ):
-    """
-    Update an existing session by ID.
-    """
     db_session = session.get(Session, session_id)
     if not db_session:
         raise ValueError("DBSession not found.")
@@ -75,9 +74,6 @@ def update_session_endpoint(
     operation_id="sessionDelete",
 )
 def delete_session_endpoint(session_id: int, session: DBSession = Depends(get_session)):
-    """
-    Delete a session by ID.
-    """
     db_session = session.get(Session, session_id)
     if not db_session:
         raise ValueError("DBSession not found.")

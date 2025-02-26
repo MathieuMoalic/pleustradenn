@@ -48,5 +48,3 @@ if Path(static_path).exists():
         StaticFiles(directory=static_path, html=True),
         name="static",
     )
-else:
-    logger.warning("No static files directory found")
