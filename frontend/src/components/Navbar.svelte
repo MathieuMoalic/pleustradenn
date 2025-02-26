@@ -11,7 +11,7 @@
             class="text-plum hover:text-thistle transition duration-300"
         >
             <span class="self-center whitespace-nowrap text-xl font-semibold">
-                Workouts
+                Sessions
             </span>
         </NavBrand>
         <NavBrand

@@ -1,6 +1,6 @@
 import { goto } from "$app/navigation";
 import { createApiClient } from "$lib/auth";
-import { workouts, exercises, workoutExercises, workoutId } from "$lib/store";
+import { sessions, exercises, sessionExercises, sessionId } from "$lib/store";
 
 export const ssr = false;
 export const prerender = true;
@@ -16,24 +16,24 @@ export async function load({ fetch }) {
         api.setSecurityData({ accessToken: token });
     }
 
-    const [workoutsa, exercisesa, workoutExercisesa] = await Promise.all([
+    const [sessionsa, exercisesa, sessionExercisesa] = await Promise.all([
         api.api.sessionReadAll(),
         api.api.exerciseReadAll(),
         api.api.sessionExerciseReadAll(),
     ]);
 
-    workouts.set(workoutsa.data);
+    sessions.set(sessionsa.data);
     exercises.set(exercisesa.data);
-    workoutExercises.set(workoutExercisesa.data);
+    sessionExercises.set(sessionExercisesa.data);
 
-    const storedValue = localStorage.getItem("workoutId");
+    const storedValue = localStorage.getItem("sessionId");
     const initialValue = storedValue ? Number(storedValue) : null;
-    workoutId.set(initialValue);
-    workoutId.subscribe((value) => {
+    sessionId.set(initialValue);
+    sessionId.subscribe((value) => {
         if (value !== null) {
-            localStorage.setItem("workoutId", String(value));
+            localStorage.setItem("sessionId", String(value));
         } else {
-            localStorage.removeItem("workoutId");
+            localStorage.removeItem("sessionId");
         }
     });
 }

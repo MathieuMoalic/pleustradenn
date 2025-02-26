@@ -1,40 +1,40 @@
 <script lang="ts">
     import {
-        workoutExercises,
-        workouts,
+        sessionExercises,
+        sessions,
         exercises,
-        workoutId,
+        sessionId,
     } from "$lib/store";
     import type { SessionExerciseCreate, SessionExerciseRead } from "$lib/Api";
     import { getApi } from "$lib/auth";
     import { addAlert } from "$lib/alert";
 
-    // Identify which workout we want
-    const wId = Number($workoutId) - 1;
-    let workout = $workouts[wId];
+    // Identify which session we want
+    const wId = Number($sessionId) - 1;
+    let session = $sessions[wId];
 
     // Build a dictionary keyed by the exercise name, storing an array of SessionExerciseRead objects
-    let workoutExercisesDict: Record<string, SessionExerciseRead[]> = {};
+    let sessionExercisesDict: Record<string, SessionExerciseRead[]> = {};
 
-    for (let i = 0; i < $workoutExercises.length; i++) {
-        const we = $workoutExercises[i];
-        if (we.session_id === workout.id) {
+    for (let i = 0; i < $sessionExercises.length; i++) {
+        const we = $sessionExercises[i];
+        if (we.session_id === session.id) {
             const exercise = $exercises[we.exercise_id];
             const { name } = exercise;
 
             // If there's no entry for this name yet, initialize an empty array
-            if (!workoutExercisesDict[name]) {
-                workoutExercisesDict[name] = [];
+            if (!sessionExercisesDict[name]) {
+                sessionExercisesDict[name] = [];
             }
 
-            // Add this workout-exercise entry under that name
-            workoutExercisesDict[name].push(we);
+            // Add this session-exercise entry under that name
+            sessionExercisesDict[name].push(we);
         }
     }
 
     let newSessionExercise: SessionExerciseCreate = {
         exercise_id: 0,
-        session_id: workout?.id,
+        session_id: session?.id,
         reps: 0,
         rest_seconds: 0,
         sets: 0,
@@ -46,10 +46,10 @@
         getApi()
             .sessionExerciseCreate(newSessionExercise)
             .then((res) => {
-                workoutExercises.update((exs) => [...exs, res.data]);
+                sessionExercises.update((exs) => [...exs, res.data]);
                 newSessionExercise = {
                     exercise_id: 0,
-                    session_id: workout?.id,
+                    session_id: session?.id,
                     reps: 0,
                     rest_seconds: 0,
                     sets: 0,
@@ -63,19 +63,19 @@
 </script>
 
 <main class="max-w-3xl mx-auto p-6">
-    <!-- Workout details -->
+    <!-- Session details -->
     <div class="bg-black-bean p-6 rounded-lg shadow-md text-thistle">
         <h1 class="text-3xl font-bold text-plum text-center mb-4">
-            Workout Details
+            Session Details
         </h1>
-        <p class="text-xl text-burnt-umber font-semibold">{workout?.date}</p>
-        <p class="mt-2">{workout?.notes}</p>
+        <p class="text-xl text-burnt-umber font-semibold">{session?.date}</p>
+        <p class="mt-2">{session?.notes}</p>
     </div>
 
     <!-- Exercises by name -->
     <h2 class="text-2xl font-semibold text-plum mt-6">Exercises</h2>
     <div class="mt-4 space-y-4">
-        {#each Object.entries(workoutExercisesDict) as [exerciseName, exerciseRecords]}
+        {#each Object.entries(sessionExercisesDict) as [exerciseName, exerciseRecords]}
             <!-- Container for all sets of the same exercise -->
             <div
                 class="border-2 border-thistle p-4 rounded-lg bg-seal-brown text-white shadow-lg"
