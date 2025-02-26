@@ -7,6 +7,7 @@ from fastapi.responses import JSONResponse
 from fastapi.security import OAuth2PasswordRequestForm
 from fastapi.staticfiles import StaticFiles
 
+from backend.init_db_data import init_db_data
 from backend.jwt import jwt_login
 from backend.router.exercise import router as exercise_router
 from backend.router.session import router as session_router
@@ -48,3 +49,5 @@ if Path(static_path).exists():
         StaticFiles(directory=static_path, html=True),
         name="static",
     )
+
+init_db_data()

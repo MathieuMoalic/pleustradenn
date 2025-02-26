@@ -9,7 +9,7 @@ from backend.passlib import hash_password
 router = APIRouter(
     prefix="/api/users",
     tags=["users"],
-    # dependencies=[Depends(get_current_user)],
+    dependencies=[Depends(get_current_user)],
 )
 
 
