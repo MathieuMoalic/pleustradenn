@@ -1,9 +1,11 @@
 <script lang="ts">
-    import ExerciseForm from "$components/ExerciseForm.svelte";
-    import ExerciseTable from "$components/ExerciseTable.svelte";
+    import Modal from "$components/exercise/Modal.svelte";
+    import List from "$components/exercise/List.svelte";
+    import Add from "$components/exercise/Add.svelte";
 </script>
 
-<main class="max-w-2xl mx-auto p-4 space-y-6">
-    <ExerciseForm />
-    <ExerciseTable />
+<main class="p-4">
+    <Modal />
+    <Add />
+    <List />
 </main>
