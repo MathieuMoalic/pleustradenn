@@ -1,6 +1,6 @@
 import { writable } from "svelte/store";
 import { type SessionExerciseRead, type ExerciseRead, type SessionRead } from "./Api";
-import type { exerciseModalState } from "./types";
+import type { exerciseModalState, sessionModalState } from "./types";
 
 export const sessions = writable<SessionRead[]>([]);
 export const exercises = writable<ExerciseRead[]>([]);
@@ -12,4 +12,12 @@ export const exerciseModal = writable<exerciseModalState>({
     exercise: { name: "", notes: "" },
     mode: "add",
     exerciseID: -1,
+});
+
+export const sessionModal = writable<sessionModalState>({
+    isOpen: false,
+    session: { date: "", notes: "" },
+    sessionID: -1,
+    selectedDate: new Date(),
+    mode: "add",
 });

@@ -1,7 +1,11 @@
 <script lang="ts">
-	import SessionList from "$components/session/List.svelte";
+	import List from "$components/session/List.svelte";
+	import Add from "$components/session/Add.svelte";
+	import Modal from "$components/session/Modal.svelte";
 </script>
 
-<main class="max-w-3xl mx-auto p-6">
-	<SessionList />
+<main class="p-4">
+	<Modal />
+	<Add />
+	<List />
 </main>

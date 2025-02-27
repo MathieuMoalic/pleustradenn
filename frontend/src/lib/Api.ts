@@ -62,8 +62,6 @@ export interface HTTPValidationError {
 
 /** SessionCreate */
 export interface SessionCreate {
-  /** User Id */
-  user_id: number;
   /**
    * Date
    * @format date
@@ -131,8 +129,6 @@ export interface SessionExerciseUpdate {
 
 /** SessionRead */
 export interface SessionRead {
-  /** User Id */
-  user_id: number;
   /**
    * Date
    * @format date
@@ -146,8 +142,6 @@ export interface SessionRead {
 
 /** SessionUpdate */
 export interface SessionUpdate {
-  /** User Id */
-  user_id?: number | null;
   /** Date */
   date?: string | null;
   /** Notes */

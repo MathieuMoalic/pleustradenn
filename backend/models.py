@@ -96,7 +96,6 @@ class Session(SQLModel, table=True):
 
 
 class SessionBase(BaseModel):
-    user_id: int
     date: datetime.date
     notes: str
 
@@ -106,7 +105,6 @@ class SessionCreate(SessionBase):
 
 
 class SessionUpdate(SessionBase):
-    user_id: int | None = None
     date: datetime.date | None = None
     notes: str | None = None
 

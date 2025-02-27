@@ -17,7 +17,7 @@
                 })
                 .catch((res) => {
                     addAlert(
-                        `Failed to update the exercise '${$exerciseModal.exercise.name}':${res.error}`,
+                        `Failed to update the exercise '${$exerciseModal.exercise.name}':${res.error.detail}`,
                         "error",
                     );
                 });
@@ -44,7 +44,6 @@
                     };
                 })
                 .catch((res) => {
-                    console.log(res);
                     addAlert(
                         `Failed to create the exercise '${$exerciseModal.exercise.name}': ${res.error.detail}`,
                         "error",
@@ -62,7 +61,7 @@
             })
             .catch((res) => {
                 addAlert(
-                    `Failed to delete the exercise '${$exerciseModal.exercise.name}':${res.error}`,
+                    `Failed to delete the exercise '${$exerciseModal.exercise.name}':${res.error.detail}`,
                     "error",
                 );
             });
