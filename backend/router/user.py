@@ -21,10 +21,7 @@ def create_user_endpoint(data: UserCreate, session: Session = Depends(get_sessio
     if existing_user:
         raise HTTPException(status_code=400, detail="Username already taken.")
 
-    user = User(
-        username=data.username,
-        hashed_password=hash_password(data.password),
-    )
+    user = User(hashed_password=hash_password(data.password), **data.model_dump())
     session.add(user)
     session.commit()
     session.refresh(user)
@@ -36,19 +33,19 @@ def read_users_endpoint(session: Session = Depends(get_session)):
     return session.exec(select(User)).all()
 
 
-@router.get("/{user_id}", response_model=UserRead, operation_id="userRead")
-def read_user_endpoint(user_id: int, session: Session = Depends(get_session)):
-    user = session.get(User, user_id)
+@router.get("/{id}", response_model=UserRead, operation_id="userRead")
+def read_user_endpoint(id: int, session: Session = Depends(get_session)):
+    user = session.get(User, id)
     if not user:
         raise ValueError("User not found.")
     return user
 
 
-@router.put("/{user_id}", response_model=UserRead, operation_id="userUpdate")
+@router.put("/{id}", response_model=UserRead, operation_id="userUpdate")
 def update_user_endpoint(
-    user_id: int, data: UserUpdate, session: Session = Depends(get_session)
+    id: int, data: UserUpdate, session: Session = Depends(get_session)
 ):
-    user = session.get(User, user_id)
+    user = session.get(User, id)
     if not user:
         raise ValueError("User not found.")
 
@@ -66,9 +63,9 @@ def update_user_endpoint(
     return user
 
 
-@router.delete("/{user_id}", response_model=UserRead, operation_id="userDelete")
-def delete_user_endpoint(user_id: int, session: Session = Depends(get_session)):
-    user = session.get(User, user_id)
+@router.delete("/{id}", response_model=UserRead, operation_id="userDelete")
+def delete_user_endpoint(id: int, session: Session = Depends(get_session)):
+    user = session.get(User, id)
     if not user:
         raise ValueError("User not found.")
     session.delete(user)

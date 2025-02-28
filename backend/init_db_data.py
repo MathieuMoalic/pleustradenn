@@ -45,20 +45,20 @@ def init_db_data():
         if user:
             try:
                 create_session_endpoint(
-                    SessionCreate(
-                        user_id=user.id,
+                    data=SessionCreate(
                         date=date.today(),
                         notes="Morning strength training",
                     ),
-                    session,
+                    db_session=session,
+                    current_user=user,
                 )
                 create_session_endpoint(
-                    SessionCreate(
-                        user_id=user.id,
+                    data=SessionCreate(
                         date=date.today(),
-                        notes="Evening cardio session",
+                        notes="Morning 2",
                     ),
-                    session,
+                    db_session=session,
+                    current_user=user,
                 )
             except ValueError as e:
                 print(f"Error creating training sessions: {e}")
@@ -73,6 +73,7 @@ def init_db_data():
                 SessionExerciseCreate(
                     session_id=training_session.id,
                     exercise_id=exercises[0].id,
+                    exercise_name=exercises[0].name,
                     sets=3,
                     reps=10,
                     weight=100,
@@ -82,6 +83,7 @@ def init_db_data():
                 SessionExerciseCreate(
                     session_id=training_session.id,
                     exercise_id=exercises[1].id,
+                    exercise_name=exercises[0].name,
                     sets=3,
                     reps=8,
                     weight=80,
@@ -91,6 +93,7 @@ def init_db_data():
                 SessionExerciseCreate(
                     session_id=training_session.id,
                     exercise_id=exercises[2].id,
+                    exercise_name=exercises[0].name,
                     sets=3,
                     reps=5,
                     weight=120,

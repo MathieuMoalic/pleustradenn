@@ -7,14 +7,17 @@ if not PROD:
     ADMIN_PASSWORD = "a"
 
 else:
-    DATABASE_URL = environ.get("DATABASE_URL")
-    ADMIN_USERNAME = environ.get("ADMIN_USERNAME")
-    ADMIN_PASSWORD = environ.get("ADMIN_PASSWORD")
-    if not ADMIN_USERNAME:
+    _DATABASE_URL = environ.get("DATABASE_URL")
+    _ADMIN_USERNAME = environ.get("ADMIN_USERNAME")
+    _ADMIN_PASSWORD = environ.get("ADMIN_PASSWORD")
+    if not _ADMIN_USERNAME:
         raise ValueError("ADMIN_USERNAME must be set.")
-    if not ADMIN_PASSWORD:
+    if not _ADMIN_PASSWORD:
         raise ValueError("ADMIN_PASSWORD must be set.")
-    if not DATABASE_URL:
+    if not _DATABASE_URL:
         raise ValueError("DATABASE_URL must be set.")
+    DATABASE_URL = str(_DATABASE_URL)
+    ADMIN_USERNAME = str(_ADMIN_USERNAME)
+    ADMIN_PASSWORD = str(_ADMIN_PASSWORD)
 
 SECRET_KEY = ADMIN_PASSWORD

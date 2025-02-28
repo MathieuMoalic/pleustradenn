@@ -47,6 +47,7 @@ class Exercise(SQLModel, table=True):
     id: int = Field(primary_key=True)
     name: str = Field(index=True, unique=True)
     notes: str = Field(default="")
+
     session_exercises: list["SessionExercise"] = Relationship(
         back_populates="exercise",
         sa_relationship_kwargs={"cascade": "all, delete", "lazy": "selectin"},
@@ -62,7 +63,7 @@ class ExerciseCreate(ExerciseBase):
     pass
 
 
-class ExerciseUpdate(ExerciseBase):
+class ExerciseUpdate(BaseModel):
     name: str | None = None
     notes: str | None = None
 
@@ -104,15 +105,25 @@ class SessionCreate(SessionBase):
     pass
 
 
-class SessionUpdate(SessionBase):
+class SessionUpdate(BaseModel):
     date: datetime.date | None = None
     notes: str | None = None
 
     model_config = ConfigDict(from_attributes=True)
 
 
-class SessionRead(SessionBase):
+class SessionReadDetailed(SessionBase):
     id: int
+    session_exercises: list["SessionExerciseRead"] = []
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+class SessionReadBasic(BaseModel):
+    id: int
+    user_id: int
+    notes: str
+
     model_config = ConfigDict(from_attributes=True)
 
 
@@ -125,6 +136,7 @@ class SessionExercise(SQLModel, table=True):
     id: int = Field(primary_key=True)
     session_id: int = Field(foreign_key="session.id")
     exercise_id: int = Field(foreign_key="exercise.id")
+
     sets: int = Field(default=1)
     reps: int = Field(default=1)
     weight: float = Field(default=0.0)
@@ -144,6 +156,7 @@ class SessionExercise(SQLModel, table=True):
 class SessionExerciseBase(BaseModel):
     session_id: int
     exercise_id: int
+
     sets: int
     reps: int
     weight: float
@@ -155,9 +168,7 @@ class SessionExerciseCreate(SessionExerciseBase):
     pass
 
 
-class SessionExerciseUpdate(SessionExerciseBase):
-    session_id: int | None = None
-    exercise_id: int | None = None
+class SessionExerciseUpdate(BaseModel):
     sets: int | None = None
     reps: int | None = None
     weight: float | None = None
@@ -169,4 +180,5 @@ class SessionExerciseUpdate(SessionExerciseBase):
 
 class SessionExerciseRead(SessionExerciseBase):
     id: int
+    exercise_name: str
     model_config = ConfigDict(from_attributes=True)

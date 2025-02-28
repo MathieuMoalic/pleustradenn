@@ -2,7 +2,6 @@ def test_create_session_exercise(client, test_user):
     session = client.post(
         "/api/sessions",
         json={
-            "user_id": test_user.id,
             "date": "2025-01-24",
             "notes": "Workout for testing exercises",
         },
@@ -52,7 +51,6 @@ def test_update_session_exercise(client, test_user):
     session = client.post(
         "/api/sessions",
         json={
-            "user_id": test_user.id,
             "date": "2025-01-24",
             "notes": "Workout for update testing",
         },
@@ -99,9 +97,8 @@ def test_delete_session_exercise(client, test_user):
     session = client.post(
         "/api/sessions",
         json={
-            "user_id": test_user.id,
             "date": "2025-01-24",
-            "notes": "Workout for delete testing",
+            "notes": "Workout for update testing",
         },
     )
     session_id = session.json()["id"]
@@ -109,8 +106,8 @@ def test_delete_session_exercise(client, test_user):
     exercise = client.post(
         "/api/exercises",
         json={
-            "name": "Bench Press",
-            "notes": "Chest strength exercise",
+            "name": "Squat",
+            "notes": "Lower body exercise",
         },
     )
     exercise_id = exercise.json()["id"]
@@ -120,19 +117,20 @@ def test_delete_session_exercise(client, test_user):
         json={
             "session_id": session_id,
             "exercise_id": exercise_id,
-            "sets": 3,
-            "reps": 8,
-            "weight": 80.0,
-            "rest_seconds": 120,
-            "count": 1,
+            "sets": 4,
+            "reps": 10,
+            "weight": 60.0,
+            "rest_seconds": 90,
+            "count": 2,
         },
     )
     session_exercise_id = session_exercise.json()["id"]
 
     response = client.delete(f"/api/session-exercises/{session_exercise_id}")
+
     assert response.status_code == 200
     deleted_session_exercise = response.json()
     assert deleted_session_exercise["id"] == session_exercise_id
-    assert deleted_session_exercise["sets"] == 3
-    assert deleted_session_exercise["reps"] == 8
-    assert deleted_session_exercise["count"] == 1
+    assert deleted_session_exercise["sets"] == 4
+    assert deleted_session_exercise["reps"] == 10
+    assert deleted_session_exercise["count"] == 2

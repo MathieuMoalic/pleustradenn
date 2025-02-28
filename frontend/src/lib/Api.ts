@@ -127,8 +127,16 @@ export interface SessionExerciseUpdate {
   count?: number | null;
 }
 
-/** SessionRead */
-export interface SessionRead {
+/** SessionReadBasic */
+export interface SessionReadBasic {
+  /** Id */
+  id: number;
+  /** Notes */
+  notes: string;
+}
+
+/** SessionReadDetailed */
+export interface SessionReadDetailed {
   /**
    * Date
    * @format date
@@ -138,6 +146,11 @@ export interface SessionRead {
   notes: string;
   /** Id */
   id: number;
+  /**
+   * Session Exercises
+   * @default []
+   */
+  session_exercises?: SessionExerciseRead[];
 }
 
 /** SessionUpdate */
@@ -614,7 +627,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * @secure
      */
     sessionReadAll: (params: RequestParams = {}) =>
-      this.request<SessionRead[], any>({
+      this.request<SessionReadBasic[], any>({
         path: `/api/sessions`,
         method: "GET",
         secure: true,
@@ -632,7 +645,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * @secure
      */
     sessionCreate: (data: SessionCreate, params: RequestParams = {}) =>
-      this.request<SessionRead, HTTPValidationError>({
+      this.request<SessionReadBasic, HTTPValidationError>({
         path: `/api/sessions`,
         method: "POST",
         body: data,
@@ -652,7 +665,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * @secure
      */
     sessionRead: (sessionId: number, params: RequestParams = {}) =>
-      this.request<SessionRead, HTTPValidationError>({
+      this.request<SessionReadDetailed, HTTPValidationError>({
         path: `/api/sessions/${sessionId}`,
         method: "GET",
         secure: true,
@@ -670,7 +683,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * @secure
      */
     sessionUpdate: (sessionId: number, data: SessionUpdate, params: RequestParams = {}) =>
-      this.request<SessionRead, HTTPValidationError>({
+      this.request<SessionReadBasic, HTTPValidationError>({
         path: `/api/sessions/${sessionId}`,
         method: "PUT",
         body: data,
@@ -690,7 +703,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * @secure
      */
     sessionDelete: (sessionId: number, params: RequestParams = {}) =>
-      this.request<SessionRead, HTTPValidationError>({
+      this.request<SessionReadBasic, HTTPValidationError>({
         path: `/api/sessions/${sessionId}`,
         method: "DELETE",
         secure: true,

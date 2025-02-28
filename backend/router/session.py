@@ -4,7 +4,14 @@ from sqlmodel import select
 
 from backend.database import get_session
 from backend.jwt import get_current_user
-from backend.models import Session, SessionCreate, SessionRead, SessionUpdate, User
+from backend.models import (
+    Session,
+    SessionCreate,
+    SessionReadBasic,
+    SessionReadDetailed,
+    SessionUpdate,
+    User,
+)
 
 router = APIRouter(
     prefix="/api/sessions",
@@ -13,24 +20,20 @@ router = APIRouter(
 )
 
 
-@router.post("", response_model=SessionRead, operation_id="sessionCreate")
+@router.post("", response_model=SessionReadBasic, operation_id="sessionCreate")
 def create_session_endpoint(
-    session_data: SessionCreate,
+    data: SessionCreate,
     db_session: DBSession = Depends(get_session),
     current_user: User = Depends(get_current_user),
 ):
-    session = Session(
-        user_id=current_user.id,
-        date=session_data.date,
-        notes=session_data.notes,
-    )
-    db_session.add(session)
+    new_session = Session(user_id=current_user.id, **data.model_dump())
+    db_session.add(new_session)
     db_session.commit()
-    db_session.refresh(session)
-    return session
+    db_session.refresh(new_session)
+    return new_session
 
 
-@router.get("", response_model=list[SessionRead], operation_id="sessionReadAll")
+@router.get("", response_model=list[SessionReadBasic], operation_id="sessionReadAll")
 def read_sessions_endpoint(
     db_session: DBSession = Depends(get_session),
     current_user: User = Depends(get_current_user),
@@ -40,30 +43,30 @@ def read_sessions_endpoint(
     ).all()
 
 
-@router.get("/{session_id}", response_model=SessionRead, operation_id="sessionRead")
+@router.get("/{id}", response_model=SessionReadDetailed, operation_id="sessionRead")
 def read_session_endpoint(
-    session_id: int,
+    id: int,
     db_session: DBSession = Depends(get_session),
     current_user: User = Depends(get_current_user),
 ):
-    session = db_session.get(Session, session_id)
+    session = db_session.get(Session, id)
     if not session or session.user_id != current_user.id:
         raise HTTPException(status_code=404, detail="Session not found.")
     return session
 
 
-@router.put("/{session_id}", response_model=SessionRead, operation_id="sessionUpdate")
+@router.put("/{id}", response_model=SessionReadBasic, operation_id="sessionUpdate")
 def update_session_endpoint(
-    session_id: int,
-    update_data: SessionUpdate,
+    id: int,
+    data: SessionUpdate,
     db_session: DBSession = Depends(get_session),
     current_user: User = Depends(get_current_user),
 ):
-    session = db_session.get(Session, session_id)
+    session = db_session.get(Session, id)
     if not session or session.user_id != current_user.id:
         raise HTTPException(status_code=404, detail="Session not found.")
 
-    update_data = update_data.model_dump(exclude_unset=True)
+    update_data = data.model_dump(exclude_unset=True)
 
     for key, value in update_data.items():
         setattr(session, key, value)
@@ -74,15 +77,13 @@ def update_session_endpoint(
     return session
 
 
-@router.delete(
-    "/{session_id}", response_model=SessionRead, operation_id="sessionDelete"
-)
+@router.delete("/{id}", response_model=SessionReadBasic, operation_id="sessionDelete")
 def delete_session_endpoint(
-    session_id: int,
+    id: int,
     db_session: DBSession = Depends(get_session),
     current_user: User = Depends(get_current_user),
 ):
-    session = db_session.get(Session, session_id)
+    session = db_session.get(Session, id)
     if not session or session.user_id != current_user.id:
         raise HTTPException(status_code=404, detail="Session not found.")
 
