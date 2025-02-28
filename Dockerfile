@@ -16,6 +16,7 @@ COPY --from=frontend /app/build /app/backend/static
 
 EXPOSE 6001
 ENV DATABASE_URL=sqlite:////data/db1.sqlite
+ENV PROD=1
 
 COPY entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh

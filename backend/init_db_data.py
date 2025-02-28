@@ -2,8 +2,8 @@ from datetime import date
 
 from sqlmodel import select
 
+from backend import env
 from backend.database import get_session
-from backend.env import ADMIN_PASSWORD, ADMIN_USERNAME
 from backend.models import (
     Exercise,
     ExerciseCreate,
@@ -23,9 +23,11 @@ from backend.router.user import create_user_endpoint
 def init_db_data():
     session = next(get_session())
     if session.exec(select(User)).first() is None:
-        data = UserCreate(username=ADMIN_USERNAME, password=ADMIN_PASSWORD)
+        data = UserCreate(username=env.ADMIN_USERNAME, password=env.ADMIN_PASSWORD)
         create_user_endpoint(data, session)
 
+    if env.PROD:
+        return
     if session.exec(select(Exercise)).first() is None:
         exercises = [
             ExerciseCreate(name="Squat", notes="Legs workout"),
@@ -73,7 +75,6 @@ def init_db_data():
                 SessionExerciseCreate(
                     session_id=training_session.id,
                     exercise_id=exercises[0].id,
-                    exercise_name=exercises[0].name,
                     sets=3,
                     reps=10,
                     weight=100,
@@ -83,7 +84,6 @@ def init_db_data():
                 SessionExerciseCreate(
                     session_id=training_session.id,
                     exercise_id=exercises[1].id,
-                    exercise_name=exercises[0].name,
                     sets=3,
                     reps=8,
                     weight=80,
@@ -93,7 +93,6 @@ def init_db_data():
                 SessionExerciseCreate(
                     session_id=training_session.id,
                     exercise_id=exercises[2].id,
-                    exercise_name=exercises[0].name,
                     sets=3,
                     reps=5,
                     weight=120,

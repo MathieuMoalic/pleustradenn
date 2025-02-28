@@ -1,6 +1,6 @@
 [project]
 name = "workouts"
-version = "5.0.8"
+version = "1.0.0"
 description = "workouts"
 authors = [{ name = "Mathieu Moalic", email = "matmoa@amu.edu.pl" }]
 license = { file = "LICENSE" }
@@ -17,7 +17,6 @@ dependencies = [
     "python-multipart==0.0.20",
     "bcrypt==4.0.1",
     "passlib==1.7.4",
-    "alembic==1.14.0",
 ]
 
 [build-system]

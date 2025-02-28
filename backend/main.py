@@ -50,4 +50,5 @@ if Path(static_path).exists():
         name="static",
     )
 
+
 init_db_data()

@@ -12,6 +12,7 @@ release:
     NEW_VERSION="$MAJOR.$MINOR.$NEW_PATCH"
     echo "Bumping version from $VERSION to $NEW_VERSION"
     sed -i -E "s/version = \"$VERSION\"/version = \"$NEW_VERSION\"/" backend/pyproject.toml
+    sed -i -E "s/\"version\": \"$VERSION\"/\"version\": \"$NEW_VERSION\"/" frontend/package.json
 
     # Step 2: Stage and commit the changes
     git add backend/pyproject.toml
@@ -33,7 +34,7 @@ staging:
     podman run --rm --replace \
         --name workouts-staging \
         --network tmp-proxy \
-        -v /tmp/data:/data \
+        -v ./data:/data \
         -p 6001:6001 \
         -e ADMIN_USERNAME=${ADMIN_USERNAME} \
         -e ADMIN_PASSWORD=${ADMIN_PASSWORD} \
