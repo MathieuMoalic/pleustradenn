@@ -24,7 +24,7 @@ def session():
 
 @pytest.fixture(scope="function")
 def test_user(session):
-    user = User(username="a", hashed_password=hash_password("a"))
+    user = User(id=1, username="a", hashed_password=hash_password("a"))
     session.add(user)
     session.commit()
     session.refresh(user)

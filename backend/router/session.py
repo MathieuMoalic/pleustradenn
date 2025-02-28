@@ -7,11 +7,28 @@ from backend.jwt import get_current_user
 from backend.models import (
     Session,
     SessionCreate,
+    SessionExercise,
+    SessionExerciseRead,
     SessionReadBasic,
     SessionReadDetailed,
     SessionUpdate,
     User,
 )
+
+
+def _to_session_exercise_read(se: SessionExercise) -> SessionExerciseRead:
+    return SessionExerciseRead(
+        id=se.id,
+        session_id=se.session_id,
+        exercise_id=se.exercise_id,
+        sets=se.sets,
+        reps=se.reps,
+        weight=se.weight,
+        rest_seconds=se.rest_seconds,
+        count=se.count,
+        exercise_name=se.exercise.name,
+    )
+
 
 router = APIRouter(
     prefix="/api/sessions",
@@ -43,16 +60,19 @@ def read_sessions_endpoint(
     ).all()
 
 
-@router.get("/{id}", response_model=SessionReadDetailed, operation_id="sessionRead")
-def read_session_endpoint(
-    id: int,
-    db_session: DBSession = Depends(get_session),
-    current_user: User = Depends(get_current_user),
-):
+@router.get("/{id}", response_model=SessionReadDetailed)
+def read_session_endpoint(id: int, db_session: DBSession = Depends(get_session)):
     session = db_session.get(Session, id)
-    if not session or session.user_id != current_user.id:
-        raise HTTPException(status_code=404, detail="Session not found.")
-    return session
+    if not session:
+        raise ValueError("Session not found.")
+    return SessionReadDetailed(
+        id=session.id,
+        date=session.date,
+        notes=session.notes,
+        session_exercises=[
+            _to_session_exercise_read(se) for se in session.session_exercises
+        ],
+    )
 
 
 @router.put("/{id}", response_model=SessionReadBasic, operation_id="sessionUpdate")
