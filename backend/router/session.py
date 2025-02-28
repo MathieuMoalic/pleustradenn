@@ -60,7 +60,9 @@ def read_sessions_endpoint(
     ).all()
 
 
-@router.get("/{id}", response_model=SessionReadDetailed)
+@router.get(
+    "/{id}", response_model=SessionReadDetailed, operation_id="sessionReadDetailed"
+)
 def read_session_endpoint(id: int, db_session: DBSession = Depends(get_session)):
     session = db_session.get(Session, id)
     if not session:

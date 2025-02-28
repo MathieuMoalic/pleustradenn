@@ -11,7 +11,7 @@
                 class="bg-burnt-umber text-white p-3 rounded-md shadow-sm flex justify-between items-center"
             >
                 <button
-                    class="flex flex-col text-left"
+                    class="flex flex-col text-left flex-grow"
                     on:click={() => {
                         sessionId.set(session.id);
                         goto("/session");

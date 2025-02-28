@@ -2,7 +2,7 @@
     import { addAlert } from "$lib/alert";
     import type { SessionExerciseRead } from "$lib/Api";
     import { getApi } from "$lib/auth";
-    import { sessionExerciseModal, sessionId } from "$lib/store";
+    import { SEModal, sessionId } from "$lib/store";
     import { EditOutline } from "flowbite-svelte-icons";
     import { onMount } from "svelte";
 
@@ -13,7 +13,7 @@
             return;
         }
         getApi()
-            .sessionRead($sessionId)
+            .sessionReadDetailed($sessionId)
             .then((res) => {
                 if (!res.data.session_exercises) {
                     return;
@@ -31,16 +31,17 @@
             >
                 <div class="flex flex-col">
                     <h3 class="text-sm font-semibold leading-tight">
-                        {ex.exercise_id}
+                        {ex.exercise_name} x {ex.sets} x {ex.reps} @ {ex.weight}kg
                     </h3>
                 </div>
                 <button
                     class="flex items-center justify-center bg-plum text-black-bean p-1.5 rounded-md hover:bg-thistle transition duration-200"
                     on:click={() => {
-                        $sessionExerciseModal.isOpen = true;
-                        $sessionExerciseModal.mode = "edit";
-                        $sessionExerciseModal.sessionExercise = ex;
-                        $sessionExerciseModal.sessionExerciseID = ex.id;
+                        $SEModal = {
+                            isOpen: true,
+                            mode: "edit",
+                            ...ex,
+                        };
                     }}
                 >
                     <EditOutline class="w-4 h-4" />

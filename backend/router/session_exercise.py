@@ -50,13 +50,19 @@ def create_session_exercise_endpoint(
     return _to_session_exercise_read(se, session)
 
 
-@router.get("", response_model=list[SessionExerciseRead])
+@router.get(
+    "", response_model=list[SessionExerciseRead], operation_id="sessionExerciseReadAll"
+)
 def read_session_exercises_endpoint(session: Session = Depends(get_session)):
     session_exercises = session.exec(select(SessionExercise)).all()
     return [_to_session_exercise_read(se, session) for se in session_exercises]
 
 
-@router.get("/{id}", response_model=SessionExerciseRead)
+@router.get(
+    "/{id}",
+    response_model=SessionExerciseRead,
+    operation_id="sessionExerciseReadDetailed",
+)
 def read_session_exercise_endpoint(id: int, session: Session = Depends(get_session)):
     se = session.get(SessionExercise, id)
     if not se:

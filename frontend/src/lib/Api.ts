@@ -107,14 +107,12 @@ export interface SessionExerciseRead {
   count: number;
   /** Id */
   id: number;
+  /** Exercise Name */
+  exercise_name: string;
 }
 
 /** SessionExerciseUpdate */
 export interface SessionExerciseUpdate {
-  /** Session Id */
-  session_id?: number | null;
-  /** Exercise Id */
-  exercise_id?: number | null;
   /** Sets */
   sets?: number | null;
   /** Reps */
@@ -131,6 +129,11 @@ export interface SessionExerciseUpdate {
 export interface SessionReadBasic {
   /** Id */
   id: number;
+  /**
+   * Date
+   * @format date
+   */
+  date: string;
   /** Notes */
   notes: string;
 }
@@ -473,12 +476,12 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * @tags exercises
      * @name ExerciseRead
      * @summary Read Exercise Endpoint
-     * @request GET:/api/exercises/{exercise_id}
+     * @request GET:/api/exercises/{id}
      * @secure
      */
-    exerciseRead: (exerciseId: number, params: RequestParams = {}) =>
+    exerciseRead: (id: number, params: RequestParams = {}) =>
       this.request<ExerciseRead, HTTPValidationError>({
-        path: `/api/exercises/${exerciseId}`,
+        path: `/api/exercises/${id}`,
         method: "GET",
         secure: true,
         format: "json",
@@ -491,12 +494,12 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * @tags exercises
      * @name ExerciseUpdate
      * @summary Update Exercise Endpoint
-     * @request PUT:/api/exercises/{exercise_id}
+     * @request PUT:/api/exercises/{id}
      * @secure
      */
-    exerciseUpdate: (exerciseId: number, data: ExerciseUpdate, params: RequestParams = {}) =>
+    exerciseUpdate: (id: number, data: ExerciseUpdate, params: RequestParams = {}) =>
       this.request<ExerciseRead, HTTPValidationError>({
-        path: `/api/exercises/${exerciseId}`,
+        path: `/api/exercises/${id}`,
         method: "PUT",
         body: data,
         secure: true,
@@ -511,12 +514,12 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * @tags exercises
      * @name ExerciseDelete
      * @summary Delete Exercise Endpoint
-     * @request DELETE:/api/exercises/{exercise_id}
+     * @request DELETE:/api/exercises/{id}
      * @secure
      */
-    exerciseDelete: (exerciseId: number, params: RequestParams = {}) =>
+    exerciseDelete: (id: number, params: RequestParams = {}) =>
       this.request<ExerciseRead, HTTPValidationError>({
-        path: `/api/exercises/${exerciseId}`,
+        path: `/api/exercises/${id}`,
         method: "DELETE",
         secure: true,
         format: "json",
@@ -567,12 +570,12 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * @tags users
      * @name UserRead
      * @summary Read User Endpoint
-     * @request GET:/api/users/{user_id}
+     * @request GET:/api/users/{id}
      * @secure
      */
-    userRead: (userId: number, params: RequestParams = {}) =>
+    userRead: (id: number, params: RequestParams = {}) =>
       this.request<UserRead, HTTPValidationError>({
-        path: `/api/users/${userId}`,
+        path: `/api/users/${id}`,
         method: "GET",
         secure: true,
         format: "json",
@@ -585,12 +588,12 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * @tags users
      * @name UserUpdate
      * @summary Update User Endpoint
-     * @request PUT:/api/users/{user_id}
+     * @request PUT:/api/users/{id}
      * @secure
      */
-    userUpdate: (userId: number, data: UserUpdate, params: RequestParams = {}) =>
+    userUpdate: (id: number, data: UserUpdate, params: RequestParams = {}) =>
       this.request<UserRead, HTTPValidationError>({
-        path: `/api/users/${userId}`,
+        path: `/api/users/${id}`,
         method: "PUT",
         body: data,
         secure: true,
@@ -605,12 +608,12 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * @tags users
      * @name UserDelete
      * @summary Delete User Endpoint
-     * @request DELETE:/api/users/{user_id}
+     * @request DELETE:/api/users/{id}
      * @secure
      */
-    userDelete: (userId: number, params: RequestParams = {}) =>
+    userDelete: (id: number, params: RequestParams = {}) =>
       this.request<UserRead, HTTPValidationError>({
-        path: `/api/users/${userId}`,
+        path: `/api/users/${id}`,
         method: "DELETE",
         secure: true,
         format: "json",
@@ -659,14 +662,14 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * No description
      *
      * @tags sessions
-     * @name SessionRead
+     * @name SessionReadDetailed
      * @summary Read Session Endpoint
-     * @request GET:/api/sessions/{session_id}
+     * @request GET:/api/sessions/{id}
      * @secure
      */
-    sessionRead: (sessionId: number, params: RequestParams = {}) =>
+    sessionReadDetailed: (id: number, params: RequestParams = {}) =>
       this.request<SessionReadDetailed, HTTPValidationError>({
-        path: `/api/sessions/${sessionId}`,
+        path: `/api/sessions/${id}`,
         method: "GET",
         secure: true,
         format: "json",
@@ -679,12 +682,12 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * @tags sessions
      * @name SessionUpdate
      * @summary Update Session Endpoint
-     * @request PUT:/api/sessions/{session_id}
+     * @request PUT:/api/sessions/{id}
      * @secure
      */
-    sessionUpdate: (sessionId: number, data: SessionUpdate, params: RequestParams = {}) =>
+    sessionUpdate: (id: number, data: SessionUpdate, params: RequestParams = {}) =>
       this.request<SessionReadBasic, HTTPValidationError>({
-        path: `/api/sessions/${sessionId}`,
+        path: `/api/sessions/${id}`,
         method: "PUT",
         body: data,
         secure: true,
@@ -699,12 +702,12 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * @tags sessions
      * @name SessionDelete
      * @summary Delete Session Endpoint
-     * @request DELETE:/api/sessions/{session_id}
+     * @request DELETE:/api/sessions/{id}
      * @secure
      */
-    sessionDelete: (sessionId: number, params: RequestParams = {}) =>
+    sessionDelete: (id: number, params: RequestParams = {}) =>
       this.request<SessionReadBasic, HTTPValidationError>({
-        path: `/api/sessions/${sessionId}`,
+        path: `/api/sessions/${id}`,
         method: "DELETE",
         secure: true,
         format: "json",
@@ -753,14 +756,14 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * No description
      *
      * @tags session-exercises
-     * @name SessionExerciseRead
+     * @name SessionExerciseReadDetailed
      * @summary Read Session Exercise Endpoint
-     * @request GET:/api/session-exercises/{session_exercise_id}
+     * @request GET:/api/session-exercises/{id}
      * @secure
      */
-    sessionExerciseRead: (sessionExerciseId: number, params: RequestParams = {}) =>
+    sessionExerciseReadDetailed: (id: number, params: RequestParams = {}) =>
       this.request<SessionExerciseRead, HTTPValidationError>({
-        path: `/api/session-exercises/${sessionExerciseId}`,
+        path: `/api/session-exercises/${id}`,
         method: "GET",
         secure: true,
         format: "json",
@@ -773,12 +776,12 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * @tags session-exercises
      * @name SessionExerciseUpdate
      * @summary Update Session Exercise Endpoint
-     * @request PUT:/api/session-exercises/{session_exercise_id}
+     * @request PUT:/api/session-exercises/{id}
      * @secure
      */
-    sessionExerciseUpdate: (sessionExerciseId: number, data: SessionExerciseUpdate, params: RequestParams = {}) =>
+    sessionExerciseUpdate: (id: number, data: SessionExerciseUpdate, params: RequestParams = {}) =>
       this.request<SessionExerciseRead, HTTPValidationError>({
-        path: `/api/session-exercises/${sessionExerciseId}`,
+        path: `/api/session-exercises/${id}`,
         method: "PUT",
         body: data,
         secure: true,
@@ -793,12 +796,12 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * @tags session-exercises
      * @name SessionExerciseDelete
      * @summary Delete Session Exercise Endpoint
-     * @request DELETE:/api/session-exercises/{session_exercise_id}
+     * @request DELETE:/api/session-exercises/{id}
      * @secure
      */
-    sessionExerciseDelete: (sessionExerciseId: number, params: RequestParams = {}) =>
+    sessionExerciseDelete: (id: number, params: RequestParams = {}) =>
       this.request<SessionExerciseRead, HTTPValidationError>({
-        path: `/api/session-exercises/${sessionExerciseId}`,
+        path: `/api/session-exercises/${id}`,
         method: "DELETE",
         secure: true,
         format: "json",

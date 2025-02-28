@@ -1,10 +1,9 @@
 import { writable } from "svelte/store";
-import { type SessionExerciseRead, type ExerciseRead, type SessionReadBasic } from "./Api";
-import type { exerciseModalState, sessionModalState, sessionExerciseModalState } from "./types";
+import { type ExerciseRead, type SessionReadBasic } from "./Api";
+import type { exerciseModalState, sessionModalState, SEModalState } from "./types";
 
 export const sessions = writable<SessionReadBasic[]>([]);
 export const exercises = writable<ExerciseRead[]>([]);
-export const sessionExercises = writable<SessionExerciseRead[]>([]);
 export const sessionId = writable<number | null>(null);
 
 export const exerciseModal = writable<exerciseModalState>({
@@ -22,9 +21,16 @@ export const sessionModal = writable<sessionModalState>({
     mode: "add",
 });
 
-export const sessionExerciseModal = writable<sessionExerciseModalState>({
+export const SEModal = writable<SEModalState>({
     isOpen: false,
-    sessionExercise: { session_id: -1, exercise_id: -1, sets: 0, reps: 0, weight: 0, rest_seconds: 0, count: 0, },
-    sessionExerciseID: -1,
     mode: "add",
+    id: -1,
+    session_id: -1,
+    exercise_id: -1,
+    sets: 0,
+    reps: 0,
+    weight: 0,
+    rest_seconds: 0,
+    count: 0,
+    exercise_name: "",
 });

@@ -1,4 +1,4 @@
-import type { ExerciseCreate, ExerciseUpdate, SessionCreate, SessionUpdate, SessionExerciseCreate, SessionExerciseUpdate } from "$lib/Api";
+import type { ExerciseCreate, ExerciseUpdate, SessionCreate, SessionUpdate, SessionExerciseCreate, SessionExerciseUpdate, SessionExerciseRead } from "$lib/Api";
 
 export interface exerciseModalState {
     isOpen: boolean;
@@ -15,9 +15,7 @@ export interface sessionModalState {
     mode: "edit" | "add";
 }
 
-export interface sessionExerciseModalState {
+export interface SEModalState extends SessionExerciseRead {
     isOpen: boolean;
-    sessionExercise: SessionExerciseCreate | SessionExerciseUpdate;
-    sessionExerciseID: number;
     mode: "edit" | "add";
 }
