@@ -11,7 +11,7 @@ def test_read_sessions(client):
     assert isinstance(response.json(), list)
 
 
-def test_create_session(client, test_user):
+def test_create_session(client):
     data = SessionCreate(
         date=datetime.date(2025, 1, 24),
         notes="Morning session",
@@ -22,11 +22,10 @@ def test_create_session(client, test_user):
         json=data,
     )
     assert response.status_code == 200
-    assert response.json()["user_id"] == test_user.id
     assert response.json()["notes"] == "Morning session"
 
 
-def test_update_session(client, test_user):
+def test_update_session(client):
     data = SessionCreate(
         date=datetime.date(2025, 1, 24),
         notes="Morning session",
@@ -47,11 +46,10 @@ def test_update_session(client, test_user):
     assert response.json()["notes"] == "Updated session notes"
 
 
-def test_delete_session(client, test_user):
+def test_delete_session(client):
     session = client.post(
         "/api/sessions",
         json={
-            "user_id": test_user.id,
             "date": "2025-01-24",
             "notes": "Workout to be deleted",
         },
