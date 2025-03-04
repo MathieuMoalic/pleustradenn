@@ -1,6 +1,6 @@
 <script lang="ts">
     import { EditOutline } from "flowbite-svelte-icons";
-    import { exerciseList, editExercise } from "$lib/exercise";
+    import { exerciseList, openExerciseModal } from "$lib/exercise";
 </script>
 
 <section class="space-y-2">
@@ -19,7 +19,7 @@
                 </div>
                 <button
                     class="flex items-center justify-center bg-plum text-black-bean p-1.5 rounded-md hover:bg-thistle transition duration-200"
-                    on:click={() => editExercise(ex)}
+                    on:click={() => openExerciseModal(ex)}
                 >
                     <EditOutline class="w-4 h-4" />
                 </button>

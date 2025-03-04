@@ -1,10 +1,7 @@
 <script lang="ts">
     import { Button, Modal, Label, Input } from "flowbite-svelte";
     import Dropdown from "$components/sessionExercise/Dropdown.svelte";
-    import {
-        removeSessionExercise,
-        submitSessionExercise,
-    } from "$lib/session-exercise";
+    import { create, remove, update } from "$lib/session-exercise";
     import { activePageState as aps } from "$lib/page";
 </script>
 
@@ -91,25 +88,28 @@
                 />
             </Label>
 
-            <Button
-                type="submit"
-                class="w-full py-2 bg-burnt-umber text-primaryText font-semibold rounded-md"
-                on:click={submitSessionExercise}
-            >
-                {#if $aps.modal.mode == "edit"}
-                    Save
-                {:else}
-                    Add Session Exercise
-                {/if}
-            </Button>
-
             {#if $aps.modal.mode == "edit"}
+                <Button
+                    type="submit"
+                    class="w-full py-2 bg-burnt-umber text-primaryText font-semibold rounded-md"
+                    on:click={update}
+                >
+                    Save
+                </Button>
                 <Button
                     type="button"
                     class="w-full py-2 bg-red-600 hover:bg-red-700 text-primaryText font-semibold rounded-md"
-                    on:click={removeSessionExercise}
+                    on:click={remove}
                 >
                     Delete
+                </Button>
+            {:else}
+                <Button
+                    type="submit"
+                    class="w-full py-2 bg-burnt-umber text-primaryText font-semibold rounded-md"
+                    on:click={create}
+                >
+                    Add Session
                 </Button>
             {/if}
         </div>

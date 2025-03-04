@@ -25,13 +25,5 @@
                 {exercise.name}
             </DropdownItem>
         {/each}
-        <a
-            slot="footer"
-            href="/"
-            class="flex items-center px-3 py-2 -mb-1 text-sm font-medium text-primary-600 bg-gray-50 pt-2"
-        >
-            <ChevronDownOutline class="w-6 h-6 ms-2 text-white " />
-            Add new exercise
-        </a>
     </Dropdown>
 {/if}

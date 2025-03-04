@@ -7,7 +7,34 @@ import type { SessionReadBasic, SessionReadDetailed } from "./api";
 
 export const sessionList = writable<SessionReadBasic[]>([]);
 
-export function fetchSessions() {
+export function create() {
+    activePageState.update((aps) => {
+        if (aps.page !== "session") return aps;
+
+        aps.modal.data.date = formatDate(aps.data.selectedDate);
+
+        getApi()
+            .sessionCreate(aps.modal.data)
+            .then((res) => {
+                sessionList.update((sessions) => {
+                    sessions.unshift(res.data);
+                    return sessions;
+                });
+                closeModal();
+            }
+            )
+            .catch((res) => {
+                addAlert(
+                    `Failed to create the session: ${res.error.detail}`,
+                    "error",
+                );
+            });
+        return aps;
+    }
+    );
+}
+
+export function read() {
     getApi()
         .sessionReadAll()
         .then((res) => {
@@ -19,75 +46,32 @@ export function fetchSessions() {
         );
 }
 
-export function editSession(session: SessionReadDetailed) {
-    activePageState.update((_) => ({
-        page: "session",
-        data: { selectedDate: new Date() },
-        modal: { open: true, mode: "edit", data: session },
-    }));
-}
-
-export function newSession() {
-    activePageState.update((_) => ({
-        page: "session",
-        data: { selectedDate: new Date() },
-        modal: { open: true, mode: "add", data: { date: "", notes: "", id: -1, session_exercises: [] } },
-    }));
-}
-
-export function submitSession() {
+export function update() {
     activePageState.update((aps) => {
         if (aps.page !== "session") return aps;
-
-        if (aps.modal.mode === "edit") {
-            getApi()
-                .sessionUpdate(aps.modal.data.id, aps.modal.data)
-                .then((res) => {
-                    sessionList.update((sessions) => {
-                        const idx = sessions.findIndex((s) => s.id === res.data.id);
-                        if (idx === -1) return sessions;
-                        sessions[idx] = res.data;
-                        return sessions;
-                    });
-                    closeModal();
-                })
-                .catch((res) => {
-                    addAlert(
-                        `Failed to update the session: ${res.error.detail}`,
-                        "error",
-                    );
+        aps.modal.data.date = formatDate(aps.data.selectedDate);
+        getApi()
+            .sessionUpdate(aps.modal.data.id, aps.modal.data)
+            .then((res) => {
+                sessionList.update((sessions) => {
+                    const idx = sessions.findIndex((s) => s.id === res.data.id);
+                    if (idx === -1) return sessions;
+                    sessions[idx] = res.data;
+                    return sessions;
                 });
-            return aps;
-        }
-
-        if (aps.modal.mode === "add") {
-            getApi()
-                .sessionCreate({
-                    date: aps.data.selectedDate.toISOString().split("T")[0],
-                    notes: aps.modal.data.notes,
-                })
-                .then((res) => {
-                    sessionList.update((sessions) => {
-                        sessions.push(res.data);
-                        return sessions;
-                    });
-                    closeModal();
-                }
-                )
-                .catch((res) => {
-                    addAlert(
-                        `Failed to create the session: ${res.error.detail}`,
-                        "error",
-                    );
-                });
-            return aps;
-        }
-
+                closeModal();
+            })
+            .catch((res) => {
+                addAlert(
+                    `Failed to update the session: ${res.error.detail}`,
+                    "error",
+                );
+            });
         return aps;
     });
 }
 
-export function removeSession() {
+export function remove() {
     activePageState.update((aps) => {
         if (aps.page !== "session") return aps;
         getApi()
@@ -112,9 +96,24 @@ export function removeSession() {
     });
 }
 
+export function openSessionModal(session: SessionReadDetailed | null) {
+    if (session === null) {
+        activePageState.set({
+            page: "session",
+            data: { selectedDate: new Date() },
+            modal: { open: true, mode: "add", data: { date: "", notes: "", id: -1, session_exercises: [] } },
+        });
+    } else {
+        activePageState.set({
+            page: "session",
+            data: { selectedDate: new Date(session.date) },
+            modal: { open: true, mode: "edit", data: session },
+        });
+    }
+}
 
-export function showSessionExercise(sessionID: number) {
-    activePageState.update((_) => ({
+export function openSessionExercise(sessionID: number) {
+    activePageState.set({
         page: "sessionExercise",
         data: { sessionID },
         modal: {
@@ -130,5 +129,9 @@ export function showSessionExercise(sessionID: number) {
                 id: -1
             }
         },
-    }));
+    });
+}
+
+function formatDate(date: Date): string {
+    return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
 }

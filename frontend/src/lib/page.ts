@@ -20,8 +20,7 @@ export type PageState =
             mode: "add" | "edit";
             data: ExerciseRead;
         };
-        data: {
-        };
+        data: {};
     }
     | {
         page: "sessionExercise";

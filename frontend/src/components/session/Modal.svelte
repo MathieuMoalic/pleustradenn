@@ -1,7 +1,7 @@
 <script lang="ts">
     import { Button, Modal, Label, Input, Datepicker } from "flowbite-svelte";
     import { activePageState as aps } from "$lib/page";
-    import { submitSession, removeSession } from "$lib/session";
+    import { create, update, remove } from "$lib/session";
 </script>
 
 <!-- This is to make ts happy, this modal will only show if it is a session anyway -->
@@ -42,25 +42,28 @@
                 />
             </Label>
 
-            <Button
-                type="submit"
-                class="w-full py-2 bg-burnt-umber text-primaryText font-semibold rounded-md"
-                on:click={submitSession}
-            >
-                {#if $aps.modal.mode == "edit"}
-                    Save
-                {:else}
-                    Add Session
-                {/if}
-            </Button>
-
             {#if $aps.modal.mode == "edit"}
+                <Button
+                    type="submit"
+                    class="w-full py-2 bg-burnt-umber text-primaryText font-semibold rounded-md"
+                    on:click={update}
+                >
+                    Save
+                </Button>
                 <Button
                     type="button"
                     class="w-full py-2 bg-red-600 hover:bg-red-700 text-primaryText font-semibold rounded-md"
-                    on:click={removeSession}
+                    on:click={remove}
                 >
                     Delete
+                </Button>
+            {:else}
+                <Button
+                    type="submit"
+                    class="w-full py-2 bg-burnt-umber text-primaryText font-semibold rounded-md"
+                    on:click={create}
+                >
+                    Add Session
                 </Button>
             {/if}
         </div>

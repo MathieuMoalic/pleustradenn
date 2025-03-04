@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlmodel import Session as DBSession
-from sqlmodel import select
+from sqlmodel import desc, select
 
 from backend.database import get_session
 from backend.jwt import get_current_user
@@ -56,7 +56,9 @@ def read_sessions_endpoint(
     current_user: User = Depends(get_current_user),
 ):
     return db_session.exec(
-        select(Session).where(Session.user_id == current_user.id)
+        select(Session)
+        .where(Session.user_id == current_user.id)
+        .order_by(desc(Session.date))
     ).all()
 
 

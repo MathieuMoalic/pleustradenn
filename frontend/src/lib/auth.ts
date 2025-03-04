@@ -1,8 +1,8 @@
 import { addAlert } from "./alert";
 import { Api } from "./api";
-import { fetchExercises } from "./exercise";
+import { read as exerciseRead } from "./exercise";
 import { goto } from "./page";
-import { fetchSessions } from "./session";
+import { read as sessionRead } from "./session";
 
 let apiInner: Api<BasicAuthSecurity>;
 
@@ -27,8 +27,8 @@ export function initializeApiAndFetch() {
         goto("login");
     } else {
         apiInner.setSecurityData({ accessToken: token });
-        fetchExercises();
-        fetchSessions();
+        exerciseRead();
+        sessionRead();
     }
 };
 
@@ -47,8 +47,8 @@ export async function login(username: string, password: string) {
         .then((res) => {
             localStorage.setItem("token", res.data.access_token);
             apiInner.setSecurityData({ accessToken: res.data.access_token });
-            fetchExercises();
-            fetchSessions();
+            exerciseRead();
+            sessionRead();
             goto("session");
         })
         .catch((res) => {

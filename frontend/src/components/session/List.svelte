@@ -1,7 +1,7 @@
 <script lang="ts">
     import {
-        showSessionExercise,
-        editSession,
+        openSessionExercise,
+        openSessionModal,
         sessionList,
     } from "$lib/session";
     import { EditOutline } from "flowbite-svelte-icons";
@@ -15,7 +15,7 @@
             >
                 <button
                     class="flex flex-col text-left flex-grow"
-                    on:click={() => showSessionExercise(session.id)}
+                    on:click={() => openSessionExercise(session.id)}
                 >
                     <h3 class="text-sm font-semibold leading-tight">
                         {session.date}
@@ -26,7 +26,7 @@
                 </button>
                 <button
                     class="flex items-center justify-center bg-plum text-black-bean p-1.5 rounded-md hover:bg-thistle transition duration-200"
-                    on:click={() => editSession(session)}
+                    on:click={() => openSessionModal(session)}
                 >
                     <EditOutline class="w-4 h-4" />
                 </button>
