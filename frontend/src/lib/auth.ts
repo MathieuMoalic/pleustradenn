@@ -1,15 +1,18 @@
-import { Api } from "./Api";
+import { addAlert } from "./alert";
+import { Api } from "./api";
+import { fetchExercises } from "./exercise";
+import { goto } from "./page";
+import { fetchSessions } from "./session";
 
-export let api: Api<BasicAuthSecurity>;
+let apiInner: Api<BasicAuthSecurity>;
 
 interface BasicAuthSecurity {
     accessToken: string;
 }
 
-export const createApiClient = (fetchFn: typeof fetch) => {
-    api = new Api<BasicAuthSecurity>({
+export function initializeApiAndFetch() {
+    apiInner = new Api<BasicAuthSecurity>({
         baseUrl: "",
-        customFetch: fetchFn,
         securityWorker: (securityData) => {
             if (!securityData) return {};
             return {
@@ -19,11 +22,36 @@ export const createApiClient = (fetchFn: typeof fetch) => {
             };
         },
     });
-
-    return api;
+    const token = localStorage.getItem("token");
+    if (!token) {
+        goto("login");
+    } else {
+        apiInner.setSecurityData({ accessToken: token });
+        fetchExercises();
+        fetchSessions();
+    }
 };
 
 export const getApi = () => {
-    if (!api) throw new Error("API client not initialized. Call `createApiClient(fetch)` first.");
-    return api.api;
+    if (!apiInner) throw new Error("API client not initialized. Call `initializeApiClient(fetch)` first.");
+    return apiInner.api;
 };
+
+export async function login(username: string, password: string) {
+    apiInner.token
+        .loginTokenPost({
+            grant_type: "password",
+            username,
+            password,
+        })
+        .then((res) => {
+            localStorage.setItem("token", res.data.access_token);
+            apiInner.setSecurityData({ accessToken: res.data.access_token });
+            fetchExercises();
+            fetchSessions();
+            goto("session");
+        })
+        .catch((res) => {
+            addAlert(`${res.error.detail}`, "error");
+        });
+}

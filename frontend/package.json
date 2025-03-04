@@ -1,7 +1,7 @@
 {
 	"name": "frontend",
 	"private": true,
-	"version": "1.0.0",
+	"version": "1.0.3",
 	"type": "module",
 	"scripts": {
 		"dev": "vite dev",
@@ -9,7 +9,7 @@
 		"preview": "vite preview",
 		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
 		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
-		"gen-api": "sta --add-readonly -p 'http://localhost:6001/openapi.json' -o ./src/lib"
+		"gen-api": "sta --add-readonly -p 'http://localhost:6001/openapi.json' -o ./src/lib/ -n api.ts"
 	},
 	"devDependencies": {
 		"@sveltejs/adapter-static": "^3.0.6",

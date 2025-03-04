@@ -1,41 +1,15 @@
 <script lang="ts">
-    import { api } from "$lib/auth";
-    import { goto } from "$app/navigation";
-
+    import { login } from "$lib/auth";
     let username = "";
     let password = "";
-    let error = "";
-
-    async function login() {
-        error = "";
-        try {
-            const response = await api.token.loginTokenPost({
-                grant_type: "password",
-                username,
-                password,
-            });
-
-            localStorage.setItem("token", response.data.access_token);
-
-            goto("/");
-        } catch (err) {
-            error = "Invalid username or password.";
-            console.error(err);
-        }
-    }
 </script>
 
-<main class="min-h-screen flex items-center justify-center bg-black-bean">
-    <div
-        class="bg-seal-brown text-thistle rounded-lg shadow-lg p-8 w-full max-w-md"
-    >
-        <h1 class="text-2xl font-bold text-center mb-6 text-plum">Login</h1>
-
-        {#if error}
-            <p class="text-sm text-burnt-umber mb-4">{error}</p>
-        {/if}
-
-        <form class="space-y-4" on:submit|preventDefault={login}>
+<main class="min-h-screen flex items-center justify-center bg-seal-brown">
+    <div class=" text-thistle rounded-lg p-8 w-full max-w-md">
+        <form
+            class="space-y-4"
+            on:submit|preventDefault={() => login(username, password)}
+        >
             <div>
                 <label
                     for="username"
