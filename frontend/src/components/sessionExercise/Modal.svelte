@@ -1,117 +1,23 @@
 <script lang="ts">
-    import { Button, Modal, Label, Input } from "flowbite-svelte";
-    import Dropdown from "$components/sessionExercise/Dropdown.svelte";
+    import { Modal } from "flowbite-svelte";
+    import DropdownModal from "$components/sessionExercise/DropdownModal.svelte";
     import { create, remove, update } from "$lib/session-exercise";
     import { activePageState as aps } from "$lib/page";
+    import Input from "$components/Modal/Input.svelte";
+    import SaveDeleteAddBtn from "$components/Modal/SaveDeleteAddBtn.svelte";
+    import Header from "$components/Modal/Header.svelte";
 </script>
 
 {#if $aps.page === "sessionExercise"}
-    <Modal
-        bind:open={$aps.modal.open}
-        size="xs"
-        outsideclose
-        class="bg-plum text-primaryText rounded-lg"
-    >
-        <div
-            class="flex flex-col space-y-4 p-3 rounded-lg shadow-lg bg-primaryBg text-primaryText"
-            role="dialog"
-        >
-            <h3 class="text-lg font-semibold text-primaryText">
-                {#if $aps.modal.mode == "edit"}
-                    Edit Session Exercise
-                {:else}
-                    Add a New Session Exercise
-                {/if}
-            </h3>
-            <Label class="space-y-1 text-sm text-primaryText">
-                <span>Exercise</span>
-                <Dropdown />
-            </Label>
+    <Modal bind:open={$aps.modal.open} size="xs" outsideclose class="modal">
+        <Header name="Session Exercise" />
 
-            <Label class="space-y-1 text-sm text-primaryText">
-                <span>Sets</span>
-                <Input
-                    type="number"
-                    name="sets"
-                    class="bg-secondaryBg border-inputBorderColor rounded-md text-primaryText"
-                    placeholder="Enter the number of sets"
-                    required
-                    bind:value={$aps.modal.data.sets}
-                />
-            </Label>
+        <DropdownModal />
+        <Input bind:value={$aps.modal.data.sets} name="Sets" />
+        <Input bind:value={$aps.modal.data.reps} name="Reps" />
+        <Input bind:value={$aps.modal.data.weight} name="Weight" />
+        <Input bind:value={$aps.modal.data.rest_seconds} name="Rest (s)" />
 
-            <Label class="space-y-1 text-sm text-primaryText">
-                <span>Reps</span>
-                <Input
-                    type="number"
-                    name="reps"
-                    class="bg-secondaryBg border-inputBorderColor rounded-md text-primaryText"
-                    placeholder="Enter the number of reps"
-                    required
-                    bind:value={$aps.modal.data.reps}
-                />
-            </Label>
-
-            <Label class="space-y-1 text-sm text-primaryText">
-                <span>Weight</span>
-                <Input
-                    type="number"
-                    name="weight"
-                    class="bg-secondaryBg border-inputBorderColor rounded-md text-primaryText"
-                    placeholder="Enter the weight"
-                    required
-                    bind:value={$aps.modal.data.weight}
-                />
-            </Label>
-
-            <Label class="space-y-1 text-sm text-primaryText">
-                <span>Rest Seconds</span>
-                <Input
-                    type="number"
-                    name="rest_seconds"
-                    class="bg-secondaryBg border-inputBorderColor rounded-md text-primaryText"
-                    placeholder="Enter the rest seconds"
-                    required
-                    bind:value={$aps.modal.data.rest_seconds}
-                />
-            </Label>
-
-            <Label class="space-y-1 text-sm text-primaryText">
-                <span>Count</span>
-                <Input
-                    type="number"
-                    name="count"
-                    class="bg-secondaryBg border-inputBorderColor rounded-md text-primaryText"
-                    placeholder="Enter the count"
-                    required
-                    bind:value={$aps.modal.data.count}
-                />
-            </Label>
-
-            {#if $aps.modal.mode == "edit"}
-                <Button
-                    type="submit"
-                    class="w-full py-2 bg-burnt-umber text-primaryText font-semibold rounded-md"
-                    on:click={update}
-                >
-                    Save
-                </Button>
-                <Button
-                    type="button"
-                    class="w-full py-2 bg-red-600 hover:bg-red-700 text-primaryText font-semibold rounded-md"
-                    on:click={remove}
-                >
-                    Delete
-                </Button>
-            {:else}
-                <Button
-                    type="submit"
-                    class="w-full py-2 bg-burnt-umber text-primaryText font-semibold rounded-md"
-                    on:click={create}
-                >
-                    Add Session
-                </Button>
-            {/if}
-        </div>
+        <SaveDeleteAddBtn {update} {remove} {create} />
     </Modal>
 {/if}
