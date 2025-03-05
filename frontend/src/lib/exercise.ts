@@ -31,8 +31,6 @@ export function create() {
 }
 
 export function read() {
-    let aps = get(activePageState)
-    if (aps.page !== "exercise") return;
     getApi()
         .exerciseReadAll()
         .then((res) => {
