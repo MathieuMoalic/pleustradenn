@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends
-from sqlmodel import Session, select
+from sqlmodel import Session, desc, select
 
 from backend.database import get_session
 from backend.jwt import get_current_user
@@ -32,6 +32,8 @@ def _to_session_exercise_read(
         rest_seconds=se.rest_seconds,
         count=se.count,
         exercise_name=exercise.name,
+        completed=se.completed,
+        created_at=se.created_at,
     )
 
 
@@ -67,6 +69,26 @@ def read_session_exercise_endpoint(id: int, session: Session = Depends(get_sessi
     se = session.get(SessionExercise, id)
     if not se:
         raise ValueError("Session exercise not found.")
+    return _to_session_exercise_read(se, session)
+
+
+# return the latest session exercise with the given exercise_id
+@router.get(
+    "/exercise/{exercise_id}",
+    response_model=SessionExerciseRead | None,
+    operation_id="sessionExerciseReadLatestByExercise",
+)
+def read_session_exercise_by_exercise_endpoint(
+    exercise_id: int, session: Session = Depends(get_session)
+):
+    se = session.exec(
+        select(SessionExercise)
+        .where(SessionExercise.exercise_id == exercise_id)
+        .order_by(desc(SessionExercise.created_at))
+    ).first()
+    print(se)
+    if not se:
+        return None
     return _to_session_exercise_read(se, session)
 
 

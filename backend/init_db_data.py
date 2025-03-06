@@ -30,11 +30,30 @@ def init_db_data():
         return
     if session.exec(select(Exercise)).first() is None:
         exercises = [
-            ExerciseCreate(name="Squat", notes="Legs workout"),
-            ExerciseCreate(name="Bench Press", notes="Chest workout"),
-            ExerciseCreate(name="Deadlift", notes="Back workout"),
-            ExerciseCreate(name="Pull-Up", notes="Back and arms"),
-            ExerciseCreate(name="Running", notes="Cardio"),
+            ExerciseCreate(
+                name="Squat",
+                notes="Push",
+                recommended_rest_seconds=90,
+                recommended_reps_min=5,
+                recommended_reps_max=10,
+                recommended_sets=3,
+            ),
+            ExerciseCreate(
+                name="Bench Press",
+                notes="Push",
+                recommended_rest_seconds=120,
+                recommended_reps_min=5,
+                recommended_reps_max=10,
+                recommended_sets=3,
+            ),
+            ExerciseCreate(
+                name="Deadlift",
+                notes="Pull",
+                recommended_rest_seconds=120,
+                recommended_reps_min=5,
+                recommended_reps_max=10,
+                recommended_sets=3,
+            ),
         ]
         for exercise in exercises:
             try:
@@ -80,6 +99,8 @@ def init_db_data():
                     weight=100,
                     rest_seconds=60,
                     count=1,
+                    completed=True,
+                    created_at=date.today(),
                 ),
                 SessionExerciseCreate(
                     session_id=training_session.id,
@@ -89,6 +110,8 @@ def init_db_data():
                     weight=80,
                     rest_seconds=90,
                     count=1,
+                    completed=False,
+                    created_at=date.today(),
                 ),
                 SessionExerciseCreate(
                     session_id=training_session.id,
@@ -98,6 +121,8 @@ def init_db_data():
                     weight=120,
                     rest_seconds=120,
                     count=1,
+                    completed=False,
+                    created_at=date.today(),
                 ),
             ]
             for session_exercise in session_exercises:

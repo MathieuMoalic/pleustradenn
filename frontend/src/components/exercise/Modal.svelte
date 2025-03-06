@@ -32,6 +32,46 @@
             />
         </Label>
 
+        <Label class="space-y-1 text-sm">
+            <span>Recommended Sets</span>
+            <Input
+                name="notes"
+                bind:value={$aps.modal.data.recommended_sets}
+                class="modal-input"
+                placeholder="Enter notes"
+            />
+        </Label>
+
+        <Label class="space-y-1 text-sm">
+            <span>Recommended reps min</span>
+            <Input
+                name="notes"
+                bind:value={$aps.modal.data.recommended_reps_min}
+                class="modal-input"
+                placeholder="Enter notes"
+            />
+        </Label>
+
+        <Label class="space-y-1 text-sm">
+            <span>Recommended reps max</span>
+            <Input
+                name="notes"
+                bind:value={$aps.modal.data.recommended_reps_max}
+                class="modal-input"
+                placeholder="Enter notes"
+            />
+        </Label>
+
+        <Label class="space-y-1 text-sm">
+            <span>Recommended rest in seconds</span>
+            <Input
+                name="notes"
+                bind:value={$aps.modal.data.recommended_rest_seconds}
+                class="modal-input"
+                placeholder="Enter notes"
+            />
+        </Label>
+
         <SaveDeleteAddBtn {update} {remove} {create} />
     </Modal>
 {/if}

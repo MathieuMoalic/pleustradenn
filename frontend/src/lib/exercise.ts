@@ -101,6 +101,10 @@ export function openExerciseModal(se: ExerciseRead | null) {
                     id: -1,
                     name: "",
                     notes: "",
+                    recommended_reps_max: 0,
+                    recommended_reps_min: 0,
+                    recommended_sets: 0,
+                    recommended_rest_seconds: 0,
                 }
             },
         });

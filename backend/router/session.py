@@ -27,6 +27,8 @@ def _to_session_exercise_read(se: SessionExercise) -> SessionExerciseRead:
         rest_seconds=se.rest_seconds,
         count=se.count,
         exercise_name=se.exercise.name,
+        completed=se.completed,
+        created_at=se.created_at,
     )
 
 

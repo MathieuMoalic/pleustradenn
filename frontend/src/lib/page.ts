@@ -31,6 +31,7 @@ export type PageState =
         };
         data: {
             sessionID: number;
+            exercise: ExerciseRead | null;
         };
     }
     | {
@@ -83,13 +84,21 @@ export function goto(page: "session" | "exercise" | "sessionExercise" | "login")
             return {
                 page,
                 data: { sessionID: -1, selectedDate: new Date() },
-                modal: { open: false, mode: "add", data: { id: -1, name: "", description: "", notes: "" } }
+                modal: {
+                    open: false, mode: "add", data: {
+                        id: -1, name: "", description: "", notes: "", recommended_reps_max: 0,
+                        recommended_reps_min: 0,
+                        recommended_sets: 0,
+                        recommended_rest_seconds: 0,
+
+                    }
+                }
             };
         }
         if (page === "sessionExercise") {
             return {
                 page,
-                data: { sessionID: -1 },
+                data: { sessionID: -1, exercise: null },
                 modal: {
                     open: false, mode: "add", data: {
                         sets: 0,
@@ -100,7 +109,9 @@ export function goto(page: "session" | "exercise" | "sessionExercise" | "login")
                         rest_seconds: 0,
                         count: 0,
                         exercise_name: "",
-                        id: -1
+                        id: -1,
+                        completed: false,
+                        created_at: "",
                     }
                 }
             };

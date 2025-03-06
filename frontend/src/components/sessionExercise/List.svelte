@@ -7,6 +7,7 @@
     import { EditOutline } from "flowbite-svelte-icons";
     import { onMount } from "svelte";
     import Countdown from "./Countdown.svelte";
+    import Sets from "./Sets.svelte";
 
     onMount(read);
 </script>
@@ -18,19 +19,19 @@
         {:else}
             {#each $sessionExerciseList as ex}
                 <div
-                    class="bg-burnt-umber text-white p-3 rounded-md shadow-sm flex flex-col gap-2"
+                    class="{ex.completed
+                        ? 'bg-green-800'
+                        : 'bg-burnt-umber'} text-white p-3 rounded-md shadow-sm flex flex-col gap-2"
                 >
                     <div class="text-sm font-semibold text-left w-full">
                         {ex.exercise_name}
                     </div>
                     <div
-                        class="grid grid-cols-[1fr_auto_1fr_auto_1fr_auto_1fr] items-center w-full"
+                        class="grid grid-cols-[1fr_1fr_auto_1fr_auto_1fr] items-center w-full"
                     >
                         <span class="s2">
-                            <div class="s1">{ex.sets}</div>
+                            <Sets bind:ex />
                         </span>
-
-                        <span class="x-span">x</span>
 
                         <span class="s2">
                             <div class="s1">{ex.reps}</div>
@@ -44,7 +45,7 @@
                         </span>
 
                         <span>
-                            <Countdown {ex} />
+                            <Countdown bind:ex />
                         </span>
 
                         <button

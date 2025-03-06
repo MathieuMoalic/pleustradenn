@@ -34,6 +34,14 @@ export interface ExerciseCreate {
   name: string;
   /** Notes */
   notes: string;
+  /** Recommended Sets */
+  recommended_sets: number;
+  /** Recommended Reps Min */
+  recommended_reps_min: number;
+  /** Recommended Reps Max */
+  recommended_reps_max: number;
+  /** Recommended Rest Seconds */
+  recommended_rest_seconds: number;
 }
 
 /** ExerciseRead */
@@ -42,6 +50,14 @@ export interface ExerciseRead {
   name: string;
   /** Notes */
   notes: string;
+  /** Recommended Sets */
+  recommended_sets: number;
+  /** Recommended Reps Min */
+  recommended_reps_min: number;
+  /** Recommended Reps Max */
+  recommended_reps_max: number;
+  /** Recommended Rest Seconds */
+  recommended_rest_seconds: number;
   /** Id */
   id: number;
 }
@@ -52,6 +68,14 @@ export interface ExerciseUpdate {
   name?: string | null;
   /** Notes */
   notes?: string | null;
+  /** Recommended Sets */
+  recommended_sets?: number | null;
+  /** Recommended Reps Min */
+  recommended_reps_min?: number | null;
+  /** Recommended Reps Max */
+  recommended_reps_max?: number | null;
+  /** Recommended Rest Seconds */
+  recommended_rest_seconds?: number | null;
 }
 
 /** HTTPValidationError */
@@ -87,6 +111,13 @@ export interface SessionExerciseCreate {
   rest_seconds: number;
   /** Count */
   count: number;
+  /** Completed */
+  completed: boolean;
+  /**
+   * Created At
+   * @format date
+   */
+  created_at: string;
 }
 
 /** SessionExerciseRead */
@@ -105,6 +136,13 @@ export interface SessionExerciseRead {
   rest_seconds: number;
   /** Count */
   count: number;
+  /** Completed */
+  completed: boolean;
+  /**
+   * Created At
+   * @format date
+   */
+  created_at: string;
   /** Id */
   id: number;
   /** Exercise Name */
@@ -123,6 +161,10 @@ export interface SessionExerciseUpdate {
   rest_seconds?: number | null;
   /** Count */
   count?: number | null;
+  /** Completed */
+  completed?: boolean | null;
+  /** Created At */
+  created_at?: string | null;
 }
 
 /** SessionReadBasic */
@@ -803,6 +845,24 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
       this.request<SessionExerciseRead, HTTPValidationError>({
         path: `/api/session-exercises/${id}`,
         method: "DELETE",
+        secure: true,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags session-exercises
+     * @name SessionExerciseReadLatestByExercise
+     * @summary Read Session Exercise By Exercise Endpoint
+     * @request GET:/api/session-exercises/exercise/{exercise_id}
+     * @secure
+     */
+    sessionExerciseReadLatestByExercise: (exerciseId: number, params: RequestParams = {}) =>
+      this.request<SessionExerciseRead | null, HTTPValidationError>({
+        path: `/api/session-exercises/exercise/${exerciseId}`,
+        method: "GET",
         secure: true,
         format: "json",
         ...params,

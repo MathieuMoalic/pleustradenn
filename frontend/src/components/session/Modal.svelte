@@ -29,6 +29,6 @@
             />
         </Label>
 
-        <SaveDeleteAddBtn {update} {remove} {create} />
+        <SaveDeleteAddBtn {update} {remove} {create} name="Session" />
     </Modal>
 {/if}

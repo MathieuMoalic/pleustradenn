@@ -47,6 +47,10 @@ class Exercise(SQLModel, table=True):
     id: int = Field(primary_key=True)
     name: str = Field(index=True, unique=True)
     notes: str = Field(default="")
+    recommended_sets: int = Field(default=3)
+    recommended_reps_min: int = Field(default=8)
+    recommended_reps_max: int = Field(default=12)
+    recommended_rest_seconds: int = Field(default=60)
 
     session_exercises: list["SessionExercise"] = Relationship(
         back_populates="exercise",
@@ -57,6 +61,10 @@ class Exercise(SQLModel, table=True):
 class ExerciseBase(BaseModel):
     name: str
     notes: str
+    recommended_sets: int
+    recommended_reps_min: int
+    recommended_reps_max: int
+    recommended_rest_seconds: int
 
 
 class ExerciseCreate(ExerciseBase):
@@ -66,6 +74,10 @@ class ExerciseCreate(ExerciseBase):
 class ExerciseUpdate(BaseModel):
     name: str | None = None
     notes: str | None = None
+    recommended_sets: int | None = None
+    recommended_reps_min: int | None = None
+    recommended_reps_max: int | None = None
+    recommended_rest_seconds: int | None = None
 
     model_config = ConfigDict(from_attributes=True)
 
@@ -142,6 +154,8 @@ class SessionExercise(SQLModel, table=True):
     weight: float = Field(default=0.0)
     rest_seconds: int = Field(default=60)
     count: int = Field(default=0)
+    completed: bool = Field(default=False)
+    created_at: datetime.date = Field(default=datetime.date.today)
 
     session: "Session" = Relationship(
         back_populates="session_exercises",
@@ -162,6 +176,8 @@ class SessionExerciseBase(BaseModel):
     weight: float
     rest_seconds: int
     count: int
+    completed: bool
+    created_at: datetime.date
 
 
 class SessionExerciseCreate(SessionExerciseBase):
@@ -174,6 +190,8 @@ class SessionExerciseUpdate(BaseModel):
     weight: float | None = None
     rest_seconds: int | None = None
     count: int | None = None
+    completed: bool | None = None
+    created_at: datetime.date | None = None
 
     model_config = ConfigDict(from_attributes=True)
 

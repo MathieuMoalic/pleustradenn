@@ -5,6 +5,7 @@
     export let update = () => {};
     export let remove = () => {};
     export let create = () => {};
+    export let name = "Exercise";
 </script>
 
 {#if $aps.modal.mode == "edit"}
@@ -12,6 +13,6 @@
     <Button type="button" class="btn-delete" on:click={remove}>Delete</Button>
 {:else}
     <Button type="submit" class="btn-edit" on:click={create}>
-        Add Exercise
+        Add {name}
     </Button>
 {/if}

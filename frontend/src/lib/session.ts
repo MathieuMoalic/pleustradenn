@@ -1,7 +1,7 @@
 import { addAlert } from "$lib/alert";
 import { getApi } from "$lib/auth";
 import { activePageState, closeModal } from "$lib/page";
-import { writable } from "svelte/store";
+import { get, writable } from "svelte/store";
 import type { SessionReadBasic, SessionReadDetailed } from "./api";
 
 
@@ -115,7 +115,7 @@ export function openSessionModal(session: SessionReadDetailed | null) {
 export function openSessionExercise(sessionID: number) {
     activePageState.set({
         page: "sessionExercise",
-        data: { sessionID },
+        data: { sessionID, exercise: null },
         modal: {
             open: false, mode: "add", data: {
                 sets: 0,
@@ -126,7 +126,9 @@ export function openSessionExercise(sessionID: number) {
                 rest_seconds: 0,
                 count: 0,
                 exercise_name: "",
-                id: -1
+                id: -1,
+                completed: false,
+                created_at: "",
             }
         },
     });
