@@ -117,6 +117,7 @@ export function goto(page: "session" | "exercise" | "sessionExercise" | "login")
             };
         }
         if (page === "login") {
+            localStorage.removeItem("token");
             return {
                 page,
                 data: null,

@@ -3,34 +3,25 @@
     import { goto } from "$lib/page";
 </script>
 
-<div class="relative px-8 pb-16">
+<nav class="pb-10">
     <Navbar
-        class="px-4 py-3 fixed w-full z-20 top-0 start-0 border-b border-thistle bg-black-bean shadow-md"
+        class="py-1 fixed top-0 start-0 border-b border-thistle bg-black-bean"
     >
         <Button
-            class="text-plum hover:text-thistle transition duration-300"
+            class="w-1/3 text-xl font-semibold text-plum"
             on:click={() => goto("session")}
         >
-            <span class="self-center whitespace-nowrap text-xl font-semibold">
-                Sessions
-            </span>
+            Sessions
         </Button>
         <Button
-            class="text-plum hover:text-thistle transition duration-300"
+            class="w-1/3 text-xl font-semibold text-plum"
             on:click={() => goto("exercise")}
         >
-            <span class="self-center whitespace-nowrap text-xl font-semibold">
-                Exercises
-            </span>
+            Exercises
         </Button>
         <Button
-            class="text-plum hover:text-thistle transition duration-300"
-            on:click={() => {
-                localStorage.removeItem("token");
-                goto("login");
-            }}
+            class="w-1/3 text-xl font-semibold text-plum"
+            on:click={() => goto("login")}>Logout</Button
         >
-            Logout
-        </Button>
     </Navbar>
-</div>
+</nav>

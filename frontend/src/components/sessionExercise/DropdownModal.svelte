@@ -5,7 +5,7 @@
     import { activePageState as aps } from "$lib/page";
     import type { ExerciseRead } from "$lib/api";
     import { loadMostRecentExerciseData } from "$lib/session-exercise";
-    let dropdownOpen = false;
+    let dropdownOpen = true;
 
     function onclick(ex: ExerciseRead) {
         if ($aps.page !== "sessionExercise") return;
@@ -29,12 +29,12 @@
                 <ChevronDownOutline class="w-6 h-6 ms-2 text-white " />
             </Button>
             <Dropdown
-                class="w-full max-w-72 bg-white border border-gray-300 rounded-md shadow-md py-1 overflow-y-auto"
+                class="h-72 overflow-y-auto rounded-md"
                 bind:open={dropdownOpen}
             >
                 {#each $exerciseList as exercise}
                     <DropdownItem
-                        class="px-4 py-2 flex items-center text-base font-semibold gap-2 hover:bg-gray-100 cursor-pointer transition w-64"
+                        class="text-base w-64 bg-thistle"
                         on:click={() => onclick(exercise)}
                     >
                         {exercise.name}
