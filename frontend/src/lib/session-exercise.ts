@@ -33,7 +33,7 @@ export function create() {
 }
 
 export function read() {
-    let aps = get(activePageState)
+    let aps = get(activePageState);
     if (aps.page !== "sessionExercise") return;
     if (aps.data.sessionID === -1) return;
     getApi()

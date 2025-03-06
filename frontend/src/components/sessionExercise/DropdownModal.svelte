@@ -3,7 +3,7 @@
     import { ChevronDownOutline } from "flowbite-svelte-icons";
     import { exerciseList } from "$lib/exercise";
     import { activePageState as aps } from "$lib/page";
-    let dropdownOpen = true;
+    let dropdownOpen = false;
 </script>
 
 <!-- This is to make ts happy, this modal will only show if it is a sessionExercise anyway -->

@@ -1,7 +1,8 @@
 import { addAlert } from "./alert";
 import { Api } from "./api";
-import { read as exerciseRead } from "./exercise";
 import { goto } from "./page";
+import { read as exerciseRead } from "./exercise";
+import { read as sessionExerciseRead } from "./session-exercise";
 import { read as sessionRead } from "./session";
 
 let apiInner: Api<BasicAuthSecurity>;
@@ -29,6 +30,7 @@ export function initializeApiAndFetch() {
         apiInner.setSecurityData({ accessToken: token });
         exerciseRead();
         sessionRead();
+        sessionExerciseRead();
     }
 };
 
