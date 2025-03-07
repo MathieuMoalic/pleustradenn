@@ -5,10 +5,12 @@
         sessionList,
     } from "$lib/session";
     import { EditOutline } from "flowbite-svelte-icons";
+    import AddNewButton from "$components/Modal/AddNewButton.svelte";
 </script>
 
 <section>
     <div class="flex flex-col gap-2">
+        <AddNewButton name="Session" onclick={openSessionModal} />
         {#each $sessionList as session}
             <div
                 class="bg-burnt-umber text-white rounded-md shadow-sm w-full flex items-center p-3 gap-2"
