@@ -49,7 +49,7 @@
                     </span>
 
                     <button
-                        class="flex items-center justify-center bg-plum text-black-bean p-1.5 rounded-md hover:bg-thistle transition duration-200 ml-auto"
+                        class="flex items-center justify-center bg-plum text-black-bean p-1.5 rounded-md ml-auto"
                         on:click={() => openSessionExerciseModal(ex)}
                     >
                         <EditOutline class="w-4 h-4" />

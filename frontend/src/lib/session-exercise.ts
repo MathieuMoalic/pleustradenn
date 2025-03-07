@@ -80,7 +80,7 @@ export function remove() {
     activePageState.update((aps) => {
         if (aps.page !== "sessionExercise") return aps;
         getApi()
-            .sessionDelete(aps.modal.data.id)
+            .sessionExerciseDelete(aps.modal.data.id)
             .then((res) => {
                 sessionExerciseList.update((ses) => {
                     const idx = ses.findIndex((s) => s.id === res.data.id);
