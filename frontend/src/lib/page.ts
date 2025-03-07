@@ -1,5 +1,5 @@
 import { writable } from "svelte/store";
-import type { SessionExerciseRead, SessionReadDetailed, ExerciseRead } from "$lib/api";
+import { type SessionExerciseRead, type SessionReadDetailed, type ExerciseRead, ExerciseCategory } from "$lib/api";
 
 export type PageState =
     | {
@@ -86,11 +86,10 @@ export function goto(page: "session" | "exercise" | "sessionExercise" | "login")
                 data: { sessionID: -1, selectedDate: new Date() },
                 modal: {
                     open: false, mode: "add", data: {
-                        id: -1, name: "", description: "", notes: "", recommended_reps_max: 0,
+                        id: -1, name: "", description: "", notes: "", category: ExerciseCategory.Other, recommended_reps_max: 0,
                         recommended_reps_min: 0,
                         recommended_sets: 0,
                         recommended_rest_seconds: 0,
-
                     }
                 }
             };

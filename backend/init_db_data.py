@@ -6,6 +6,7 @@ from backend import env
 from backend.database import get_session
 from backend.models import (
     Exercise,
+    ExerciseCategory,
     ExerciseCreate,
     Session,
     SessionCreate,
@@ -33,6 +34,7 @@ def init_db_data():
             ExerciseCreate(
                 name="Squat",
                 notes="Push",
+                category=ExerciseCategory.LEGS,
                 recommended_rest_seconds=90,
                 recommended_reps_min=5,
                 recommended_reps_max=10,
@@ -41,6 +43,7 @@ def init_db_data():
             ExerciseCreate(
                 name="Bench Press",
                 notes="Push",
+                category=ExerciseCategory.PUSH,
                 recommended_rest_seconds=120,
                 recommended_reps_min=5,
                 recommended_reps_max=10,
@@ -49,6 +52,7 @@ def init_db_data():
             ExerciseCreate(
                 name="Deadlift",
                 notes="Pull",
+                category=ExerciseCategory.PULL,
                 recommended_rest_seconds=120,
                 recommended_reps_min=5,
                 recommended_reps_max=10,

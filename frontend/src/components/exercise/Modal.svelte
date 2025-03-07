@@ -33,6 +33,16 @@
         </Label>
 
         <Label class="space-y-1 text-sm">
+            <span>Category</span>
+            <Input
+                name="notes"
+                bind:value={$aps.modal.data.category}
+                class="modal-input"
+                placeholder="Enter notes"
+            />
+        </Label>
+
+        <Label class="space-y-1 text-sm">
             <span>Recommended Sets</span>
             <Input
                 name="notes"

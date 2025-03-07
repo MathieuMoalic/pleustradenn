@@ -86,7 +86,6 @@ def read_session_exercise_by_exercise_endpoint(
         .where(SessionExercise.exercise_id == exercise_id)
         .order_by(desc(SessionExercise.created_at))
     ).first()
-    print(se)
     if not se:
         return None
     return _to_session_exercise_read(se, session)

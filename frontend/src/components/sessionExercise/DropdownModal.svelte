@@ -5,7 +5,7 @@
     import { activePageState as aps } from "$lib/page";
     import type { ExerciseRead } from "$lib/api";
     import { loadMostRecentExerciseData } from "$lib/session-exercise";
-    let dropdownOpen = true;
+    let dropdownOpen = false;
 
     function onclick(ex: ExerciseRead) {
         if ($aps.page !== "sessionExercise") return;

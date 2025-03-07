@@ -11,21 +11,26 @@
     <div class="flex flex-col gap-2">
         {#each $sessionList as session}
             <div
-                class="bg-burnt-umber text-white p-3 rounded-md shadow-sm flex justify-between items-center"
+                class="bg-burnt-umber text-white rounded-md shadow-sm w-full flex items-center p-3 gap-2"
             >
                 <button
-                    class="flex flex-col text-left flex-grow"
+                    class="flex-shrink-0 text-sm font-semibold leading-tight"
                     on:click={() => openSessionExercise(session.id)}
                 >
-                    <h3 class="text-sm font-semibold leading-tight">
-                        {session.date}
-                    </h3>
-                    <p class="text-xs text-thistle mt-0.5">
+                    {session.date}
+                </button>
+                <button
+                    class="flex-grow min-w-0 text-left"
+                    on:click={() => openSessionExercise(session.id)}
+                >
+                    <p
+                        class="text-xs text-thistle whitespace-nowrap overflow-hidden text-ellipsis"
+                    >
                         {session.notes}
                     </p>
                 </button>
                 <button
-                    class="flex items-center justify-center bg-plum text-black-bean p-1.5 rounded-md hover:bg-thistle transition duration-200"
+                    class="flex-shrink-0 flex items-center justify-center bg-plum text-black-bean p-2 rounded-md"
                     on:click={() => openSessionModal(session)}
                 >
                     <EditOutline class="w-4 h-4" />

@@ -1,4 +1,5 @@
 import datetime
+from enum import Enum
 
 from pydantic import BaseModel, ConfigDict
 from sqlmodel import Field, Relationship, SQLModel
@@ -43,10 +44,20 @@ class UserRead(UserBase):
 ##############################
 
 
+class ExerciseCategory(str, Enum):
+    PUSH = "push"
+    PULL = "pull"
+    LEGS = "legs"
+    CORE = "core"
+    FOREARMS = "forearms"
+    OTHER = "other"
+
+
 class Exercise(SQLModel, table=True):
     id: int = Field(primary_key=True)
     name: str = Field(index=True, unique=True)
     notes: str = Field(default="")
+    category: ExerciseCategory = Field(default=ExerciseCategory.OTHER)
     recommended_sets: int = Field(default=3)
     recommended_reps_min: int = Field(default=8)
     recommended_reps_max: int = Field(default=12)
@@ -61,6 +72,7 @@ class Exercise(SQLModel, table=True):
 class ExerciseBase(BaseModel):
     name: str
     notes: str
+    category: ExerciseCategory
     recommended_sets: int
     recommended_reps_min: int
     recommended_reps_max: int
@@ -74,6 +86,7 @@ class ExerciseCreate(ExerciseBase):
 class ExerciseUpdate(BaseModel):
     name: str | None = None
     notes: str | None = None
+    category: ExerciseCategory | None = None
     recommended_sets: int | None = None
     recommended_reps_min: int | None = None
     recommended_reps_max: int | None = None

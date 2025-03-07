@@ -7,7 +7,6 @@ def test_create_user(client):
         "/api/users",
         json=user_data,
     )
-    print("Response:", response.json())
     assert response.status_code == 200
     created_user = response.json()
     assert created_user["username"] == "test_user"

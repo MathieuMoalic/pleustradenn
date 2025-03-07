@@ -37,7 +37,7 @@
         on:click={handleClick}
         class="bg-green-400 text-sm px-2 py-1 rounded-md text-center bg-opacity-40 border-opacity-80 w-10 h-8"
     >
-        {#if seconds === ex.rest_seconds}
+        {#if !interval}
             <CheckOutline class="" />
         {:else}
             {seconds}

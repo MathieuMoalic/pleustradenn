@@ -2,7 +2,7 @@ import { addAlert } from "$lib/alert";
 import { getApi } from "$lib/auth";
 import { activePageState, closeModal } from "$lib/page";
 import { get, writable } from "svelte/store";
-import { type ExerciseRead } from "./api";
+import { ExerciseCategory, type ExerciseRead } from "./api";
 
 export const exerciseList = writable<ExerciseRead[]>([]);
 
@@ -101,6 +101,7 @@ export function openExerciseModal(se: ExerciseRead | null) {
                     id: -1,
                     name: "",
                     notes: "",
+                    category: ExerciseCategory.Other,
                     recommended_reps_max: 0,
                     recommended_reps_min: 0,
                     recommended_sets: 0,

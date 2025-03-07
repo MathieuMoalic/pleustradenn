@@ -177,7 +177,7 @@ export function loadMostRecentExerciseData(ex: ExerciseRead) {
                     aps.modal.data.reps = res.data.reps;
                     aps.modal.data.weight = res.data.weight;
                     aps.modal.data.rest_seconds = res.data.rest_seconds;
-                    aps.modal.data.count = res.data.count;
+                    aps.modal.data.count = 0;
                     return aps;
                 }
                 );

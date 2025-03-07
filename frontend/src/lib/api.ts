@@ -28,12 +28,23 @@ export interface BodyLoginTokenPost {
   client_secret?: string | null;
 }
 
+/** ExerciseCategory */
+export enum ExerciseCategory {
+  Push = "push",
+  Pull = "pull",
+  Legs = "legs",
+  Core = "core",
+  Forearms = "forearms",
+  Other = "other",
+}
+
 /** ExerciseCreate */
 export interface ExerciseCreate {
   /** Name */
   name: string;
   /** Notes */
   notes: string;
+  category: ExerciseCategory;
   /** Recommended Sets */
   recommended_sets: number;
   /** Recommended Reps Min */
@@ -50,6 +61,7 @@ export interface ExerciseRead {
   name: string;
   /** Notes */
   notes: string;
+  category: ExerciseCategory;
   /** Recommended Sets */
   recommended_sets: number;
   /** Recommended Reps Min */
@@ -68,6 +80,7 @@ export interface ExerciseUpdate {
   name?: string | null;
   /** Notes */
   notes?: string | null;
+  category?: ExerciseCategory | null;
   /** Recommended Sets */
   recommended_sets?: number | null;
   /** Recommended Reps Min */
