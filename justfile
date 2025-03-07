@@ -16,6 +16,7 @@ release:
 
     # Step 2: Stage and commit the changes
     git add backend/pyproject.toml
+    git add frontend/package.json
     git commit -m "Release of v$NEW_VERSION"
 
     # Step 3: Tag the commit with the new version
