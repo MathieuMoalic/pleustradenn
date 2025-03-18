@@ -1,7 +1,7 @@
 <script lang="ts">
     import { Button, Dropdown, DropdownItem, Label } from "flowbite-svelte";
-    import { ChevronDownOutline } from "flowbite-svelte-icons";
-    import { exerciseList } from "$lib/exercise";
+    import { ChevronDownOutline, EditOutline } from "flowbite-svelte-icons";
+    import { exerciseList, openExerciseModal } from "$lib/exercise";
     import { activePageState as aps } from "$lib/page";
     import type { ExerciseRead } from "$lib/api";
     import { loadMostRecentExerciseData } from "$lib/session-exercise";
@@ -41,6 +41,12 @@
                     </DropdownItem>
                 {/each}
             </Dropdown>
+            <button
+                class="p-1.5 bg-burnt-umber rounded-md text-white"
+                on:click={() => openExerciseModal($aps.data.exercise)}
+            >
+                <EditOutline class="w-6 h-6" />
+            </button>
         </div>
     </Label>
 {/if}
