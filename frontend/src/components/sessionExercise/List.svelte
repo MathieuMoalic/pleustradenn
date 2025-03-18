@@ -26,9 +26,7 @@
                 <div class="text-sm font-semibold text-left w-full">
                     {ex.exercise_name}
                 </div>
-                <div
-                    class="grid grid-cols-[1fr_1fr_auto_1fr_auto_1fr] items-center w-full"
-                >
+                <div class="grid grid-cols-6 items-center w-full gap-2">
                     <span class="s2">
                         <Sets bind:ex />
                     </span>
@@ -37,19 +35,19 @@
                         <div class="s1">{ex.reps}</div>
                     </span>
 
-                    <span class="x-span mr-2">x</span>
+                    <span class="x-span">x</span>
 
                     <span class="s2">
                         <div class="s1">{ex.weight}</div>
-                        <div class="pl-1 pr-5 py-1">kg</div>
+                        <div class="unit">kg</div>
                     </span>
 
-                    <span>
+                    <span class="s2">
                         <Countdown bind:ex />
                     </span>
 
                     <button
-                        class="flex items-center justify-center bg-plum text-black-bean p-1.5 rounded-md ml-auto"
+                        class="edit-btn"
                         on:click={() => openSessionExerciseModal(ex)}
                     >
                         <EditOutline class="w-4 h-4" />
@@ -61,15 +59,27 @@
 </section>
 
 <style>
+    .grid {
+        grid-template-columns: repeat(6, 1fr);
+    }
+
     .s2 {
-        @apply flex justify-center;
+        @apply flex justify-center min-w-[60px] w-full;
     }
 
     .s1 {
-        @apply bg-seal-brown text-sm px-2 py-1 rounded-md border-2 text-center bg-opacity-40 border-opacity-80 w-12;
+        @apply bg-seal-brown text-sm px-2 py-1 rounded-md border-2 text-center bg-opacity-40 border-opacity-80 w-full;
     }
 
     .x-span {
-        @apply text-sm px-1 py-1 text-center;
+        @apply text-sm text-center w-full flex justify-center;
+    }
+
+    .unit {
+        @apply text-sm pl-1 text-center flex items-center justify-center;
+    }
+
+    .edit-btn {
+        @apply flex items-center justify-center bg-plum text-black-bean p-1.5 rounded-md ml-auto w-full max-w-[40px];
     }
 </style>
