@@ -1,12 +1,26 @@
 import { addAlert } from "$lib/alert";
 import { getApi } from "$lib/auth";
 import { activePageState, closeModal } from "$lib/page";
-import { get, writable } from "svelte/store";
+import { writable } from "svelte/store";
 import type { SessionReadBasic, SessionReadDetailed } from "./api";
 
 
 export const sessionList = writable<SessionReadBasic[]>([]);
 
+export function clone(id: number) {
+    getApi()
+        .sessionClone(id)
+        .then((res) => {
+            sessionList.update((sessions) => {
+                sessions.unshift(res.data);
+                return sessions;
+            });
+        }
+        )
+        .catch((res) => {
+            addAlert(`Failed to clone the session: ${res.error.detail}`, "error");
+        });
+}
 export function create() {
     activePageState.update((aps) => {
         if (aps.page !== "session") return aps;

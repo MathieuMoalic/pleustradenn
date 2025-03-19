@@ -1,3 +1,5 @@
+from datetime import date
+
 from fastapi import APIRouter, Depends, HTTPException
 from sqlmodel import Session as DBSession
 from sqlmodel import desc, select
@@ -8,12 +10,14 @@ from backend.models import (
     Session,
     SessionCreate,
     SessionExercise,
+    SessionExerciseCreate,
     SessionExerciseRead,
     SessionReadBasic,
     SessionReadDetailed,
     SessionUpdate,
     User,
 )
+from backend.router.session_exercise import create_session_exercise_endpoint
 
 
 def _to_session_exercise_read(se: SessionExercise) -> SessionExerciseRead:
@@ -47,6 +51,43 @@ def create_session_endpoint(
 ):
     new_session = Session(user_id=current_user.id, **data.model_dump())
     db_session.add(new_session)
+    db_session.commit()
+    db_session.refresh(new_session)
+    return new_session
+
+
+@router.post("/{id}", response_model=SessionReadBasic, operation_id="sessionClone")
+def clone_session_endpoint(
+    id: int,
+    db_session: DBSession = Depends(get_session),
+    current_user: User = Depends(get_current_user),
+):
+    session = db_session.get(Session, id)
+    if not session:
+        raise ValueError("Session not found.")
+    new_session = create_session_endpoint(
+        SessionCreate(date=date.today(), notes=session.notes),
+        db_session,
+        current_user,
+    )
+    db_session.add(new_session)
+    db_session.commit()
+    db_session.refresh(new_session)
+    for se in session.session_exercises:
+        create_session_exercise_endpoint(
+            SessionExerciseCreate(
+                session_id=new_session.id,
+                exercise_id=se.exercise_id,
+                sets=se.sets,
+                reps=se.reps,
+                weight=se.weight,
+                rest_seconds=se.rest_seconds,
+                count=se.count,
+                completed=se.completed,
+                created_at=se.created_at,
+            ),
+            db_session,
+        )
     db_session.commit()
     db_session.refresh(new_session)
     return new_session

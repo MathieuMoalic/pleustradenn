@@ -717,6 +717,24 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * No description
      *
      * @tags sessions
+     * @name SessionClone
+     * @summary Clone Session Endpoint
+     * @request POST:/api/sessions/{id}
+     * @secure
+     */
+    sessionClone: (id: number, params: RequestParams = {}) =>
+      this.request<SessionReadBasic, HTTPValidationError>({
+        path: `/api/sessions/${id}`,
+        method: "POST",
+        secure: true,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags sessions
      * @name SessionReadDetailed
      * @summary Read Session Endpoint
      * @request GET:/api/sessions/{id}
