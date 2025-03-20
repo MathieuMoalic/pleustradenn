@@ -122,6 +122,8 @@ export function openSessionExerciseModal(se: SessionExerciseRead | null) {
                     id: -1,
                     completed: false,
                     created_at: "",
+                    notes: "",
+                    success: false,
                 }
             },
         });

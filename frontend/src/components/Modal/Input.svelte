@@ -6,9 +6,10 @@
 </script>
 
 <Label class="space-y-1 text-sm">
-    <span class="font-medium">{name}</span>
     <div class="flex items-center space-x-3">
+        <span class="font-medium w-28 text-left flex-shrink-0">{name}</span>
         <NumberInput
+            style="-moz-appearance: textfield;"
             class="border-burnt-umber rounded-md bg-white w-full text-center"
             required
             bind:value

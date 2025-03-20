@@ -105,6 +105,8 @@ def init_db_data():
                     count=1,
                     completed=True,
                     created_at=date.today(),
+                    success=True,
+                    notes="Good form",
                 ),
                 SessionExerciseCreate(
                     session_id=training_session.id,
@@ -116,6 +118,8 @@ def init_db_data():
                     count=1,
                     completed=False,
                     created_at=date.today(),
+                    success=True,
+                    notes="Struggled with last set",
                 ),
                 SessionExerciseCreate(
                     session_id=training_session.id,
@@ -127,6 +131,8 @@ def init_db_data():
                     count=1,
                     completed=False,
                     created_at=date.today(),
+                    success=False,
+                    notes="Back pain",
                 ),
             ]
             for session_exercise in session_exercises:

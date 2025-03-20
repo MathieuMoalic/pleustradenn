@@ -33,6 +33,8 @@ def _to_session_exercise_read(se: SessionExercise) -> SessionExerciseRead:
         exercise_name=se.exercise.name,
         completed=se.completed,
         created_at=se.created_at,
+        success=se.success,
+        notes=se.notes,
     )
 
 
@@ -85,6 +87,8 @@ def clone_session_endpoint(
                 count=se.count,
                 completed=se.completed,
                 created_at=se.created_at,
+                success=se.success,
+                notes=se.notes,
             ),
             db_session,
         )

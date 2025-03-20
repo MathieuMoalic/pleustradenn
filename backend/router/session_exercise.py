@@ -34,6 +34,8 @@ def _to_session_exercise_read(
         exercise_name=exercise.name,
         completed=se.completed,
         created_at=se.created_at,
+        success=se.success,
+        notes=se.notes,
     )
 
 

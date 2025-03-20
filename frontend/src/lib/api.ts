@@ -131,6 +131,10 @@ export interface SessionExerciseCreate {
    * @format date
    */
   created_at: string;
+  /** Success */
+  success: boolean;
+  /** Notes */
+  notes: string;
 }
 
 /** SessionExerciseRead */
@@ -156,6 +160,10 @@ export interface SessionExerciseRead {
    * @format date
    */
   created_at: string;
+  /** Success */
+  success: boolean;
+  /** Notes */
+  notes: string;
   /** Id */
   id: number;
   /** Exercise Name */
@@ -178,6 +186,10 @@ export interface SessionExerciseUpdate {
   completed?: boolean | null;
   /** Created At */
   created_at?: string | null;
+  /** Success */
+  success?: boolean | null;
+  /** Notes */
+  notes?: string | null;
 }
 
 /** SessionReadBasic */

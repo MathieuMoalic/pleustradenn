@@ -169,6 +169,8 @@ class SessionExercise(SQLModel, table=True):
     count: int = Field(default=0)
     completed: bool = Field(default=False)
     created_at: datetime.date = Field(default=datetime.date.today)
+    success: bool = Field(default=False)
+    notes: str = Field(default="")
 
     session: "Session" = Relationship(
         back_populates="session_exercises",
@@ -191,6 +193,8 @@ class SessionExerciseBase(BaseModel):
     count: int
     completed: bool
     created_at: datetime.date
+    success: bool
+    notes: str
 
 
 class SessionExerciseCreate(SessionExerciseBase):
@@ -205,6 +209,8 @@ class SessionExerciseUpdate(BaseModel):
     count: int | None = None
     completed: bool | None = None
     created_at: datetime.date | None = None
+    success: bool | None = None
+    notes: str | None = None
 
     model_config = ConfigDict(from_attributes=True)
 

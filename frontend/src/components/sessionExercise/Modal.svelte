@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { Button, Modal } from "flowbite-svelte";
+    import { Button, Modal, Label, Input } from "flowbite-svelte";
     import DropdownModal from "$components/sessionExercise/DropdownModal.svelte";
     import {
         create,
@@ -8,8 +8,9 @@
         update,
     } from "$lib/session-exercise";
     import { activePageState as aps } from "$lib/page";
-    import Input from "$components/Modal/Input.svelte";
+    import PlusMinusInput from "$components/Modal/Input.svelte";
     import SaveDeleteAddBtn from "$components/Modal/SaveDeleteAddBtn.svelte";
+    import Radio from "$components/Modal/Radio.svelte";
     import { ExerciseCategory, type ExerciseRead } from "$lib/api";
     import { exerciseList } from "$lib/exercise";
     let filter: ExerciseCategory = ExerciseCategory.Core;
@@ -59,20 +60,34 @@
             </div>
         {:else}
             <DropdownModal />
-            <Input
+            <PlusMinusInput
                 bind:value={$aps.modal.data.sets}
                 name={`Sets (${$aps.data.exercise?.recommended_sets})`}
             />
-            <Input
+            <PlusMinusInput
                 bind:value={$aps.modal.data.reps}
                 name={`Reps (${$aps.data.exercise?.recommended_reps_min}-${$aps.data.exercise?.recommended_reps_max})`}
             />
-            <Input bind:value={$aps.modal.data.weight} name="Weight" />
-            <Input
+            <PlusMinusInput bind:value={$aps.modal.data.weight} name="Weight" />
+            <PlusMinusInput
                 bind:value={$aps.modal.data.rest_seconds}
                 name={`Rest (${$aps.data.exercise?.recommended_rest_seconds}s)`}
             />
-            <Input bind:value={$aps.modal.data.count} name="Count" />
+            <PlusMinusInput bind:value={$aps.modal.data.count} name="Count" />
+            <Label class="space-y-1 text-sm">
+                <div class="flex items-center space-x-3">
+                    <span class="font-medium w-28 text-left flex-shrink-0"
+                        >Notes</span
+                    >
+                    <Input
+                        name="notes"
+                        bind:value={$aps.modal.data.notes}
+                        class="modal-input"
+                        placeholder="Enter notes"
+                    />
+                </div>
+            </Label>
+            <Radio bind:value={$aps.modal.data.completed} />
 
             <SaveDeleteAddBtn {update} {remove} {create} />
         {/if}
