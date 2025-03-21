@@ -49,7 +49,9 @@
             </div>
 
             <div class="flex flex-col gap-2">
-                {#each $exerciseList.filter((e) => filter === null || e.category === filter) as exercise}
+                {#each $exerciseList
+                    .filter((e) => filter === null || e.category === filter)
+                    .sort((a, b) => (b.count ?? 0) - (a.count ?? 0)) as exercise}
                     <Button
                         class="w-full text-left px-4 py-2 rounded-md bg-white shadow-sm border text-gray-700"
                         on:click={() => onclick(exercise)}

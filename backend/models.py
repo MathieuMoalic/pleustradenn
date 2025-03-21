@@ -97,6 +97,7 @@ class ExerciseUpdate(BaseModel):
 
 class ExerciseRead(ExerciseBase):
     id: int
+    count: int = 0
     model_config = ConfigDict(from_attributes=True)
 
 

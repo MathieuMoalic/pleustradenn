@@ -72,6 +72,11 @@ export interface ExerciseRead {
   recommended_rest_seconds: number;
   /** Id */
   id: number;
+  /**
+   * Count
+   * @default 0
+   */
+  count?: number;
 }
 
 /** ExerciseUpdate */

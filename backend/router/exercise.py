@@ -3,7 +3,13 @@ from sqlmodel import Session, select
 
 from backend.database import get_session
 from backend.jwt import get_current_user
-from backend.models import Exercise, ExerciseCreate, ExerciseRead, ExerciseUpdate
+from backend.models import (
+    Exercise,
+    ExerciseCreate,
+    ExerciseRead,
+    ExerciseUpdate,
+    SessionExercise,
+)
 
 router = APIRouter(
     prefix="/api/exercises",
@@ -31,7 +37,16 @@ def create_exercise_endpoint(
 
 @router.get("", response_model=list[ExerciseRead], operation_id="exerciseReadAll")
 def read_exercises_endpoint(session: Session = Depends(get_session)):
-    return session.exec(select(Exercise)).all()
+    exercises = session.exec(select(Exercise)).all()
+    result = []
+    for ex in exercises:
+        count = len(
+            session.exec(
+                select(SessionExercise).where(SessionExercise.exercise_id == ex.id)
+            ).all()
+        )
+        result.append(ExerciseRead(**ex.model_dump(), count=count))
+    return result
 
 
 @router.get("/{id}", response_model=ExerciseRead, operation_id="exerciseRead")
@@ -39,7 +54,12 @@ def read_exercise_endpoint(id: int, session: Session = Depends(get_session)):
     exercise = session.get(Exercise, id)
     if not exercise:
         raise ValueError("Exercise not found.")
-    return exercise
+    count = len(
+        session.exec(
+            select(SessionExercise).where(SessionExercise.exercise_id == id)
+        ).all()
+    )
+    return ExerciseRead(**exercise.model_dump(), count=count)
 
 
 @router.put("/{id}", response_model=ExerciseRead, operation_id="exerciseUpdate")
