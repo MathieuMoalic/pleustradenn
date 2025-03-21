@@ -19,6 +19,7 @@
             fix-python.packages.${system}.default
             python312
             nodejs_23
+            sqlite
           ];
 
           shellHook = ''
