@@ -1,4 +1,4 @@
-# 🏋️ Workouts
+# 🏋️ Pleustradenn
 
 A full-stack web app to track workout sessions, exercises, and progress — built with FastAPI + SQLModel backend and SvelteKit frontend.
 
