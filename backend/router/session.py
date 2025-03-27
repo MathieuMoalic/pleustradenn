@@ -84,7 +84,7 @@ def clone_session_endpoint(
                 reps=se.reps,
                 weight=se.weight,
                 rest_seconds=se.rest_seconds,
-                count=se.count,
+                count=0,
                 completed=False,
                 created_at=date.today(),
                 success=se.success,
