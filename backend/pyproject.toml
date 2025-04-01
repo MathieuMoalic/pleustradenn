@@ -7,10 +7,10 @@ license = { file = "LICENSE" }
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
-    "fastapi==0.115.11",
+    "fastapi==0.115.12",
     "uvicorn==0.34.0",
-    "sqlmodel==0.0.23",
-    "websockets==15.0",
+    "sqlmodel==0.0.24",
+    "websockets==15.0.1",
     "pytest==8.3.5",
     "httpx==0.28.1",
     "pyjwt==2.10.1",
@@ -20,7 +20,7 @@ dependencies = [
 ]
 
 [build-system]
-requires = ["setuptools==75.8.2", "wheel"]
+requires = ["setuptools==78.1.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [tool.setuptools.packages.find]
