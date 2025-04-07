@@ -4,6 +4,7 @@
     import { update, remove, create } from "$lib/exercise";
     import { activePageState as aps } from "$lib/page";
     import Header from "$components/Modal/Header.svelte";
+    import DropdownModal from "$components/exercise/DropdownModal.svelte";
 </script>
 
 {#if $aps.page === "exercise"}
@@ -32,15 +33,7 @@
             />
         </Label>
 
-        <Label class="space-y-1 text-sm">
-            <span>Category</span>
-            <Input
-                name="notes"
-                bind:value={$aps.modal.data.category}
-                class="modal-input"
-                placeholder="Enter notes"
-            />
-        </Label>
+        <DropdownModal />
 
         <Label class="space-y-1 text-sm">
             <span>Recommended Sets</span>
