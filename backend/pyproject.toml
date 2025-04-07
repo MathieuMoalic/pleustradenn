@@ -1,6 +1,6 @@
 [project]
 name = "workouts"
-version = "1.0.13"
+version = "1.0.14"
 description = "workouts"
 authors = [{ name = "Mathieu Moalic", email = "matmoa@amu.edu.pl" }]
 license = { file = "LICENSE" }
