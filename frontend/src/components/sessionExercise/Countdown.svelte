@@ -1,29 +1,43 @@
 <script lang="ts">
-    import { onDestroy } from "svelte";
+    import { onMount, onDestroy } from "svelte";
     import { CheckOutline } from "flowbite-svelte-icons";
     import type { SessionExerciseRead } from "$lib/api";
     import { incrementSet } from "$lib/session-exercise";
 
     export let ex: SessionExerciseRead;
-    let seconds = ex.rest_seconds;
     let interval: number | null = null;
 
-    function startCountdown() {
-        if (interval) return;
-        interval = setInterval(() => {
-            if (seconds > 0) {
-                seconds--;
-            } else {
-                clearInterval(interval!);
+    let targetTime: number | null = null;
+    let remaining = 0;
+
+    function updateRemaining() {
+        if (targetTime) {
+            const diff = Math.max(
+                0,
+                Math.floor((targetTime - Date.now()) / 1000),
+            );
+            remaining = diff;
+
+            // When finished, stop interval and reset state
+            if (diff === 0 && interval) {
+                clearInterval(interval);
                 interval = null;
-                seconds = ex.rest_seconds;
+                targetTime = null;
             }
-        }, 1000);
+        }
+    }
+
+    function startCountdown() {
+        if (interval || targetTime) return;
+
+        targetTime = Date.now() + ex.rest_seconds * 1000;
+        updateRemaining();
+
+        interval = setInterval(updateRemaining, 500); // Check twice per second
     }
 
     function handleClick() {
-        if (!interval) {
-            seconds = ex.rest_seconds;
+        if (!interval && !targetTime) {
             startCountdown();
             ex = incrementSet(ex);
         }
@@ -37,10 +51,10 @@
         on:click={handleClick}
         class="bg-green-400 text-sm px-2 py-1 rounded-md text-center bg-opacity-40 border-opacity-80 w-10 h-8"
     >
-        {#if !interval}
-            <CheckOutline class="" />
+        {#if !targetTime}
+            <CheckOutline />
         {:else}
-            {seconds}
+            {remaining}
         {/if}
     </button>
 {/if}
