@@ -4,6 +4,6 @@
 // if not, it should redirect to the login page
 // if the user is authenticated, it should fetch the data
 
-import { initializeApiAndFetch } from "$lib/auth";
+// import { initializeApiAndFetch } from "$lib/auth";
 
-initializeApiAndFetch()
+// initializeApiAndFetch()

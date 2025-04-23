@@ -1,6 +1,6 @@
 <script lang="ts">
     import { Button, Navbar } from "flowbite-svelte";
-    import { goto } from "$lib/page";
+    import { goto } from "$app/navigation";
 </script>
 
 <nav class="pb-10">
@@ -9,19 +9,19 @@
     >
         <Button
             class="w-1/3 text-xl font-semibold text-plum"
-            on:click={() => goto("session")}
+            on:click={() => goto("/sessions")}
         >
             Sessions
         </Button>
         <Button
             class="w-1/3 text-xl font-semibold text-plum"
-            on:click={() => goto("exercise")}
+            on:click={() => goto("/exercises")}
         >
             Exercises
         </Button>
         <Button
             class="w-1/3 text-xl font-semibold text-plum"
-            on:click={() => goto("login")}>Logout</Button
+            on:click={() => goto("/login")}>Logout</Button
         >
     </Navbar>
 </nav>

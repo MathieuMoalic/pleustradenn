@@ -1,0 +1,51 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model ExerciseCategory {
+  id        Int        @id @default(autoincrement())
+  name      String     @unique
+  exercises Exercise[]
+}
+
+model Exercise {
+  id                       Int               @id @default(autoincrement())
+  name                     String            @unique
+  notes                    String            @default("")
+  category_id              Int
+  sessionExercises         SessionExercise[]
+
+  category ExerciseCategory @relation(fields: [category_id], references: [id])
+}
+
+
+model Session {
+  id               Int               @id @default(autoincrement())
+  date             DateTime          @default(now())
+  notes            String            @default("")
+  sessionExercises SessionExercise[]
+}
+
+model SessionExercise {
+  id          Int @id @default(autoincrement())
+  session_id  Int
+  exercise_id Int
+
+  sets         Int      @default(1)
+  reps         Int      @default(1)
+  weight       Float    @default(0.0)
+  rest_seconds Int      @default(60)
+  count        Int      @default(0)
+  completed    Boolean  @default(false)
+  created_at   DateTime @default(now())
+  success      Boolean  @default(false)
+  notes        String   @default("")
+
+  session  Session  @relation(fields: [session_id], references: [id])
+  exercise Exercise @relation(fields: [exercise_id], references: [id])
+}

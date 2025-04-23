@@ -3,12 +3,14 @@
     import { PlusOutline, MinusOutline } from "flowbite-svelte-icons";
     export let value = 0;
     export let name = "";
+    export let label = "";
 </script>
 
 <Label class="space-y-1 text-sm">
     <div class="flex items-center space-x-3">
-        <span class="font-medium w-28 text-left flex-shrink-0">{name}</span>
+        <span class="font-medium w-28 text-left flex-shrink-0">{label}</span>
         <NumberInput
+            {name}
             style="-moz-appearance: textfield;"
             class="border-burnt-umber rounded-md bg-white w-full text-center"
             required
