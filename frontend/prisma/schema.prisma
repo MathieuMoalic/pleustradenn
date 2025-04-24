@@ -23,11 +23,31 @@ model Exercise {
   category ExerciseCategory @relation(fields: [category_id], references: [id])
 }
 
+model User {
+  id            String        @id @default(cuid())
+  username      String        @unique
+  password_hash String
+  sessions      Session[]
+  userSessions  UserSession[]
+}
+
+model UserSession {
+  id        String   @id @default(cuid()) // Session ID stored in cookie
+  expiresAt DateTime
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade) // Cascade delete sessions if user is deleted
+
+  @@index([userId])
+}
+
 model Session {
   id               Int               @id @default(autoincrement())
   date             DateTime          @default(now())
   notes            String            @default("")
+  user_id          String            @map("user_id")
   sessionExercises SessionExercise[]
+
+  user User @relation(fields: [user_id], references: [id])
 }
 
 model SessionExercise {

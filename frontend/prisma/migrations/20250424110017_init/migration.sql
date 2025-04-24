@@ -1,8 +1,7 @@
 -- CreateTable
-CREATE TABLE "User" (
+CREATE TABLE "ExerciseCategory" (
     "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
-    "username" TEXT NOT NULL,
-    "hashed_password" TEXT NOT NULL
+    "name" TEXT NOT NULL
 );
 
 -- CreateTable
@@ -10,20 +9,15 @@ CREATE TABLE "Exercise" (
     "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
     "name" TEXT NOT NULL,
     "notes" TEXT NOT NULL DEFAULT '',
-    "category" TEXT NOT NULL DEFAULT 'OTHER',
-    "recommended_sets" INTEGER NOT NULL DEFAULT 3,
-    "recommended_reps_min" INTEGER NOT NULL DEFAULT 8,
-    "recommended_reps_max" INTEGER NOT NULL DEFAULT 12,
-    "recommended_rest_seconds" INTEGER NOT NULL DEFAULT 60
+    "category_id" INTEGER NOT NULL,
+    CONSTRAINT "Exercise_category_id_fkey" FOREIGN KEY ("category_id") REFERENCES "ExerciseCategory" ("id") ON DELETE RESTRICT ON UPDATE CASCADE
 );
 
 -- CreateTable
 CREATE TABLE "Session" (
     "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
-    "user_id" INTEGER NOT NULL,
     "date" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "notes" TEXT NOT NULL DEFAULT '',
-    CONSTRAINT "Session_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "User" ("id") ON DELETE RESTRICT ON UPDATE CASCADE
+    "notes" TEXT NOT NULL DEFAULT ''
 );
 
 -- CreateTable
@@ -41,11 +35,11 @@ CREATE TABLE "SessionExercise" (
     "success" BOOLEAN NOT NULL DEFAULT false,
     "notes" TEXT NOT NULL DEFAULT '',
     CONSTRAINT "SessionExercise_session_id_fkey" FOREIGN KEY ("session_id") REFERENCES "Session" ("id") ON DELETE RESTRICT ON UPDATE CASCADE,
-    CONSTRAINT "SessionExercise_exercise_id_fkey" FOREIGN KEY ("exercise_id") REFERENCES "Exercise" ("id") ON DELETE RESTRICT ON UPDATE CASCADE
+    CONSTRAINT "SessionExercise_exercise_id_fkey" FOREIGN KEY ("exercise_id") REFERENCES "Exercise" ("id") ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 -- CreateIndex
-CREATE UNIQUE INDEX "User_username_key" ON "User"("username");
+CREATE UNIQUE INDEX "ExerciseCategory_name_key" ON "ExerciseCategory"("name");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Exercise_name_key" ON "Exercise"("name");
