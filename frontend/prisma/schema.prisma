@@ -14,15 +14,14 @@ model ExerciseCategory {
 }
 
 model Exercise {
-  id                       Int               @id @default(autoincrement())
-  name                     String            @unique
-  notes                    String            @default("")
-  category_id              Int
-  sessionExercises         SessionExercise[]
+  id               Int               @id @default(autoincrement())
+  name             String            @unique
+  notes            String            @default("")
+  category_id      Int
+  sessionExercises SessionExercise[]
 
   category ExerciseCategory @relation(fields: [category_id], references: [id])
 }
-
 
 model Session {
   id               Int               @id @default(autoincrement())
@@ -47,5 +46,5 @@ model SessionExercise {
   notes        String   @default("")
 
   session  Session  @relation(fields: [session_id], references: [id])
-  exercise Exercise @relation(fields: [exercise_id], references: [id])
+  exercise Exercise @relation(fields: [exercise_id], references: [id], onDelete: Cascade)
 }

@@ -1,61 +1,50 @@
 <script lang="ts">
-    import { Label, Input, Button } from "flowbite-svelte";
+    import { Input, Button, Dropdown, DropdownItem } from "flowbite-svelte";
+    import { ChevronDownOutline } from "flowbite-svelte-icons";
     import { page } from "$app/state";
-    export let ex = {
-        name: "",
-        notes: "",
-        recommended_sets: "",
-        recommended_reps_min: "",
-        recommended_reps_max: "",
-        recommended_rest_seconds: "",
+    import type { ExerciseCategory } from "@prisma/client";
+    export let form_data: {
+        name: string;
+        notes: string;
+        category: ExerciseCategory;
     };
+    export let categories: ExerciseCategory[] = [];
+    let selected_category: ExerciseCategory = categories[0];
+    let dropdownOpen = false;
+
+    function select_category(c: ExerciseCategory) {
+        dropdownOpen = false;
+        selected_category = c;
+    }
 </script>
 
 <form method="POST" class="space-y-5 text-white">
     <label>
         <span>Name</span>
-        <Input name="name" bind:value={ex.name} class="modal-input" required />
+        <Input name="name" bind:value={form_data.name} required />
     </label>
 
     <label>
         <span>Notes</span>
-        <Input name="notes" bind:value={ex.notes} class="modal-input" />
+        <Input name="notes" bind:value={form_data.notes} />
     </label>
 
     <label>
-        <span>Recommended Sets</span>
-        <Input
-            name="recommended_sets"
-            bind:value={ex.recommended_sets}
-            class="modal-input"
-        />
-    </label>
-
-    <label>
-        <span>Recommended reps min</span>
-        <Input
-            name="recommended_reps_min"
-            bind:value={ex.recommended_reps_min}
-            class="modal-input"
-        />
-    </label>
-
-    <label>
-        <span>Recommended reps max</span>
-        <Input
-            name="recommended_reps_max"
-            bind:value={ex.recommended_reps_max}
-            class="modal-input"
-        />
-    </label>
-
-    <label>
-        <span>Recommended rest in seconds</span>
-        <Input
-            name="recommended_rest_seconds"
-            bind:value={ex.recommended_rest_seconds}
-            class="modal-input"
-        />
+        <span>Category</span>
+        <input type="hidden" name="category_id" value={selected_category.id} />
+        <Button class="w-full bg-white text-black mt-1">
+            {selected_category.name}
+            <ChevronDownOutline
+                class="w-6 h-6 ms-2 text-white dark:text-white"
+            />
+        </Button>
+        <Dropdown bind:open={dropdownOpen}>
+            {#each categories as c}
+                <DropdownItem on:click={() => select_category(c)}
+                    >{c.name}</DropdownItem
+                >
+            {/each}
+        </Dropdown>
     </label>
 
     <div class="flex justify-between gap-2 pt-4">
@@ -73,14 +62,8 @@
             </Button>
         {:else}
             <Button type="submit" formaction="?/create" class="btn-edit w-full">
-                Add {ex.name}
+                Add {form_data.name}
             </Button>
         {/if}
     </div>
 </form>
-
-<style>
-    label {
-        @apply text-sm text-gray-300 font-bold mt-3;
-    }
-</style>

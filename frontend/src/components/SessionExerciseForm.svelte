@@ -1,5 +1,4 @@
 <script lang="ts">
-    import { page } from "$app/state";
     import PlusMinusInput from "$components/Modal/Input.svelte";
     import {
         Button,
@@ -9,17 +8,23 @@
         Input,
     } from "flowbite-svelte";
     import { ChevronDownOutline, EditOutline } from "flowbite-svelte-icons";
-    import type { LoadedExercise } from "$lib/types";
+    import type { SessionExerciseFormData } from "$lib/types";
     import type { Exercise } from "@prisma/client";
     import { goto } from "$app/navigation";
 
-    export let sessionExercise: LoadedExercise;
+    export let sessionExercise: SessionExerciseFormData;
     export let exercises: Exercise[];
 
     let dropdownOpen = false;
 </script>
 
 <form method="POST" class="space-y-4">
+    <input type="hidden" name="session_id" value={sessionExercise.session_id} />
+    <input
+        type="hidden"
+        name="exercise_id"
+        value={sessionExercise.exercise_id}
+    />
     <Label class="space-y-1 text-sm">
         <span class="font-medium">Exercise</span>
         <div class="flex items-center space-x-3">
@@ -94,10 +99,10 @@
     </Label>
 
     <div class="flex justify-between gap-2 pt-4">
-        {#if page.params.id}
-            <Button type="submit" formaction="?/update" class="btn-edit w-full"
-                >Save</Button
-            >
+        {#if sessionExercise.id !== undefined}
+            <Button type="submit" formaction="?/update" class="btn-edit w-full">
+                Save
+            </Button>
             <Button
                 type="submit"
                 class="btn-delete w-full"

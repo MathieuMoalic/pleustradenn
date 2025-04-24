@@ -1,50 +1,68 @@
 <script lang="ts">
-    export let data;
-    import { ExerciseCategory } from "$lib/api"; // your enum
-    import { Button, Input } from "flowbite-svelte";
-    import PlusMinusInput from "$components/Modal/Input.svelte";
+    import { Button } from "flowbite-svelte";
+    import SessionExerciseForm from "$components/SessionExerciseForm.svelte";
+    import type { SessionExerciseFormData } from "$lib/types.js";
+    import type { Exercise } from "@prisma/client";
+    import { page } from "$app/state";
 
-    let selectedExerciseId: number | null = null;
-    let filter: ExerciseCategory = ExerciseCategory.Core;
+    export let data;
+    let exercises = data.exercises;
+    let sessionExercise: SessionExerciseFormData = {
+        exercise: exercises[0],
+        count: 0,
+        reps: 0,
+        sets: 0,
+        notes: "",
+        weight: 0,
+        success: false,
+        completed: false,
+        created_at: new Date(),
+        session_id: parseInt(page.params.id),
+        exercise_id: 0,
+        rest_seconds: 0,
+        id: undefined,
+    };
+    let exercise_selected = false;
+    let filter = data.categories[0];
+
+    function selectExercise(ex: Exercise) {
+        sessionExercise.exercise_id = ex.id;
+        sessionExercise.exercise = ex;
+        exercise_selected = true;
+    }
 </script>
 
-{#if selectedExerciseId === null}
-    <h2 class="text-xl font-semibold text-gray-700 mb-4">Select Exercise</h2>
+{#if !exercise_selected}
+    <h2 class="text-xl font-semibold text-gray-200 mb-4">Select Exercise</h2>
 
     <div class="flex flex-wrap gap-2 mb-4">
-        {#each Object.values(ExerciseCategory) as cat}
+        {#each data.categories as cat}
             <Button
                 class="px-4 py-2 text-sm rounded-md {filter === cat
-                    ? 'bg-seal-brown'
-                    : 'bg-burnt-umber'}"
+                    ? 'bg-burnt-umber'
+                    : 'bg-black-bean'}"
                 on:click={() => (filter = cat)}
             >
-                {cat}
+                {cat.name.toUpperCase()}
             </Button>
         {/each}
     </div>
 
-    {#each data.exercises.filter((e) => e.category.name === filter) as exercise}
-        <Button on:click={() => (selectedExerciseId = exercise.id)}>
-            {exercise.name}
-        </Button>
-    {/each}
+    <div class="flex flex-col gap-2">
+        {#each data.exercises.filter((e) => e.category.name === filter.name) as ex}
+            <Button
+                on:click={() => selectExercise(ex)}
+                class="bg-burnt-umber text-white p-3 rounded-md shadow-sm flex"
+            >
+                <div class="flex items-center h-2">
+                    <h3 class="text-sm font-semibold text-left">
+                        {ex.name}
+                    </h3>
+                </div>
+            </Button>
+        {/each}
+    </div>
 {:else}
-    <form method="POST">
-        <input type="hidden" name="exercise_id" value={selectedExerciseId} />
-        <input type="hidden" name="session_id" value={1} />
-
-        <PlusMinusInput name="sets" value={3} />
-        <PlusMinusInput name="reps" value={8} />
-        <PlusMinusInput name="weight" value={50} />
-        <PlusMinusInput name="rest_seconds" value={90} />
-        <PlusMinusInput name="count" value={1} />
-        <Input name="notes" placeholder="Enter notes" />
-        <label>
-            Completed <input type="checkbox" name="completed" />
-        </label>
-
-        <Button type="submit">Save</Button>
-        <Button on:click={() => (selectedExerciseId = null)}>Back</Button>
-    </form>
+    <h3 class="text-plum">Add Exercise to Session</h3>
+    <SessionExerciseForm {exercises} {sessionExercise} />
 {/if}

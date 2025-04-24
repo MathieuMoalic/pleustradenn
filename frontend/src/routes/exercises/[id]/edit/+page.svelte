@@ -2,16 +2,11 @@
     import ExerciseForm from "$components/ExerciseForm.svelte";
     export let data;
 
-    const ex = {
+    const form_data = {
         name: data.exercise.name,
         notes: data.exercise.notes ?? "",
-        recommended_sets: String(data.exercise.recommended_sets ?? ""),
-        recommended_reps_min: String(data.exercise.recommended_reps_min ?? ""),
-        recommended_reps_max: String(data.exercise.recommended_reps_max ?? ""),
-        recommended_rest_seconds: String(
-            data.exercise.recommended_rest_seconds ?? "",
-        ),
+        category: data.categories[0],
     };
 </script>
 
-<ExerciseForm {ex} />
+<ExerciseForm {form_data} categories={data.categories} />

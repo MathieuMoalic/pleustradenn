@@ -1,14 +1,11 @@
 <script lang="ts">
     import ExerciseForm from "$components/ExerciseForm.svelte";
-
-    const ex = {
+    export let data;
+    const form_data = {
         name: "",
         notes: "",
-        recommended_sets: "",
-        recommended_reps_min: "",
-        recommended_reps_max: "",
-        recommended_rest_seconds: "",
+        category: data.categories[0],
     };
 </script>
 
-<ExerciseForm {ex} />
+<ExerciseForm {form_data} categories={data.categories} />
