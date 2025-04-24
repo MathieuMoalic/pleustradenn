@@ -1,6 +1,6 @@
 <script lang="ts">
     export let data;
-    import AddNewButton from "$components/Modal/AddNewButton.svelte";
+    import AddNewButton from "$components/AddNewButton.svelte";
     import { goto } from "$app/navigation";
 </script>
 

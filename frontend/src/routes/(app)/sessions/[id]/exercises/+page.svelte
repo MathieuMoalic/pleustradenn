@@ -1,10 +1,8 @@
 <script lang="ts">
     export let data;
-    import AddNewButton from "$components/Modal/AddNewButton.svelte";
-    import { EditOutline, FileCopyOutline } from "flowbite-svelte-icons";
+    import AddNewButton from "$components/AddNewButton.svelte";
+    import { EditOutline } from "flowbite-svelte-icons";
     import { goto } from "$app/navigation";
-    import Countdown from "$components/sessionExercise/Countdown.svelte";
-    import Sets from "$components/sessionExercise/Sets.svelte";
     import { page } from "$app/state";
 </script>
 
@@ -25,10 +23,6 @@
                     {ex.exercise.name}
                 </div>
                 <div class="grid grid-cols-6 items-center w-full gap-2">
-                    <!-- <span class="s2">
-                        <Sets bind:ex />
-                    </span> -->
-
                     <span class="s2">
                         <div class="s1">{ex.reps}</div>
                     </span>
@@ -39,10 +33,6 @@
                         <div class="s1">{ex.weight}</div>
                         <div class="unit">kg</div>
                     </span>
-
-                    <!-- <span class="s2">
-                        <Countdown bind:ex />
-                    </span> -->
 
                     <button
                         class="edit-btn"

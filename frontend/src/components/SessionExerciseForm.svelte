@@ -1,5 +1,5 @@
 <script lang="ts">
-    import PlusMinusInput from "$components/Modal/Input.svelte";
+    import PlusMinusInput from "$components/Input.svelte";
     import {
         Button,
         Dropdown,

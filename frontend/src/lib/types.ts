@@ -1,7 +1,4 @@
-import type {
-    Exercise,
-    ExerciseCategory,
-} from "@prisma/client";
+import type { Exercise } from "@prisma/client";
 
 export type SessionExerciseFormData = {
     id: number | undefined;
@@ -22,10 +19,4 @@ export type SessionExerciseFormData = {
 export type CreateSessionFormData = {
     date?: Date;
     notes?: string;
-};
-
-export type ExerciseFormData = {
-    name: string;
-    notes: string;
-    category: ExerciseCategory;
 };

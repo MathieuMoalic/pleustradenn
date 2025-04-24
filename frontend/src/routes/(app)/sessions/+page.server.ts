@@ -1,14 +1,24 @@
 import prisma from '$lib/server/prisma';
-import { redirect, type Actions } from '@sveltejs/kit';
+import { fail, redirect, type Actions } from '@sveltejs/kit';
+import type { PageServerLoad } from './$types';
 
-export const load = async () => {
-    const sessions = await prisma.session.findMany();
-    return { sessions };
+export const load: PageServerLoad = async ({ locals }) => {
+    if (!locals.user) {
+        throw redirect(302, '/login?redirectTo=/sessions');
+    }
+    const userId = locals.user.id;
+    const sessions = await prisma.session.findMany({
+        where: { user_id: userId },
+        orderBy: { date: 'desc' },
+    });
+    return { sessions: sessions };
 };
 
-
 export const actions: Actions = {
-    clone: async ({ request }) => {
+    clone: async ({ request, locals }) => {
+        if (!locals.user) {
+            return fail(401, { error: 'You must be logged in to create a session.' });
+        }
         const form = await request.formData();
         const sessionId = parseInt(form.get('session_id') as string);
 
@@ -29,7 +39,7 @@ export const actions: Actions = {
             data: {
                 date: new Date(),
                 notes: original.notes,
-                user_id: 1,
+                user_id: locals.user.id,
                 sessionExercises: {}
             }
         });
@@ -52,7 +62,6 @@ export const actions: Actions = {
         }
 
 
-        // Redirect to edit page of cloned session
-        // throw redirect(303, `/sessions/${cloned.id}/edit`);
+        throw redirect(303, `/sessions/${cloned.id}/edit`);
     }
 };

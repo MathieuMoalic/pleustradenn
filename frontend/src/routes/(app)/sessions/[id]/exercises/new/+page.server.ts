@@ -13,7 +13,6 @@ export const load = async () => {
 export const actions: Actions = {
     create: async ({ request }) => {
         const form = await request.formData();
-        console.log("Form data:", form);
         const se = await prisma.sessionExercise.create({
             data: {
                 sets: parseInt(form.get("sets") as string),
