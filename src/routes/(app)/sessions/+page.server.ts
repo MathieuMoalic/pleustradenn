@@ -1,67 +1,68 @@
-import prisma from '$lib/server/prisma';
-import { fail, redirect, type Actions } from '@sveltejs/kit';
+// src/routes/sessions/+page.server.ts
+import type { Actions } from "./$types";
+import prisma from "$lib/server/prisma";
+import { redirect, fail } from "@sveltejs/kit";
 import type { PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async ({ locals }) => {
     if (!locals.user) {
         throw redirect(302, '/login?redirectTo=/sessions');
     }
+
     const userId = locals.user.id;
+
     const sessions = await prisma.session.findMany({
-        where: { user_id: userId },
-        orderBy: { date: 'desc' },
+        where: {
+            user_id: userId,
+        },
+        orderBy: {
+            date: 'desc',
+        },
     });
-    return { sessions: sessions };
+
+    return {
+        sessions: sessions,
+        user: locals.user
+    };
 };
 
+
 export const actions: Actions = {
-    clone: async ({ request, locals }) => {
+    create: async ({ request, locals }) => {
         if (!locals.user) {
             return fail(401, { error: 'You must be logged in to create a session.' });
         }
+
         const form = await request.formData();
-        const sessionId = parseInt(form.get('session_id') as string);
+        const rawDate = form.get("date")?.toString();
+        const notes = form.get("notes")?.toString() ?? "";
 
-        if (isNaN(sessionId)) {
-            return { error: 'Invalid session ID' };
+        if (!rawDate || isNaN(Date.parse(rawDate))) {
+            return fail(400, { notes: notes, error: "Invalid or missing date" });
         }
 
-        const original = await prisma.session.findUnique({
-            where: { id: sessionId },
-            include: { sessionExercises: true }
-        });
+        const userId = locals.user.id;
+        let session;
 
-        if (!original) {
-            return { error: 'Session not found' };
-        }
-
-        const cloned = await prisma.session.create({
-            data: {
-                date: new Date(),
-                notes: original.notes,
-                user_id: locals.user.id,
-                sessionExercises: {}
-            }
-        });
-        for (const exercise of original.sessionExercises) {
-            await prisma.sessionExercise.create({
+        try {
+            session = await prisma.session.create({
                 data: {
-                    session_id: cloned.id,
-                    exercise_id: exercise.exercise_id,
-                    sets: exercise.sets,
-                    reps: exercise.reps,
-                    weight: exercise.weight,
-                    rest_seconds: exercise.rest_seconds,
-                    count: exercise.count,
-                    completed: exercise.completed,
-                    created_at: new Date(),
-                    success: exercise.success,
-                    notes: exercise.notes
-                }
+                    date: new Date(rawDate),
+                    notes: notes,
+                    user_id: userId,
+                    // No need to include Sets here when creating a new session initially
+                },
+            });
+        } catch (err) {
+            console.error("Error creating session:", err);
+            return fail(500, {
+                date: rawDate,
+                notes: notes,
+                error: 'Failed to create session. Please try again.'
             });
         }
 
-
-        throw redirect(303, `/sessions/${cloned.id}/edit`);
-    }
+        // Redirect to the new session's exercises page (or wherever you manage sets)
+        throw redirect(303, `/sessions/${session.id}/exercises`); // Assuming this is the correct path
+    },
 };

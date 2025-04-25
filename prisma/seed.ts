@@ -68,11 +68,7 @@ async function main() {
         console.log(`Created exercise: ${exercise.name}`);
       } catch (e) {
         // Handle potential unique constraint violation if run multiple times concurrently (less likely in seed)
-        if ((e as any)?.code === 'P2002' && (e as any)?.meta?.target?.includes('name')) {
-          console.warn(`Exercise '${exercise.name}' already exists.`);
-        } else {
-          console.error(`Error creating exercise '${exercise.name}':`, e);
-        }
+        console.error(`Error creating exercise '${exercise.name}':`, e);
       }
     }
   } else {
@@ -161,49 +157,86 @@ async function main() {
     }
   }
 
-  // --- Step 5: Create default session exercises if none exist ---
-  console.log('Checking for existing Session Exercises...');
-  const sessionExerciseExists = await prisma.sessionExercise.findFirst(); // Maybe refine check based on session ID?
+  // --- Step 5: Create default sets if none exist ---
+  console.log('Checking for existing Sets...');
+  // Check if *any* Set record exists to avoid re-seeding
+  const setExists = await prisma.set.findFirst();
 
-  if (!sessionExerciseExists && firstSessionId) {
-    console.log(`No existing session exercises found. Seeding for session ID: ${firstSessionId}...`);
-    const exercises = await prisma.exercise.findMany({ take: 3 }); // Get first 3 exercises for seeding
+  if (!setExists && firstSessionId) {
+    console.log(`No existing sets found. Seeding sets for session ID: ${firstSessionId}...`);
+    const exercises = await prisma.exercise.findMany({ take: 3 });
 
     if (exercises.length >= 3) {
-      const sessionExercisesData = [
+      const setsToSeed = [
+        // Squats (Exercise 0) - 3 sets of 10 reps @ 100 intensity
         {
           session_id: firstSessionId,
-          exercise_id: exercises[0].id, // Squat
-          sets: 3, reps: 10, weight: 100, rest_seconds: 60, count: 1, completed: true, success: true, notes: 'Good form',
+          exercise_id: exercises[0].id,
+          reps: 10,
+          intensity: 100.0,
         },
         {
           session_id: firstSessionId,
-          exercise_id: exercises[1].id, // Bench Press
-          sets: 3, reps: 8, weight: 80, rest_seconds: 90, count: 1, completed: false, success: true, notes: 'Struggled with last set',
+          exercise_id: exercises[0].id,
+          reps: 10,
+          intensity: 100.0,
         },
         {
           session_id: firstSessionId,
-          exercise_id: exercises[2].id, // Deadlift
-          sets: 1, reps: 5, weight: 120, rest_seconds: 120, count: 1, completed: false, success: false, notes: 'Felt heavy',
+          exercise_id: exercises[0].id,
+          reps: 10,
+          intensity: 100.0,
+        },
+
+        // Bench Press (Exercise 1) - 3 sets of 8 reps @ 80 intensity
+        {
+          session_id: firstSessionId,
+          exercise_id: exercises[1].id,
+          reps: 8,
+          intensity: 80.0,
+        },
+        {
+          session_id: firstSessionId,
+          exercise_id: exercises[1].id,
+          reps: 8,
+          intensity: 80.0,
+        },
+        {
+          session_id: firstSessionId,
+          exercise_id: exercises[1].id,
+          reps: 8,
+          intensity: 80.0,
+        },
+
+        // Deadlift (Exercise 2) - 1 set of 5 reps @ 120 intensity
+        {
+          session_id: firstSessionId,
+          exercise_id: exercises[2].id,
+          reps: 5,
+          intensity: 120.0,
         },
       ];
 
-      for (const se of sessionExercisesData) {
+      console.log(`Attempting to create ${setsToSeed.length} Set records...`);
+      for (const set of setsToSeed) {
         try {
-          // Add created_at here if you want it to be exactly now, otherwise Prisma default works
-          await prisma.sessionExercise.create({ data: { ...se, created_at: new Date() } });
-          console.log(`Created session exercise for exercise ID ${se.exercise_id} in session ID ${se.session_id}`);
+          // Prisma will automatically set created_at if not provided,
+          // or you can explicitly set it: created_at: new Date()
+          await prisma.set.create({ data: set });
+          console.log(`Created set for exercise ID ${set.exercise_id} in session ID ${set.session_id}`);
         } catch (e) {
-          console.error(`Error creating session exercise for exercise ID ${se.exercise_id}:`, e);
+          console.error(`Error creating set for exercise ID ${set.exercise_id}:`, e);
         }
       }
-    } else {
-      console.warn('Not enough exercises found in DB to seed session exercises.');
+      console.log('Set seeding complete.');
+
+    } else if (exercises.length < 3) {
+      console.warn(`Not enough exercises found in DB (found ${exercises.length}) to seed the planned sets (need at least 3). Skipping set seeding.`);
     }
   } else if (!firstSessionId) {
-    console.warn('Skipping session exercise seeding because no target session ID was found or created.');
+    console.warn('Skipping set seeding because no target session ID was found or created.');
   } else {
-    console.log('Session exercises already exist. Skipping session exercise seeding.');
+    console.log('Sets already exist. Skipping set seeding.');
   }
 
   console.log('Seed script finished.');
