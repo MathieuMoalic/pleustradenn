@@ -1,45 +1,57 @@
 <script lang="ts">
-    import { Label, Input, Button, Datepicker } from "flowbite-svelte";
-    import { page } from "$app/state";
-    import type { CreateSessionFormData } from "$lib/types";
-    export let session: CreateSessionFormData;
+    import { Datepicker } from "flowbite-svelte";
+    export let session: {
+        id: number;
+        date: Date;
+        notes: string;
+    };
 </script>
 
 <form method="POST" class="space-y-4">
-    <!-- <Header name="Session" /> -->
+    <input type="hidden" name="id" value={session.id} />
 
-    <div class="mb-64 md:w-1/2">
+    <div class="md:w-1/2 flex justify-center items-center">
         <Datepicker bind:value={session.date} inline color="red" />
         <input type="hidden" name="date" value={session.date} />
     </div>
 
-    <Label class="space-y-1 text-sm">
-        <span>Notes</span>
-        <Input
+    <div>
+        <label for="notes" class="block text-sm font-medium text-thistle mb-1"
+            >Notes</label
+        >
+        <textarea
+            id="notes"
             name="notes"
             bind:value={session.notes}
-            class="modal-input"
-            placeholder="Enter notes"
-        />
-    </Label>
+            rows="3"
+            class="w-full rounded-md border border-burnt-umber bg-black-bean text-thistle shadow-sm focus:border-plum focus:ring-plum sm:text-sm p-2"
+        ></textarea>
+    </div>
 
     <div class="flex justify-between gap-2 pt-4">
-        {#if page.params.id}
-            <Button type="submit" formaction="?/update" class="btn-edit w-full"
-                >Save</Button
-            >
-            <Button
+        {#if session.id >= 0}
+            <button
                 type="submit"
-                class="btn-delete w-full"
+                formaction="?/update"
+                class="w-full rounded-md bg-plum py-2 px-4 text-black-bean hover:bg-plum/90 focus:outline-none focus:ring-2 focus:ring-burnt-umber focus:ring-offset-2 focus:ring-offset-seal-brown"
+                >Save</button
+            >
+            <button
+                type="submit"
+                class="w-full rounded-md bg-red-600 py-2 px-4 text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 focus:ring-offset-seal-brown"
                 formaction="?/delete"
                 formmethod="POST"
             >
                 Delete
-            </Button>
+            </button>
         {:else}
-            <Button type="submit" formaction="?/create" class="btn-edit w-full">
+            <button
+                type="submit"
+                formaction="?/create"
+                class="w-full rounded-md bg-plum py-2 px-4 text-black-bean hover:bg-plum/90 focus:outline-none focus:ring-2 focus:ring-plum focus:ring-offset-2 focus:ring-offset-seal-brown"
+            >
                 Add Session
-            </Button>
+            </button>
         {/if}
     </div>
 </form>

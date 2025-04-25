@@ -50,7 +50,6 @@ export const actions: Actions = {
                     date: new Date(rawDate),
                     notes: notes,
                     user_id: userId,
-                    // No need to include Sets here when creating a new session initially
                 },
             });
         } catch (err) {
@@ -62,7 +61,52 @@ export const actions: Actions = {
             });
         }
 
-        // Redirect to the new session's exercises page (or wherever you manage sets)
-        throw redirect(303, `/sessions/${session.id}/exercises`); // Assuming this is the correct path
+        // throw redirect(303, `/sessions/${session.id}`);
     },
+
+    update: async ({ request }) => {
+        const form = await request.formData();
+        const idString = form.get("id")?.toString();
+        if (!idString) {
+            return fail(400, { error: "Exercise ID is missing.", form: Object.fromEntries(form) });
+        }
+        const id = parseInt(idString);
+        if (isNaN(id)) {
+            return fail(400, { error: "Invalid exercise ID.", form: Object.fromEntries(form) });
+        }
+
+        const rawDate = form.get('date')?.toString();
+        if (!rawDate || isNaN(Date.parse(rawDate))) {
+            return { error: 'Invalid or missing date' };
+        }
+
+        const formData = {
+            date: new Date(rawDate),
+            notes: form.get('notes')?.toString() ?? '',
+        };
+
+        await prisma.session.update({
+            where: { id },
+            data: formData
+        });
+
+        throw redirect(303, '/sessions');
+    },
+    delete: async ({ request }) => {
+        const form = await request.formData();
+
+        const idString = form.get("id")?.toString();
+        if (!idString) {
+            return fail(400, { error: "Exercise ID is missing for deletion." });
+        }
+        const id = parseInt(idString);
+        if (isNaN(id)) {
+            return fail(400, { error: "Invalid exercise ID for deletion." });
+        }
+        await prisma.session.delete({ where: { id } });
+        throw redirect(303, '/sessions');
+    },
+    clone: async ({ request }) => {
+        console.log("todo");
+    }
 };
