@@ -28,7 +28,6 @@
           PRISMA_QUERY_ENGINE_BINARY = "${pkgs.prisma-engines}/bin/query-engine";
           PRISMA_SCHEMA_ENGINE_BINARY = "${pkgs.prisma-engines}/bin/schema-engine";
           PRISMA_HIDE_UPDATE_MESSAGE = 1;
-          DATABASE_URL = "file:./db1.sqlite";
 
           shellHook = ''
             set -euo pipefail
