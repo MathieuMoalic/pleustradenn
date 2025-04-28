@@ -65,8 +65,7 @@
                 {:else}
                     <button
                         type="button"
-                        on:click={() =>
-                            goto(`/sessions/${session.id}/exercises`)}
+                        on:click={() => goto(`/sessions/${session.id}`)}
                         class="flex flex-1 items-center gap-3 min-w-0 p-4 pr-0"
                     >
                         <div

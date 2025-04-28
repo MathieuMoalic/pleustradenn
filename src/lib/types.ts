@@ -1,4 +1,4 @@
-import type { Exercise } from "@prisma/client";
+import type { Exercise, Set } from "@prisma/client";
 
 export type SessionExerciseFormData = {
     id: number | undefined;
@@ -20,3 +20,12 @@ export type CreateSessionFormData = {
     date?: Date;
     notes?: string;
 };
+
+export type SetWithExercise = Set & {
+    exercise: Exercise;
+};
+
+export interface GroupedSets {
+    exercise: Exercise;
+    sets: SetWithExercise[];
+}

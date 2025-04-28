@@ -42,10 +42,9 @@ export const actions: Actions = {
         }
 
         const userId = locals.user.id;
-        let session;
 
         try {
-            session = await prisma.session.create({
+            await prisma.session.create({
                 data: {
                     date: new Date(rawDate),
                     notes: notes,
@@ -60,19 +59,17 @@ export const actions: Actions = {
                 error: 'Failed to create session. Please try again.'
             });
         }
-
-        // throw redirect(303, `/sessions/${session.id}`);
     },
 
     update: async ({ request }) => {
         const form = await request.formData();
         const idString = form.get("id")?.toString();
         if (!idString) {
-            return fail(400, { error: "Exercise ID is missing.", form: Object.fromEntries(form) });
+            return fail(400, { error: "Session ID is missing.", form: Object.fromEntries(form) });
         }
         const id = parseInt(idString);
         if (isNaN(id)) {
-            return fail(400, { error: "Invalid exercise ID.", form: Object.fromEntries(form) });
+            return fail(400, { error: "Invalid Session ID.", form: Object.fromEntries(form) });
         }
 
         const rawDate = form.get('date')?.toString();
@@ -90,21 +87,19 @@ export const actions: Actions = {
             data: formData
         });
 
-        throw redirect(303, '/sessions');
     },
     delete: async ({ request }) => {
         const form = await request.formData();
 
         const idString = form.get("id")?.toString();
         if (!idString) {
-            return fail(400, { error: "Exercise ID is missing for deletion." });
+            return fail(400, { error: "Session ID is missing for deletion." });
         }
         const id = parseInt(idString);
         if (isNaN(id)) {
-            return fail(400, { error: "Invalid exercise ID for deletion." });
+            return fail(400, { error: "Invalid Session ID for deletion." });
         }
         await prisma.session.delete({ where: { id } });
-        throw redirect(303, '/sessions');
     },
     clone: async ({ request }) => {
         console.log("todo");
