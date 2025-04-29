@@ -35,7 +35,6 @@
     class="flex flex-col bg-black-bean text-plum rounded-md shadow-sm border border-burnt-umber text-sm overflow-hidden"
 >
     <input type="hidden" name="id" value={set.id} />
-    <input type="hidden" name="session_id" value={set.session_id} />
     <input type="hidden" name="exercise_id" value={set.exercise_id} />
 
     <button

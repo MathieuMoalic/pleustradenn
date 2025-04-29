@@ -3,6 +3,7 @@ import type { Actions } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
 import { fail } from '@sveltejs/kit';
 import type { SetWithExercise, GroupedSets } from "$lib/types";
+import type { Set } from '@prisma/client';
 
 function groupSetsByExercise(sets: SetWithExercise[]): GroupedSets[] {
     const groups = new Map<number, GroupedSets>();
@@ -30,37 +31,79 @@ export const load: PageServerLoad = async ({ params }) => {
             exercise: true
         }
     });
-
+    const categories = await prisma.exerciseCategory.findMany();
     let groupedSets = groupSetsByExercise(setList);
-    return { groupedSets };
+    const exercises = await prisma.exercise.findMany({});
+    return { groupedSets, categories, exercises };
 };
 
 export const actions: Actions = {
-    create: async ({ request }) => {
+    create: async ({ request, params }) => {
+        const session_id = parseInt(params.id as string);
+        if (isNaN(session_id)) {
+            return fail(400, { error: "Invalid Session ID from URL." });
+        }
         const form = await request.formData();
-        console.log("Form data:", Object.fromEntries(form));
-        const session_id = form.get("session_id")?.toString();
-        const exerciseIdString = form.get("exercise_id")?.toString();
-        let last_set = await prisma.set.findFirst({
-            orderBy: {
-                id: "desc"
-            },
+        const exercise_id = parseInt(form.get("exercise_id") as string);
+
+        // Check if this session already has a set for this exercise
+        const existingSet = await prisma.set.findFirst({
             where: {
-                session_id: parseInt(session_id as string),
-                exercise_id: parseInt(exerciseIdString as string)
+                session_id: session_id,
+                exercise_id: exercise_id
             }
         });
-        let new_set = {
-            session_id: parseInt(session_id as string),
-            exercise_id: parseInt(exerciseIdString as string),
-            reps: last_set?.reps || 0,
-            intensity: last_set?.intensity || 0
-        };
+
+        let new_set;
+        if (existingSet) {
+            let last_set = await prisma.set.findFirst({
+                orderBy: {
+                    id: "desc"
+                },
+                where: {
+                    session_id: session_id,
+                    exercise_id: exercise_id
+                }
+            });
+            new_set = {
+                session_id: session_id,
+                exercise_id: exercise_id,
+                reps: last_set?.reps || 0,
+                intensity: last_set?.intensity || 0
+            };
+        } else {
+            // get the set that has the highest intensity and more than 5 reps
+            console.log("Creating new set for exercise_id:", exercise_id);
+            const last_set = await prisma.set.findFirst({
+                orderBy: {
+                    intensity: "desc"
+                },
+                where: {
+                    exercise_id: exercise_id,
+                    reps: {
+                        gt: 5
+                    }
+                }
+            });
+            console.log("Last set found:", last_set);
+            new_set = {
+                session_id: session_id,
+                exercise_id: exercise_id,
+                reps: last_set?.reps || 0,
+                intensity: last_set?.intensity || 0
+            };
+        }
+
         await prisma.set.create({
             data: new_set
         });
     },
-    update: async ({ request }) => {
+    update: async ({ request, params }) => {
+        const session_id = parseInt(params.id as string);
+        if (isNaN(session_id)) {
+            return fail(400, { error: "Invalid Session ID from URL." });
+        }
+
         const form = await request.formData();
         const idString = form.get("id")?.toString();
         if (!idString) {
@@ -74,7 +117,7 @@ export const actions: Actions = {
         await prisma.set.update({
             where: { id: id },
             data: {
-                session_id: parseInt(form.get("session_id") as string),
+                session_id: session_id,
                 exercise_id: parseInt(form.get("exercise_id") as string),
                 reps: parseInt(form.get("reps") as string),
                 intensity: parseFloat(form.get("intensity") as string),

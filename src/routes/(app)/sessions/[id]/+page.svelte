@@ -2,14 +2,22 @@
     import AddSetButton from "$components/Sets/AddSetButton.svelte";
     import type { GroupedSets } from "$lib/types";
     import SingleSet from "$components/Sets/SingleSet.svelte";
+    import AddExerciseButton from "$components/AddExerciseButton.svelte";
+    import type { Exercise, ExerciseCategory } from "@prisma/client";
 
     export let data: {
         groupedSets: GroupedSets[];
+        categories: ExerciseCategory[];
+        exercises: Exercise[];
     };
 </script>
 
 <section class="p-2">
     <h2 class="text-xl font-bold text-thistle mb-3">Sets</h2>
+    <AddExerciseButton
+        categories={data.categories}
+        exercises={data.exercises}
+    />
 
     {#if data.groupedSets && data.groupedSets.length > 0}
         <div class="flex flex-col gap-4">
