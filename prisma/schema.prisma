@@ -20,10 +20,20 @@ model Exercise {
   category_id Int
   category    ExerciseCategory @relation(fields: [category_id], references: [id])
 
-  intensity_unit String @default("kg")
-  name           String @unique
-  notes          String @default("")
-  Sets           Set[]
+  intensity_unit       String                 @default("kg")
+  name                 String                 @unique
+  notes                String                 @default("")
+  Sets                 Set[]
+  SessionExerciseOrder SessionExerciseOrder[]
+}
+
+model SessionExerciseOrder {
+  id         Int      @id @default(autoincrement())
+  session    Session  @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  sessionId  Int
+  exercise   Exercise @relation(fields: [exerciseId], references: [id], onDelete: Cascade)
+  exerciseId Int
+  position   Int
 }
 
 model Session {
@@ -34,7 +44,9 @@ model Session {
 
   date  DateTime @default(now())
   notes String   @default("")
-  Sets  Set[]
+
+  Sets                 Set[]
+  SessionExerciseOrder SessionExerciseOrder[]
 }
 
 model Set {

@@ -28,4 +28,5 @@ export type SetWithExercise = Set & {
 export interface GroupedSets {
     exercise: Exercise;
     sets: SetWithExercise[];
+    id: number;
 }

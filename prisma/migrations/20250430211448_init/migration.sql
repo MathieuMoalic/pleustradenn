@@ -15,6 +15,16 @@ CREATE TABLE "Exercise" (
 );
 
 -- CreateTable
+CREATE TABLE "SessionExerciseOrder" (
+    "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    "sessionId" INTEGER NOT NULL,
+    "exerciseId" INTEGER NOT NULL,
+    "position" INTEGER NOT NULL,
+    CONSTRAINT "SessionExerciseOrder_sessionId_fkey" FOREIGN KEY ("sessionId") REFERENCES "Session" ("id") ON DELETE CASCADE ON UPDATE CASCADE,
+    CONSTRAINT "SessionExerciseOrder_exerciseId_fkey" FOREIGN KEY ("exerciseId") REFERENCES "Exercise" ("id") ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+-- CreateTable
 CREATE TABLE "Session" (
     "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
     "user_id" TEXT NOT NULL,

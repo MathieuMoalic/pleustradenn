@@ -3,26 +3,33 @@ import type { Actions } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
 import { fail } from '@sveltejs/kit';
 import type { SetWithExercise, GroupedSets } from "$lib/types";
-import type { Set } from '@prisma/client';
 
 function groupSetsByExercise(sets: SetWithExercise[]): GroupedSets[] {
     const groups = new Map<number, GroupedSets>();
 
     sets.forEach(set => {
         if (!groups.has(set.exercise.id)) {
-            groups.set(set.exercise.id, { exercise: set.exercise, sets: [] });
+            groups.set(set.exercise.id, { exercise: set.exercise, sets: [], id: set.exercise.id });
         }
         groups.get(set.exercise.id)!.sets.push(set);
     });
 
     return [...groups.values()].map(({ exercise, sets }) => ({
         exercise,
-        sets: sets.sort((a, b) => (a.id < 0 && b.id >= 0) ? -1 : (b.id < 0 && a.id >= 0) ? 1 : new Date(a.created_at).getTime() - new Date(b.created_at).getTime())
+        sets: sets.sort((a, b) => (a.id < 0 && b.id >= 0) ? -1 : (b.id < 0 && a.id >= 0) ? 1 : new Date(a.created_at).getTime() - new Date(b.created_at).getTime()),
+        id: exercise.id
     }));
 }
 
 
 export const load: PageServerLoad = async ({ params }) => {
+    const sessionOrders = await prisma.sessionExerciseOrder.findMany({
+        where: { sessionId: parseInt(params.id) },
+        orderBy: { position: 'asc' }
+    });
+
+    const exerciseOrderMap = new Map(sessionOrders.map((o, i) => [o.exerciseId, i]));
+
     const setList = await prisma.set.findMany({
         where: {
             session_id: parseInt(params.id)
@@ -33,6 +40,12 @@ export const load: PageServerLoad = async ({ params }) => {
     });
     const categories = await prisma.exerciseCategory.findMany();
     let groupedSets = groupSetsByExercise(setList);
+
+    groupedSets.sort((a, b) => {
+        const posA = exerciseOrderMap.get(a.exercise.id) ?? Infinity;
+        const posB = exerciseOrderMap.get(b.exercise.id) ?? Infinity;
+        return posA - posB;
+    });
     const exercises = await prisma.exercise.findMany({});
     return { groupedSets, categories, exercises };
 };
@@ -73,7 +86,6 @@ export const actions: Actions = {
             };
         } else {
             // get the set that has the highest intensity and more than 5 reps
-            console.log("Creating new set for exercise_id:", exercise_id);
             const last_set = await prisma.set.findFirst({
                 orderBy: {
                     intensity: "desc"
@@ -85,7 +97,6 @@ export const actions: Actions = {
                     }
                 }
             });
-            console.log("Last set found:", last_set);
             new_set = {
                 session_id: session_id,
                 exercise_id: exercise_id,
@@ -96,6 +107,13 @@ export const actions: Actions = {
 
         await prisma.set.create({
             data: new_set
+        });
+        await prisma.sessionExerciseOrder.create({
+            data: {
+                sessionId: session_id,
+                exerciseId: exercise_id,
+                position: await prisma.sessionExerciseOrder.count({ where: { sessionId: session_id } })
+            }
         });
     },
     update: async ({ request, params }) => {
@@ -137,4 +155,28 @@ export const actions: Actions = {
         }
         await prisma.set.delete({ where: { id } });
     },
+    reorder: async ({ request, params }) => {
+        const sessionId = parseInt(params.id as string);
+        const form = await request.formData();
+        let exerciseIds = form.get("exerciseIds");
+        let exerciseOrderArray: number[];
+
+        if (typeof exerciseIds === "string") {
+            exerciseOrderArray = JSON.parse(exerciseIds);
+        } else {
+            return fail(400, { error: "Invalid exercise order format" });
+        }
+
+        const newOrders = exerciseOrderArray.map((exerciseId: number, index: number) => ({
+            sessionId,
+            exerciseId,
+            position: index
+        }));
+
+        await prisma.sessionExerciseOrder.createMany({
+            data: newOrders
+        });
+
+        return { success: true };
+    }
 };
