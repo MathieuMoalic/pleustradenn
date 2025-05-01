@@ -1,15 +1,17 @@
 <script lang="ts">
-    import AddSetButton from "$components/Sets/AddSetButton.svelte";
+    import AddSetButton from "./AddSetButton.svelte";
     import type { GroupedSets } from "$lib/types";
-    import SingleSet from "$components/Sets/SingleSet.svelte";
-    import AddExerciseButton from "$components/AddExerciseButton.svelte";
-    import type { Exercise, ExerciseCategory } from "@prisma/client";
+    import SingleSet from "./SingleSet.svelte";
+    import type { Exercise, ExerciseCategory, Session } from "@prisma/client";
     import { dndzone } from "svelte-dnd-action";
+    import AddExercise from "./AddExercise.svelte";
+    import Menu from "$components/Menu.svelte";
 
     export let data: {
         groupedSets: GroupedSets[];
         categories: ExerciseCategory[];
         exercises: Exercise[];
+        session: Session;
     };
 
     function handleReorder(event: CustomEvent) {
@@ -27,18 +29,39 @@
         const form = document.getElementById("reorder-form") as HTMLFormElement;
         form.submit();
     }
+
+    function formatSessionDate(date: Date): string {
+        const today = new Date();
+        const isToday =
+            date.getFullYear() === today.getFullYear() &&
+            date.getMonth() === today.getMonth() &&
+            date.getDate() === today.getDate();
+
+        if (isToday) {
+            return "Today's session";
+        }
+
+        const yyyy = date.getFullYear();
+        const mm = String(date.getMonth() + 1).padStart(2, "0");
+        const dd = String(date.getDate()).padStart(2, "0");
+
+        return `Session of ${yyyy}.${mm}.${dd}`;
+    }
+    let addingExercise = false;
 </script>
 
+<Menu
+    name={formatSessionDate(data.session.date)}
+    bind:addButtonToggle={addingExercise}
+/>
 <section class="p-2">
     <form method="POST" action="?/reorder" id="reorder-form">
         <input type="hidden" name="exerciseIds" id="exercise-order-input" />
     </form>
 
-    <h2 class="text-xl font-bold text-thistle mb-3">Sets</h2>
-    <AddExerciseButton
-        categories={data.categories}
-        exercises={data.exercises}
-    />
+    {#if addingExercise}
+        <AddExercise categories={data.categories} exercises={data.exercises} />
+    {/if}
 
     {#if data.groupedSets && data.groupedSets.length > 0}
         <div
@@ -50,7 +73,7 @@
         >
             {#each data.groupedSets as group (group.id)}
                 <div
-                    class="bg-seal-brown rounded-md shadow-md p-3 border border-burnt-umber my-3"
+                    class="bg-seal-brown/90 rounded-md shadow-md p-3 border border-burnt-umber my-3"
                 >
                     <div class="flex justify-between items-center mb-2">
                         <h3 class="text-lg font-semibold text-thistle truncate">

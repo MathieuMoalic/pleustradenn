@@ -1,6 +1,7 @@
 <script lang="ts">
+    import Menu from "$components/Menu.svelte";
     import type { PageData } from "./$types";
-    import ExerciseForm from "$components/ExerciseForm.svelte";
+    import ExerciseForm from "./ExerciseForm.svelte";
 
     export let data: PageData;
     let categories = data.categories;
@@ -23,42 +24,20 @@
         name: "",
         notes: "",
     };
+    let addingExercise = false;
 </script>
 
-<section class="space-y-2 p-4">
-    <button
-        on:click={() => {
-            toggleExpand(-1);
-        }}
-        class="bg-green-500 text-white px-4 py-2 rounded-md shadow-lg flex items-center space-x-5 bg-opacity-60 w-full"
-    >
-        <svg
-            class="mr-2 w-5 h-5"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-            xmlns="http://www.w3.org/2000/svg"
-        >
-            <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M12 4v16m8-8H4"
-            ></path>
-        </svg>
-        Add Exercise
-    </button>
-
-    {#if expandedExerciseId === -1}
+<Menu name="Exercises" bind:addButtonToggle={addingExercise} />
+<section class="space-y-2 p-2">
+    {#if addingExercise}
         <ExerciseForm ex={new_ex} {categories} />
     {/if}
 
-    <h1 class="text-2xl font-bold text-thistle mb-4">Exercises</h1>
     {#if exercises && exercises.length > 0}
         <div class="flex flex-col gap-2">
             {#each exercises as ex (ex.id)}
                 <div
-                    class="bg-burnt-umber rounded-md shadow-sm overflow-hidden"
+                    class="bg-burnt-umber/95 rounded-md shadow-sm overflow-hidden"
                 >
                     <button
                         on:click={() => toggleExpand(ex.id)}
@@ -72,9 +51,6 @@
                                 <h3 class="text-lg font-semibold text-thistle">
                                     {ex.name}
                                 </h3>
-                                <p class="text-sm text-plum mt-0.5">
-                                    {ex.notes || "No notes"}
-                                </p>
                             </div>
                             <svg
                                 class="w-5 h-5 transition-transform duration-200 {expandedExerciseId ===

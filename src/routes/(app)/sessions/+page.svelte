@@ -2,7 +2,8 @@
     import { goto } from "$app/navigation";
     import { EditOutline, FileCopyOutline } from "flowbite-svelte-icons";
     import type { PageData } from "./$types";
-    import SessionForm from "$components/SessionForm.svelte";
+    import SessionForm from "./SessionForm.svelte";
+    import Menu from "$components/Menu.svelte";
 
     export let data: PageData;
     let sessions = data.sessions;
@@ -25,32 +26,14 @@
         date: today,
         notes: "",
     };
+    let addingSession = false;
 </script>
 
+<Menu name="Sessions" bind:addButtonToggle={addingSession} />
+
 <section>
-    <div class="flex flex-col gap-2">
-        <button
-            on:click={() => {
-                toggleExpand(-1);
-            }}
-            class="bg-green-500 text-white px-4 py-2 rounded-md shadow-lg flex items-center space-x-5 bg-opacity-70"
-        >
-            <svg
-                class="mr-2 w-5 h-5"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-                xmlns="http://www.w3.org/2000/svg"
-            >
-                <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M12 4v16m8-8H4"
-                ></path>
-            </svg> Add Session
-        </button>
-        {#if expandedSessionId === -1}
+    <div class="flex flex-col gap-2 p-2">
+        {#if addingSession}
             <SessionForm session={new_session} />
         {/if}
 

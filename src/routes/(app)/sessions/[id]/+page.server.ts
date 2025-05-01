@@ -47,7 +47,10 @@ export const load: PageServerLoad = async ({ params }) => {
         return posA - posB;
     });
     const exercises = await prisma.exercise.findMany({});
-    return { groupedSets, categories, exercises };
+    const session = await prisma.session.findUnique({
+        where: { id: parseInt(params.id) },
+    });
+    return { groupedSets, categories, exercises, session };
 };
 
 export const actions: Actions = {
@@ -108,13 +111,22 @@ export const actions: Actions = {
         await prisma.set.create({
             data: new_set
         });
-        await prisma.sessionExerciseOrder.create({
-            data: {
+        const existingOrder = await prisma.sessionExerciseOrder.findFirst({
+            where: {
                 sessionId: session_id,
-                exerciseId: exercise_id,
-                position: await prisma.sessionExerciseOrder.count({ where: { sessionId: session_id } })
+                exerciseId: exercise_id
             }
         });
+
+        if (!existingOrder) {
+            await prisma.sessionExerciseOrder.create({
+                data: {
+                    sessionId: session_id,
+                    exerciseId: exercise_id,
+                    position: await prisma.sessionExerciseOrder.count({ where: { sessionId: session_id } })
+                }
+            });
+        }
     },
     update: async ({ request, params }) => {
         const session_id = parseInt(params.id as string);
@@ -167,6 +179,12 @@ export const actions: Actions = {
             return fail(400, { error: "Invalid exercise order format" });
         }
 
+        // Delete old order, this helps because sometimes the requests bugs out.
+        await prisma.sessionExerciseOrder.deleteMany({
+            where: { sessionId }
+        });
+
+        // Recreate with new positions
         const newOrders = exerciseOrderArray.map((exerciseId: number, index: number) => ({
             sessionId,
             exerciseId,

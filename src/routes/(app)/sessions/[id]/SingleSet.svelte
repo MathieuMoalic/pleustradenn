@@ -1,9 +1,9 @@
 <script lang="ts">
     import type { SetWithExercise } from "$lib/types";
-    import DecrementButton from "./Buttons/DecrementButton.svelte";
-    import DeleteButton from "./Buttons/DeleteButton.svelte";
-    import IncrementButton from "./Buttons/IncrementButton.svelte";
-    import SubmitButton from "./Buttons/SubmitButton.svelte";
+    import DecrementButton from "./DecrementButton.svelte";
+    import DeleteButton from "./DeleteButton.svelte";
+    import IncrementButton from "./IncrementButton.svelte";
+    import SubmitButton from "./SubmitButton.svelte";
     import NumberInput from "./NumberInput.svelte";
 
     export let set: SetWithExercise;
@@ -32,7 +32,7 @@
     method="POST"
     action="?/update"
     data-set-id={set.id}
-    class="flex flex-col bg-black-bean text-plum rounded-md shadow-sm border border-burnt-umber text-sm overflow-hidden"
+    class="flex flex-col bg-black-bean/40 text-plum rounded-md shadow-sm border border-burnt-umber text-sm overflow-hidden"
 >
     <input type="hidden" name="id" value={set.id} />
     <input type="hidden" name="exercise_id" value={set.exercise_id} />
