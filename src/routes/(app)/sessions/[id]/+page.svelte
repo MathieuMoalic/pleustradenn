@@ -6,6 +6,7 @@
     import { dndzone } from "svelte-dnd-action";
     import AddExercise from "./AddExercise.svelte";
     import Menu from "$components/Menu.svelte";
+    import { flip } from "svelte/animate";
 
     export let data: {
         groupedSets: GroupedSets[];
@@ -67,6 +68,10 @@
         <div
             use:dndzone={{
                 items: data.groupedSets,
+                dropTargetStyle: {
+                    border: "none",
+                },
+                flipDurationMs: 200,
             }}
             on:consider={handleReorder}
             on:finalize={finalizeReorder}
@@ -74,6 +79,7 @@
             {#each data.groupedSets as group (group.id)}
                 <div
                     class="bg-seal-brown/90 rounded-md shadow-md p-3 border border-burnt-umber my-3"
+                    animate:flip={{ duration: 200 }}
                 >
                     <div class="flex justify-between items-center mb-2">
                         <h3 class="text-lg font-semibold text-thistle truncate">
