@@ -5,7 +5,7 @@
     export let categories: ExerciseCategory[] = [];
 
     let selected_category_id: number =
-        categories.find((c) => c.id === ex.category_id)?.id ?? -1;
+        categories.find((c) => c.id === ex.category_id)?.id ?? 1;
 </script>
 
 <form method="POST" class="space-y-5 text-plum p-3 pt-0">

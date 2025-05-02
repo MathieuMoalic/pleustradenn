@@ -1,6 +1,6 @@
 <button
     type="submit"
-    formaction="?/update"
+    formaction="?/update_set"
     class="text-blue-500 hover:text-blue-400 p-1 rounded-sm"
     aria-label="Save set"
 >

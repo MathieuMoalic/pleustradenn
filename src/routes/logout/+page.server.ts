@@ -6,7 +6,7 @@ const SESSION_COOKIE_NAME = 'session_id';
 
 export const actions: Actions = {
     default: async ({ cookies, locals }) => {
-        const sessionId = locals.sessionId; // Get sessionId from hooks
+        const sessionId = locals.sessionId;
 
         if (sessionId) {
             // Delete session from database
@@ -19,7 +19,6 @@ export const actions: Actions = {
         locals.user = null;
         locals.sessionId = null;
 
-        // Redirect to login or home page
         throw redirect(303, '/login');
     }
 };

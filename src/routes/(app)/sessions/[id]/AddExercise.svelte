@@ -40,7 +40,7 @@
         </div>
     {:else if state == "pickExercise"}
         <form
-            action="?/create"
+            action="?/create_session_exercise"
             method="POST"
             class="flex flex-col gap-4 w-full"
         >

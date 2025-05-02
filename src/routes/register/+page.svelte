@@ -1,6 +1,6 @@
 <script lang="ts">
     import type { ActionData } from "./$types";
-    export let form: ActionData; // To display validation errors
+    export let form: ActionData;
 </script>
 
 <div class="flex min-h-screen items-center justify-center bg-black-bean p-4">

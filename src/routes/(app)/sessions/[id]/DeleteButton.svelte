@@ -1,6 +1,6 @@
 <button
     type="submit"
-    formaction="?/delete"
+    formaction="?/delete_set"
     formmethod="POST"
     class="text-red-500 hover:text-red-400 p-1 rounded-sm"
     aria-label="Delete set"

@@ -19,7 +19,7 @@
 
     let new_ex = {
         id: -1,
-        category_id: -1,
+        category_id: 0,
         intensity_unit: "kg",
         name: "",
         notes: "",

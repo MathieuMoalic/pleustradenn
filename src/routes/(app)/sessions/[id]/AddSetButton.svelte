@@ -3,7 +3,7 @@
     export let exercise_id: number;
 </script>
 
-<form method="POST" action="?/create">
+<form method="POST" action="?/create_set">
     <input type="hidden" name="session_id" value={session_id || ""} />
     <input type="hidden" name="exercise_id" value={exercise_id || ""} />
 

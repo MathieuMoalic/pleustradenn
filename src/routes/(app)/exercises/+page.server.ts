@@ -17,8 +17,8 @@ type ExerciseFormData = {
 
 async function validateExerciseFormData(form: FormData): Promise<ExerciseFormData | ActionFailure<{ error: string, form?: any }>> {
     const name = form.get("name")?.toString();
-    const notes = form.get("notes")?.toString() ?? ""; // Notes can be empty
-    const intensity_unit = form.get("intensity_unit")?.toString() ?? ""; // intensity_unit can be empty
+    const notes = form.get("notes")?.toString() ?? "";
+    const intensity_unit = form.get("intensity_unit")?.toString() ?? "";
     const categoryIdString = form.get("category_id")?.toString();
 
     if (!name || name.trim().length === 0) {
@@ -54,9 +54,11 @@ async function validateExerciseFormData(form: FormData): Promise<ExerciseFormDat
 export const actions: Actions = {
     create: async ({ request }) => {
         const form = await request.formData();
+        console.log("Form data received for exercise creation:", Object.fromEntries(form));
         const validationResult = await validateExerciseFormData(form);
 
         if ('status' in validationResult) {
+            console.error("Validation failed:", validationResult);
             return validationResult;
         }
 

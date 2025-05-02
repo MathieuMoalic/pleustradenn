@@ -1,4 +1,3 @@
-// src/routes/sessions/+page.server.ts
 import type { Actions } from "./$types";
 import prisma from "$lib/server/prisma";
 import { redirect, fail } from "@sveltejs/kit";
@@ -9,11 +8,11 @@ export const load: PageServerLoad = async ({ locals }) => {
         throw redirect(302, '/login?redirectTo=/sessions');
     }
 
-    const userId = locals.user.id;
+    const user_id = locals.user.id;
 
     const sessions = await prisma.session.findMany({
         where: {
-            user_id: userId,
+            user_id: user_id,
         },
         orderBy: {
             date: 'desc',
@@ -41,14 +40,14 @@ export const actions: Actions = {
             return fail(400, { notes: notes, error: "Invalid or missing date" });
         }
 
-        const userId = locals.user.id;
+        const user_id = locals.user.id;
 
         try {
             await prisma.session.create({
                 data: {
                     date: new Date(rawDate),
                     notes: notes,
-                    user_id: userId,
+                    user_id: user_id,
                 },
             });
         } catch (err) {

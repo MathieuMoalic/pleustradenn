@@ -15,16 +15,6 @@ CREATE TABLE "Exercise" (
 );
 
 -- CreateTable
-CREATE TABLE "SessionExerciseOrder" (
-    "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
-    "sessionId" INTEGER NOT NULL,
-    "exerciseId" INTEGER NOT NULL,
-    "position" INTEGER NOT NULL,
-    CONSTRAINT "SessionExerciseOrder_sessionId_fkey" FOREIGN KEY ("sessionId") REFERENCES "Session" ("id") ON DELETE CASCADE ON UPDATE CASCADE,
-    CONSTRAINT "SessionExerciseOrder_exerciseId_fkey" FOREIGN KEY ("exerciseId") REFERENCES "Exercise" ("id") ON DELETE CASCADE ON UPDATE CASCADE
-);
-
--- CreateTable
 CREATE TABLE "Session" (
     "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
     "user_id" TEXT NOT NULL,
@@ -34,15 +24,25 @@ CREATE TABLE "Session" (
 );
 
 -- CreateTable
-CREATE TABLE "Set" (
+CREATE TABLE "SessionExercise" (
     "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
     "session_id" INTEGER NOT NULL,
     "exercise_id" INTEGER NOT NULL,
+    "position" INTEGER NOT NULL,
+    CONSTRAINT "SessionExercise_session_id_fkey" FOREIGN KEY ("session_id") REFERENCES "Session" ("id") ON DELETE CASCADE ON UPDATE CASCADE,
+    CONSTRAINT "SessionExercise_exercise_id_fkey" FOREIGN KEY ("exercise_id") REFERENCES "Exercise" ("id") ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+-- CreateTable
+CREATE TABLE "Set" (
+    "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    "sessionExercise_id" INTEGER NOT NULL,
+    "exercise_id" INTEGER,
     "reps" INTEGER NOT NULL DEFAULT 1,
     "intensity" REAL NOT NULL DEFAULT 0.0,
     "created_at" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT "Set_session_id_fkey" FOREIGN KEY ("session_id") REFERENCES "Session" ("id") ON DELETE RESTRICT ON UPDATE CASCADE,
-    CONSTRAINT "Set_exercise_id_fkey" FOREIGN KEY ("exercise_id") REFERENCES "Exercise" ("id") ON DELETE CASCADE ON UPDATE CASCADE
+    CONSTRAINT "Set_sessionExercise_id_fkey" FOREIGN KEY ("sessionExercise_id") REFERENCES "SessionExercise" ("id") ON DELETE CASCADE ON UPDATE CASCADE,
+    CONSTRAINT "Set_exercise_id_fkey" FOREIGN KEY ("exercise_id") REFERENCES "Exercise" ("id") ON DELETE SET NULL ON UPDATE CASCADE
 );
 
 -- CreateTable
@@ -56,8 +56,8 @@ CREATE TABLE "User" (
 CREATE TABLE "UserSession" (
     "id" TEXT NOT NULL PRIMARY KEY,
     "expiresAt" DATETIME NOT NULL,
-    "userId" TEXT NOT NULL,
-    CONSTRAINT "UserSession_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User" ("id") ON DELETE CASCADE ON UPDATE CASCADE
+    "user_id" TEXT NOT NULL,
+    CONSTRAINT "UserSession_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "User" ("id") ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 -- CreateIndex
@@ -67,7 +67,10 @@ CREATE UNIQUE INDEX "ExerciseCategory_name_key" ON "ExerciseCategory"("name");
 CREATE UNIQUE INDEX "Exercise_name_key" ON "Exercise"("name");
 
 -- CreateIndex
+CREATE UNIQUE INDEX "SessionExercise_session_id_position_key" ON "SessionExercise"("session_id", "position");
+
+-- CreateIndex
 CREATE UNIQUE INDEX "User_username_key" ON "User"("username");
 
 -- CreateIndex
-CREATE INDEX "UserSession_userId_idx" ON "UserSession"("userId");
+CREATE INDEX "UserSession_user_id_idx" ON "UserSession"("user_id");

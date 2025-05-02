@@ -2,133 +2,156 @@ import prisma from '$lib/server/prisma';
 import type { Actions } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
 import { fail } from '@sveltejs/kit';
-import type { SetWithExercise, GroupedSets } from "$lib/types";
-
-function groupSetsByExercise(sets: SetWithExercise[]): GroupedSets[] {
-    const groups = new Map<number, GroupedSets>();
-
-    sets.forEach(set => {
-        if (!groups.has(set.exercise.id)) {
-            groups.set(set.exercise.id, { exercise: set.exercise, sets: [], id: set.exercise.id });
-        }
-        groups.get(set.exercise.id)!.sets.push(set);
-    });
-
-    return [...groups.values()].map(({ exercise, sets }) => ({
-        exercise,
-        sets: sets.sort((a, b) => (a.id < 0 && b.id >= 0) ? -1 : (b.id < 0 && a.id >= 0) ? 1 : new Date(a.created_at).getTime() - new Date(b.created_at).getTime()),
-        id: exercise.id
-    }));
-}
-
 
 export const load: PageServerLoad = async ({ params }) => {
-    const sessionOrders = await prisma.sessionExerciseOrder.findMany({
-        where: { sessionId: parseInt(params.id) },
-        orderBy: { position: 'asc' }
-    });
-
-    const exerciseOrderMap = new Map(sessionOrders.map((o, i) => [o.exerciseId, i]));
-
-    const setList = await prisma.set.findMany({
-        where: {
-            session_id: parseInt(params.id)
-        },
-        include: {
-            exercise: true
-        }
-    });
     const categories = await prisma.exerciseCategory.findMany();
-    let groupedSets = groupSetsByExercise(setList);
 
-    groupedSets.sort((a, b) => {
-        const posA = exerciseOrderMap.get(a.exercise.id) ?? Infinity;
-        const posB = exerciseOrderMap.get(b.exercise.id) ?? Infinity;
-        return posA - posB;
-    });
     const exercises = await prisma.exercise.findMany({});
     const session = await prisma.session.findUnique({
         where: { id: parseInt(params.id) },
+        include: {
+            session_exercises: {
+                include: {
+                    sets: {},
+                    exercise: {},
+                }
+            }
+        }
     });
-    return { groupedSets, categories, exercises, session };
+    return { categories, exercises, session };
 };
 
+async function create_set(exercise_id: number, session_id: number) {
+    console.log(`[create_set] Starting for exercise_id: ${exercise_id}, session_id: ${session_id}`);
+
+    let sessionExercise = await prisma.sessionExercise.findFirst({
+        where: {
+            session_id: session_id,
+            exercise_id: exercise_id,
+        },
+    });
+
+    if (!sessionExercise) {
+        console.log(`[create_set] SessionExercise link not found for session ${session_id}, exercise ${exercise_id}. Creating...`);
+        const position = await prisma.sessionExercise.count({
+            where: { session_id: session_id }
+        });
+
+        sessionExercise = await prisma.sessionExercise.create({
+            data: {
+                session_id: session_id,
+                exercise_id: exercise_id,
+                position: position,
+            },
+        });
+        console.log(`[create_set] SessionExercise link created with id: ${sessionExercise.id} and position: ${sessionExercise.position}`);
+    } else {
+        console.log(`[create_set] SessionExercise link found with id: ${sessionExercise.id}`);
+    }
+
+    const currentSessionExerciseId = sessionExercise.id;
+
+    const lastSetForExercise = await prisma.set.findFirst({
+        where: {
+            exercise_id: exercise_id
+        },
+        orderBy: {
+            created_at: 'desc'
+        },
+        select: {
+            reps: true,
+            intensity: true
+        }
+    });
+
+    let reps = 1;
+    let intensity = 0.0;
+
+    if (lastSetForExercise) {
+        console.log(`[create_set] Found last set for exercise ${exercise_id}. Suggesting reps: ${lastSetForExercise.reps}, intensity: ${lastSetForExercise.intensity}`);
+        reps = lastSetForExercise.reps;
+        intensity = lastSetForExercise.intensity;
+    } else {
+        console.log(`[create_set] No previous sets found for exercise ${exercise_id}. Checking fallback logic.`);
+        const fallbackSet = await prisma.set.findFirst({
+            where: {
+                exercise_id: exercise_id, // <-- FIX: Added exercise_id filter
+                reps: { gt: 5 }
+            },
+            orderBy: {
+                intensity: 'desc'
+            },
+            select: {
+                reps: true,
+                intensity: true
+            }
+        });
+
+        if (fallbackSet) {
+            console.log(`[create_set] Fallback set found for exercise ${exercise_id}. Suggesting reps: ${fallbackSet.reps}, intensity: ${fallbackSet.intensity}`);
+            reps = fallbackSet.reps;
+            intensity = fallbackSet.intensity;
+        } else {
+            console.log(`[create_set] No fallback set found for exercise ${exercise_id}. Using default reps: ${reps}, intensity: ${intensity}`);
+        }
+    }
+
+    console.log(`[create_set] Final calculated reps: ${reps}, intensity: ${intensity}`);
+
+    const newSetData = {
+        session_exercise_id: currentSessionExerciseId,
+        exercise_id: exercise_id,
+        reps: reps,
+        intensity: intensity,
+    };
+
+    console.log("[create_set] Creating new set with data:", newSetData);
+
+    try {
+        const newSet = await prisma.set.create({ data: newSetData });
+        console.log(`[create_set] Successfully created new set with id: ${newSet.id}`);
+    } catch (error) {
+        console.error("[create_set] Error creating set:", error);
+        throw error; // Re-throw the error if needed
+    }
+}
 export const actions: Actions = {
-    create: async ({ request, params }) => {
+    create_session_exercise: async ({ request, params }) => {
         const session_id = parseInt(params.id as string);
         if (isNaN(session_id)) {
             return fail(400, { error: "Invalid Session ID from URL." });
         }
+
         const form = await request.formData();
         const exercise_id = parseInt(form.get("exercise_id") as string);
 
-        // Check if this session already has a set for this exercise
-        const existingSet = await prisma.set.findFirst({
-            where: {
-                session_id: session_id,
-                exercise_id: exercise_id
+        const session = await prisma.session.findUnique({
+            where: { id: session_id },
+            include: {
+                session_exercises: {}
             }
         });
-
-        let new_set;
-        if (existingSet) {
-            let last_set = await prisma.set.findFirst({
-                orderBy: {
-                    id: "desc"
-                },
-                where: {
-                    session_id: session_id,
-                    exercise_id: exercise_id
-                }
-            });
-            new_set = {
-                session_id: session_id,
-                exercise_id: exercise_id,
-                reps: last_set?.reps || 0,
-                intensity: last_set?.intensity || 0
-            };
-        } else {
-            // get the set that has the highest intensity and more than 5 reps
-            const last_set = await prisma.set.findFirst({
-                orderBy: {
-                    intensity: "desc"
-                },
-                where: {
-                    exercise_id: exercise_id,
-                    reps: {
-                        gt: 5
-                    }
-                }
-            });
-            new_set = {
-                session_id: session_id,
-                exercise_id: exercise_id,
-                reps: last_set?.reps || 0,
-                intensity: last_set?.intensity || 0
-            };
+        if (!session) {
+            return fail(404, { error: "Session not found." });
         }
-
-        await prisma.set.create({
-            data: new_set
-        });
-        const existingOrder = await prisma.sessionExerciseOrder.findFirst({
-            where: {
-                sessionId: session_id,
-                exerciseId: exercise_id
-            }
-        });
-
-        if (!existingOrder) {
-            await prisma.sessionExerciseOrder.create({
-                data: {
-                    sessionId: session_id,
-                    exerciseId: exercise_id,
-                    position: await prisma.sessionExerciseOrder.count({ where: { sessionId: session_id } })
-                }
-            });
+        if (session.session_exercises.some((se) => se.exercise_id === exercise_id)) {
+            return fail(400, { error: "Exercise already exists in this session." });
         }
+        await create_set(exercise_id, session_id);
+
     },
-    update: async ({ request, params }) => {
+    create_set: async ({ request, params }) => {
+        const session_id = parseInt(params.id as string);
+        if (isNaN(session_id)) {
+            return fail(400, { error: "Invalid Session ID from URL." });
+        }
+
+        const form = await request.formData();
+        const exercise_id = parseInt(form.get("exercise_id") as string);
+
+        await create_set(exercise_id, session_id);
+    },
+    update_set: async ({ request, params }) => {
         const session_id = parseInt(params.id as string);
         if (isNaN(session_id)) {
             return fail(400, { error: "Invalid Session ID from URL." });
@@ -147,15 +170,18 @@ export const actions: Actions = {
         await prisma.set.update({
             where: { id: id },
             data: {
-                session_id: session_id,
                 exercise_id: parseInt(form.get("exercise_id") as string),
                 reps: parseInt(form.get("reps") as string),
                 intensity: parseFloat(form.get("intensity") as string),
             },
         });
     },
-    delete: async ({ request }) => {
+    delete_set: async ({ request, params }) => {
         const form = await request.formData();
+        const session_id = parseInt(params.id as string);
+        if (isNaN(session_id)) {
+            return fail(400, { error: "Invalid Session ID from URL." });
+        }
 
         const idString = form.get("id")?.toString();
         if (!idString) {
@@ -165,36 +191,72 @@ export const actions: Actions = {
         if (isNaN(id)) {
             return fail(400, { error: "Invalid Set ID for deletion." });
         }
-        await prisma.set.delete({ where: { id } });
+        let set = await prisma.set.delete({ where: { id } });
+        // if the session exercise has no sets, delete the session exercise
+        let sessionExercise = await prisma.sessionExercise.findUnique({
+            where: { id: set.session_exercise_id }
+        });
+        if (sessionExercise) {
+            let sets = await prisma.set.findMany({
+                where: { session_exercise_id: sessionExercise.id }
+            });
+            if (sets.length === 0) {
+                await prisma.sessionExercise.delete({ where: { id: sessionExercise.id } });
+            }
+        }
+
     },
-    reorder: async ({ request, params }) => {
-        const sessionId = parseInt(params.id as string);
+    reorder_session_exercises: async ({ request, params }) => {
+        const session_id = parseInt(params.id as string);
         const form = await request.formData();
-        let exerciseIds = form.get("exerciseIds");
+        let exercise_ids = form.get("exercise_ids");
         let exerciseOrderArray: number[];
 
-        if (typeof exerciseIds === "string") {
-            exerciseOrderArray = JSON.parse(exerciseIds);
+        if (typeof exercise_ids === "string") {
+            exerciseOrderArray = JSON.parse(exercise_ids);
         } else {
             return fail(400, { error: "Invalid exercise order format" });
         }
 
-        // Delete old order, this helps because sometimes the requests bugs out.
-        await prisma.sessionExerciseOrder.deleteMany({
-            where: { sessionId }
+        const session = await prisma.session.findUnique({
+            where: { id: session_id },
+            include: {
+                session_exercises: true
+            }
         });
 
-        // Recreate with new positions
-        const newOrders = exerciseOrderArray.map((exerciseId: number, index: number) => ({
-            sessionId,
-            exerciseId,
-            position: index
-        }));
+        if (!session) {
+            return fail(404, { error: "Session not found" });
+        }
 
-        await prisma.sessionExerciseOrder.createMany({
-            data: newOrders
+        // Create a map of exercise_id -> sessionExercise.id
+        const exerciseToSessionExerciseMap = new Map();
+        for (const se of session.session_exercises) {
+            exerciseToSessionExerciseMap.set(se.exercise_id, se.id);
+        }
+
+        const tempOffset = 1000;
+
+        const tempUpdates = exerciseOrderArray.map((exercise_id, index) => {
+            const sessionExerciseId = exerciseToSessionExerciseMap.get(exercise_id);
+            if (!sessionExerciseId) {
+                throw new Error(`Exercise ID ${exercise_id} not found in session_exercises`);
+            }
+            return prisma.sessionExercise.update({
+                where: { id: sessionExerciseId },
+                data: { position: index + tempOffset }
+            });
         });
 
-        return { success: true };
+        const finalUpdates = exerciseOrderArray.map((exercise_id, index) => {
+            const sessionExerciseId = exerciseToSessionExerciseMap.get(exercise_id);
+            return prisma.sessionExercise.update({
+                where: { id: sessionExerciseId },
+                data: { position: index }
+            });
+        });
+
+        await prisma.$transaction([...tempUpdates, ...finalUpdates]);
     }
+
 };

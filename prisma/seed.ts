@@ -9,15 +9,7 @@ const prisma = new PrismaClient();
 const DEFAULT_SEED_USERNAME = 'a'; // Define a default username for seeding
 const DEFAULT_SEED_PASSWORD = 'a'; // Define a default password (change if needed)
 
-async function main() {
-  // Skip if production
-  if (process.env.NODE_ENV === 'production') {
-    console.log('Skipping seed script in production environment.');
-    return;
-  }
-
-  console.log('Starting seed script...');
-
+async function createExerciseCategory() {
   // --- Step 1: Create or update exercise categories ---
   console.log('Seeding Exercise Categories...');
   const categories = ['LEGS', 'PUSH', 'PULL', 'CORE', 'FOREARMS', 'OTHER'];
@@ -36,7 +28,10 @@ async function main() {
       console.error(`Error upserting category ${name}:`, e);
     }
   }
+  return categoryMap;
+}
 
+async function createExercises(categoryMap: Record<string, number>) {
   // --- Step 2: Create default exercises if none exist ---
   console.log('Checking for existing Exercises...');
   const existingExercise = await prisma.exercise.findFirst();
@@ -52,8 +47,8 @@ async function main() {
     ];
 
     for (const exercise of exercisesData) {
-      const categoryId = categoryMap[exercise.category];
-      if (!categoryId) {
+      const category_id = categoryMap[exercise.category];
+      if (!category_id) {
         console.warn(`Category '${exercise.category}' not found for exercise '${exercise.name}'. Skipping.`);
         continue;
       }
@@ -62,7 +57,7 @@ async function main() {
           data: {
             name: exercise.name,
             notes: exercise.notes,
-            category_id: categoryId,
+            category_id: category_id,
           },
         });
         console.log(`Created exercise: ${exercise.name}`);
@@ -74,13 +69,15 @@ async function main() {
   } else {
     console.log('Exercises already exist. Skipping exercise seeding.');
   }
+}
 
+async function createDefaultUser() {
   // --- Step 3: Create a default user if none exist ---
   console.log('Checking for default user...');
   let defaultUser = await prisma.user.findUnique({
     where: { username: DEFAULT_SEED_USERNAME },
   });
-  let defaultUserId: string;
+  let defaultUser_id: string;
 
   if (!defaultUser) {
     console.log(`Default user '${DEFAULT_SEED_USERNAME}' not found. Creating...`);
@@ -95,7 +92,7 @@ async function main() {
         },
       });
       console.log(`Created default user: ${defaultUser.username} (ID: ${defaultUser.id})`);
-      defaultUserId = defaultUser.id;
+      defaultUser_id = defaultUser.id;
     } catch (e) {
       if ((e as any)?.code === 'P2002' && (e as any)?.meta?.target?.includes('username')) {
         console.warn(`Default user '${DEFAULT_SEED_USERNAME}' already exists (race condition?). Fetching again.`);
@@ -104,7 +101,7 @@ async function main() {
           console.error('Failed to create or find default user after race condition check.');
           throw new Error('Could not establish default user for seeding.');
         }
-        defaultUserId = defaultUser.id;
+        defaultUser_id = defaultUser.id;
       } else {
         console.error('Error creating default user:', e);
         throw e; // Stop seeding if user creation fails fundamentally
@@ -112,134 +109,143 @@ async function main() {
     }
   } else {
     console.log(`Default user '${DEFAULT_SEED_USERNAME}' already exists.`);
-    defaultUserId = defaultUser.id;
+    defaultUser_id = defaultUser.id;
   }
+  return defaultUser_id;
+}
 
+async function createFirstSession(defaultUser_id: string) {
   // --- Step 4: Create default sessions if none exist FOR THE DEFAULT USER ---
-  console.log(`Checking for existing Sessions for user ${defaultUserId}...`);
+  console.log(`Checking for existing Sessions for user ${defaultUser_id}...`);
   const existingSession = await prisma.session.findFirst({
-    where: { user_id: defaultUserId } // Check specifically for sessions belonging to this user
+    where: { user_id: defaultUser_id } // Check specifically for sessions belonging to this user
   });
 
-  let firstSessionId: number | undefined = existingSession?.id;
+  let firstSession_id: number | undefined = existingSession?.id;
 
   if (!existingSession) {
-    console.log(`No existing sessions found for user ${defaultUserId}. Seeding default sessions...`);
+    console.log(`No existing sessions found for user ${defaultUser_id}. Seeding default sessions...`);
     try {
       const createdSessions = await prisma.session.createManyAndReturn({ // Use createManyAndReturn if available and needed, otherwise createMany
         data: [
-          { date: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000), notes: 'Past strength training', user_id: defaultUserId }, // Link to user
-          { date: new Date(), notes: 'Today strength training', user_id: defaultUserId }, // Link to user
+          { date: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000), notes: 'Past strength training', user_id: defaultUser_id }, // Link to user
+          { date: new Date(), notes: 'Today strength training', user_id: defaultUser_id }, // Link to user
         ],
       });
-      console.log(`Created ${createdSessions.length} sessions for user ${defaultUserId}.`);
+      console.log(`Created ${createdSessions.length} sessions for user ${defaultUser_id}.`);
       // Find the ID of one of the created sessions to link exercises
       const todaySession = await prisma.session.findFirst({
-        where: { user_id: defaultUserId, notes: 'Today strength training' },
+        where: { user_id: defaultUser_id, notes: 'Today strength training' },
         orderBy: { date: 'desc' }
       });
-      firstSessionId = todaySession?.id;
+      firstSession_id = todaySession?.id;
 
     } catch (e) {
       console.error('Error creating sessions:', e);
       // Don't proceed if sessions weren't created
-      firstSessionId = undefined;
+      firstSession_id = undefined;
     }
   } else {
-    console.log(`Sessions already exist for user ${defaultUserId}. Skipping session seeding.`);
-    // Optionally, ensure firstSessionId is set if needed later, e.g., find the latest one
-    if (!firstSessionId) {
+    console.log(`Sessions already exist for user ${defaultUser_id}. Skipping session seeding.`);
+    // Optionally, ensure firstSession_id is set if needed later, e.g., find the latest one
+    if (!firstSession_id) {
       const latestSession = await prisma.session.findFirst({
-        where: { user_id: defaultUserId },
+        where: { user_id: defaultUser_id },
         orderBy: { date: 'desc' }
       });
-      firstSessionId = latestSession?.id;
+      firstSession_id = latestSession?.id;
     }
   }
+  return firstSession_id;
+}
 
-  // --- Step 5: Create default sets if none exist ---
+async function createSets(sessionExerciseLinks: { id: number, exercise_id: number }[]) {
   console.log('Checking for existing Sets...');
-  // Check if *any* Set record exists to avoid re-seeding
   const setExists = await prisma.set.findFirst();
 
-  if (!setExists && firstSessionId) {
-    console.log(`No existing sets found. Seeding sets for session ID: ${firstSessionId}...`);
-    const exercises = await prisma.exercise.findMany({ take: 3 });
+  if (!setExists && sessionExerciseLinks.length > 0) {
+    console.log(`No existing sets found. Seeding sets for ${sessionExerciseLinks.length} SessionExercise links...`);
 
-    if (exercises.length >= 3) {
-      const setsToSeed = [
-        // Squats (Exercise 0) - 3 sets of 10 reps @ 100 intensity
-        {
-          session_id: firstSessionId,
-          exercise_id: exercises[0].id,
-          reps: 10,
-          intensity: 100.0,
-        },
-        {
-          session_id: firstSessionId,
-          exercise_id: exercises[0].id,
-          reps: 10,
-          intensity: 100.0,
-        },
-        {
-          session_id: firstSessionId,
-          exercise_id: exercises[0].id,
-          reps: 10,
-          intensity: 100.0,
-        },
+    const setsToSeed: { session_exercise_id: number; reps: number; intensity: number }[] = [];
 
-        // Bench Press (Exercise 1) - 3 sets of 8 reps @ 80 intensity
-        {
-          session_id: firstSessionId,
-          exercise_id: exercises[1].id,
-          reps: 8,
-          intensity: 80.0,
-        },
-        {
-          session_id: firstSessionId,
-          exercise_id: exercises[1].id,
-          reps: 8,
-          intensity: 80.0,
-        },
-        {
-          session_id: firstSessionId,
-          exercise_id: exercises[1].id,
-          reps: 8,
-          intensity: 80.0,
-        },
-
-        // Deadlift (Exercise 2) - 1 set of 5 reps @ 120 intensity
-        {
-          session_id: firstSessionId,
-          exercise_id: exercises[2].id,
-          reps: 5,
-          intensity: 120.0,
-        },
-      ];
-
-      console.log(`Attempting to create ${setsToSeed.length} Set records...`);
-      for (const set of setsToSeed) {
-        try {
-          // Prisma will automatically set created_at if not provided,
-          // or you can explicitly set it: created_at: new Date()
-          await prisma.set.create({ data: set });
-          console.log(`Created set for exercise ID ${set.exercise_id} in session ID ${set.session_id}`);
-        } catch (e) {
-          console.error(`Error creating set for exercise ID ${set.exercise_id}:`, e);
-        }
+    for (const link of sessionExerciseLinks) {
+      if (link.exercise_id === 1) { // Squat example
+        setsToSeed.push(
+          { session_exercise_id: link.id, reps: 10, intensity: 100 },
+          { session_exercise_id: link.id, reps: 10, intensity: 100 },
+          { session_exercise_id: link.id, reps: 10, intensity: 100 },
+        );
+      } else if (link.exercise_id === 2) { // Bench Press example
+        setsToSeed.push(
+          { session_exercise_id: link.id, reps: 8, intensity: 80 },
+          { session_exercise_id: link.id, reps: 8, intensity: 80 },
+          { session_exercise_id: link.id, reps: 8, intensity: 80 },
+        );
+      } else if (link.exercise_id === 3) { // Deadlift example
+        setsToSeed.push(
+          { session_exercise_id: link.id, reps: 5, intensity: 120 },
+        );
       }
-      console.log('Set seeding complete.');
-
-    } else if (exercises.length < 3) {
-      console.warn(`Not enough exercises found in DB (found ${exercises.length}) to seed the planned sets (need at least 3). Skipping set seeding.`);
     }
-  } else if (!firstSessionId) {
-    console.warn('Skipping set seeding because no target session ID was found or created.');
-  } else {
+
+    for (const set of setsToSeed) {
+      try {
+        await prisma.set.create({ data: set });
+        console.log(`Created set for SessionExercise ID ${set.session_exercise_id}`);
+      } catch (e) {
+        console.error(`Error creating set for SessionExercise ID ${set.session_exercise_id}:`, e);
+      }
+    }
+    console.log('Set seeding complete.');
+  } else if (setExists) {
     console.log('Sets already exist. Skipping set seeding.');
+  } else {
+    console.warn('No SessionExercise links provided. Skipping set seeding.');
+  }
+}
+
+async function createSessionExercises(session_id: number, exercise_ids: number[]) {
+  console.log(`Creating SessionExercises for session ${session_id}...`);
+
+  const createdSessionExercises: { id: number; exercise_id: number }[] = [];
+
+  for (let i = 0; i < exercise_ids.length; i++) {
+    const exercise_id = exercise_ids[i];
+    try {
+      const sessionExercise = await prisma.sessionExercise.create({
+        data: {
+          session_id,
+          exercise_id,
+          position: i, // ensures order
+        },
+      });
+      console.log(`Linked exercise ${exercise_id} to session ${session_id} as position ${i}`);
+      createdSessionExercises.push({ id: sessionExercise.id, exercise_id });
+    } catch (e) {
+      console.error(`Error linking exercise ${exercise_id} to session:`, e);
+    }
   }
 
-  console.log('Seed script finished.');
+  return createdSessionExercises;
+}
+
+
+async function main() {
+  // Skip if production
+  if (process.env.NODE_ENV === 'production') {
+    console.log('Skipping seed script in production environment.');
+    return;
+  }
+
+  let categoryMap = await createExerciseCategory();
+  await createExercises(categoryMap);
+  let defaultUser_id = await createDefaultUser();
+  const firstSession_id = await createFirstSession(defaultUser_id);
+  if (firstSession_id) {
+    const exercises = await prisma.exercise.findMany({ take: 3 });
+    const sessionExerciseLinks = await createSessionExercises(firstSession_id, exercises.map(e => e.id));
+    await createSets(sessionExerciseLinks);
+  }
 }
 
 main()

@@ -1,12 +1,13 @@
 <script lang="ts">
-    import type { SetWithExercise } from "$lib/types";
     import DecrementButton from "./DecrementButton.svelte";
     import DeleteButton from "./DeleteButton.svelte";
     import IncrementButton from "./IncrementButton.svelte";
     import SubmitButton from "./SubmitButton.svelte";
     import NumberInput from "./NumberInput.svelte";
+    import type { Set } from "@prisma/client";
 
-    export let set: SetWithExercise;
+    export let set: Set;
+    export let unit: string;
 
     let expended: boolean = false;
 
@@ -30,7 +31,7 @@
 
 <form
     method="POST"
-    action="?/update"
+    action="?/update_set"
     data-set-id={set.id}
     class="flex flex-col bg-black-bean/40 text-plum rounded-md shadow-sm border border-burnt-umber text-sm overflow-hidden"
 >
@@ -46,7 +47,7 @@
     >
         <div class="flex-grow min-w-0 mr-2">
             <span class="font-medium">
-                {set.reps} x {set.intensity}{set.exercise.intensity_unit || ""}
+                {set.reps} x {set.intensity}{unit}
             </span>
         </div>
         <svg
@@ -91,8 +92,7 @@
             <div class="flex items-center justify-between">
                 <label
                     for={`intensity-expanded-${set.id}`}
-                    class="text-thistle font-medium"
-                    >Intensity ({set.exercise.intensity_unit || ""}):</label
+                    class="text-thistle font-medium">Intensity ({unit}):</label
                 >
                 <div class="flex items-center gap-2">
                     <DecrementButton callback={decrementIntensity} />

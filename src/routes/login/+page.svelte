@@ -1,6 +1,6 @@
 <script lang="ts">
     import type { ActionData } from "./$types";
-    import { page } from "$app/stores"; // Correct import for stores
+    import { page } from "$app/state";
     export let form: ActionData;
 </script>
 
@@ -8,7 +8,7 @@
     <div class="w-full max-w-md rounded-lg bg-seal-brown p-8 shadow-lg">
         <h1 class="mb-6 text-center text-2xl font-bold text-thistle">Login</h1>
 
-        {#if $page.url.searchParams.get("registered") === "true"}
+        {#if page.url.searchParams.get("registered") === "true"}
             <p class="mb-4 rounded bg-green-300 p-3 text-green-900">
                 Registration successful! Please log in.
             </p>
