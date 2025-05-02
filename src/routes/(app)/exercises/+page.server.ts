@@ -54,11 +54,9 @@ async function validateExerciseFormData(form: FormData): Promise<ExerciseFormDat
 export const actions: Actions = {
     create: async ({ request }) => {
         const form = await request.formData();
-        console.log("Form data received for exercise creation:", Object.fromEntries(form));
         const validationResult = await validateExerciseFormData(form);
 
         if ('status' in validationResult) {
-            console.error("Validation failed:", validationResult);
             return validationResult;
         }
 
@@ -69,7 +67,6 @@ export const actions: Actions = {
                 data: validatedData,
             });
         } catch (error) {
-            console.error("Error creating exercise:", error);
             return fail(500, { error: "Failed to create exercise. Please try again.", form: Object.fromEntries(form) });
         }
 
@@ -101,7 +98,6 @@ export const actions: Actions = {
                 data: validatedData,
             });
         } catch (error) {
-            console.error("Error updating exercise:", error);
             return fail(500, { error: "Failed to update exercise. Please try again.", form: Object.fromEntries(form) });
         }
 
@@ -123,7 +119,6 @@ export const actions: Actions = {
         try {
             await prisma.exercise.delete({ where: { id } });
         } catch (error) {
-            console.error("Error deleting exercise:", error);
             if (error instanceof Error && 'code' in error && error.code === 'P2025') {
                 return fail(404, { error: "Exercise not found for deletion." });
             }

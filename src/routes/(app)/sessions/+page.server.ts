@@ -42,21 +42,25 @@ export const actions: Actions = {
 
         const user_id = locals.user.id;
 
+        let session_id: number | null = null;
         try {
-            await prisma.session.create({
+            const session = await prisma.session.create({
                 data: {
                     date: new Date(rawDate),
                     notes: notes,
                     user_id: user_id,
                 },
             });
+            session_id = session.id;
         } catch (err) {
-            console.error("Error creating session:", err);
             return fail(500, {
                 date: rawDate,
                 notes: notes,
                 error: 'Failed to create session. Please try again.'
             });
+        }
+        if (session_id !== null) {
+            redirect(302, `/sessions/${session_id}`);
         }
     },
 

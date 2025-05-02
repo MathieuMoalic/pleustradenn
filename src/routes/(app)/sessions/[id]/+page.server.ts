@@ -22,8 +22,6 @@ export const load: PageServerLoad = async ({ params }) => {
 };
 
 async function create_set(exercise_id: number, session_id: number) {
-    console.log(`[create_set] Starting for exercise_id: ${exercise_id}, session_id: ${session_id}`);
-
     let sessionExercise = await prisma.sessionExercise.findFirst({
         where: {
             session_id: session_id,
@@ -32,7 +30,6 @@ async function create_set(exercise_id: number, session_id: number) {
     });
 
     if (!sessionExercise) {
-        console.log(`[create_set] SessionExercise link not found for session ${session_id}, exercise ${exercise_id}. Creating...`);
         const position = await prisma.sessionExercise.count({
             where: { session_id: session_id }
         });
@@ -44,9 +41,6 @@ async function create_set(exercise_id: number, session_id: number) {
                 position: position,
             },
         });
-        console.log(`[create_set] SessionExercise link created with id: ${sessionExercise.id} and position: ${sessionExercise.position}`);
-    } else {
-        console.log(`[create_set] SessionExercise link found with id: ${sessionExercise.id}`);
     }
 
     const currentSessionExerciseId = sessionExercise.id;
@@ -68,14 +62,12 @@ async function create_set(exercise_id: number, session_id: number) {
     let intensity = 0.0;
 
     if (lastSetForExercise) {
-        console.log(`[create_set] Found last set for exercise ${exercise_id}. Suggesting reps: ${lastSetForExercise.reps}, intensity: ${lastSetForExercise.intensity}`);
         reps = lastSetForExercise.reps;
         intensity = lastSetForExercise.intensity;
     } else {
-        console.log(`[create_set] No previous sets found for exercise ${exercise_id}. Checking fallback logic.`);
         const fallbackSet = await prisma.set.findFirst({
             where: {
-                exercise_id: exercise_id, // <-- FIX: Added exercise_id filter
+                exercise_id: exercise_id,
                 reps: { gt: 5 }
             },
             orderBy: {
@@ -88,15 +80,10 @@ async function create_set(exercise_id: number, session_id: number) {
         });
 
         if (fallbackSet) {
-            console.log(`[create_set] Fallback set found for exercise ${exercise_id}. Suggesting reps: ${fallbackSet.reps}, intensity: ${fallbackSet.intensity}`);
             reps = fallbackSet.reps;
             intensity = fallbackSet.intensity;
-        } else {
-            console.log(`[create_set] No fallback set found for exercise ${exercise_id}. Using default reps: ${reps}, intensity: ${intensity}`);
         }
     }
-
-    console.log(`[create_set] Final calculated reps: ${reps}, intensity: ${intensity}`);
 
     const newSetData = {
         session_exercise_id: currentSessionExerciseId,
@@ -105,14 +92,10 @@ async function create_set(exercise_id: number, session_id: number) {
         intensity: intensity,
     };
 
-    console.log("[create_set] Creating new set with data:", newSetData);
-
     try {
         const newSet = await prisma.set.create({ data: newSetData });
-        console.log(`[create_set] Successfully created new set with id: ${newSet.id}`);
     } catch (error) {
-        console.error("[create_set] Error creating set:", error);
-        throw error; // Re-throw the error if needed
+        throw error;
     }
 }
 export const actions: Actions = {

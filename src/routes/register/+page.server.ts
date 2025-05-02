@@ -42,7 +42,6 @@ export const actions: Actions = {
                 }
             });
         } catch (err) {
-            console.error(err);
             return fail(500, { username, error: 'Failed to create user. Please try again.' });
         }
 

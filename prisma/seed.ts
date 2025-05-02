@@ -3,11 +3,7 @@ import dotenv from 'dotenv';
 import bcrypt from 'bcrypt'; // Import bcrypt
 
 dotenv.config();
-
 const prisma = new PrismaClient();
-
-const DEFAULT_SEED_USERNAME = 'a'; // Define a default username for seeding
-const DEFAULT_SEED_PASSWORD = 'a'; // Define a default password (change if needed)
 
 async function createExerciseCategory() {
   // --- Step 1: Create or update exercise categories ---
@@ -73,21 +69,31 @@ async function createExercises(categoryMap: Record<string, number>) {
 
 async function createDefaultUser() {
   // --- Step 3: Create a default user if none exist ---
+  let username = process.env.FIRST_USER_USERNAME;
+  if (!username) {
+    console.error('Environment variable FIRST_USER_USERNAME is not set. Exiting...');
+    process.exit(1);
+  }
+  let password = process.env.FIRST_USER_PASSWORD;
+  if (!password) {
+    console.error('Environment variable FIRST_USER_PASSWORD is not set. Exiting...');
+    process.exit(1);
+  }
   console.log('Checking for default user...');
   let defaultUser = await prisma.user.findUnique({
-    where: { username: DEFAULT_SEED_USERNAME },
+    where: { username: username },
   });
   let defaultUser_id: string;
 
   if (!defaultUser) {
-    console.log(`Default user '${DEFAULT_SEED_USERNAME}' not found. Creating...`);
+    console.log(`Default user '${username}' not found. Creating...`);
     try {
       // Hash the default password
-      const passwordHash = await bcrypt.hash(DEFAULT_SEED_PASSWORD, 10); // Use bcrypt
+      const passwordHash = await bcrypt.hash(password, 10); // Use bcrypt
 
       defaultUser = await prisma.user.create({
         data: {
-          username: DEFAULT_SEED_USERNAME,
+          username: username,
           password_hash: passwordHash,
         },
       });
@@ -95,8 +101,8 @@ async function createDefaultUser() {
       defaultUser_id = defaultUser.id;
     } catch (e) {
       if ((e as any)?.code === 'P2002' && (e as any)?.meta?.target?.includes('username')) {
-        console.warn(`Default user '${DEFAULT_SEED_USERNAME}' already exists (race condition?). Fetching again.`);
-        defaultUser = await prisma.user.findUnique({ where: { username: DEFAULT_SEED_USERNAME } });
+        console.warn(`Default user '${username}' already exists (race condition?). Fetching again.`);
+        defaultUser = await prisma.user.findUnique({ where: { username: username } });
         if (!defaultUser) {
           console.error('Failed to create or find default user after race condition check.');
           throw new Error('Could not establish default user for seeding.');
@@ -108,7 +114,7 @@ async function createDefaultUser() {
       }
     }
   } else {
-    console.log(`Default user '${DEFAULT_SEED_USERNAME}' already exists.`);
+    console.log(`Default user '${username}' already exists.`);
     defaultUser_id = defaultUser.id;
   }
   return defaultUser_id;
@@ -237,15 +243,15 @@ async function main() {
     return;
   }
 
-  let categoryMap = await createExerciseCategory();
-  await createExercises(categoryMap);
+  // let categoryMap = await createExerciseCategory();
+  // await createExercises(categoryMap);
   let defaultUser_id = await createDefaultUser();
-  const firstSession_id = await createFirstSession(defaultUser_id);
-  if (firstSession_id) {
-    const exercises = await prisma.exercise.findMany({ take: 3 });
-    const sessionExerciseLinks = await createSessionExercises(firstSession_id, exercises.map(e => e.id));
-    await createSets(sessionExerciseLinks);
-  }
+  // const firstSession_id = await createFirstSession(defaultUser_id);
+  // if (firstSession_id) {
+  //   const exercises = await prisma.exercise.findMany({ take: 3 });
+  //   const sessionExerciseLinks = await createSessionExercises(firstSession_id, exercises.map(e => e.id));
+  //   await createSets(sessionExerciseLinks);
+  // }
 }
 
 main()

@@ -49,7 +49,6 @@ export const actions: Actions = {
                 }
             });
         } catch (err) {
-            console.error("Failed to create session:", err);
             return fail(500, { username, error: 'Login failed. Please try again.' });
         }
 
@@ -57,7 +56,7 @@ export const actions: Actions = {
             path: '/',               // Available on entire site
             httpOnly: true,          // Not accessible via client-side JS
             sameSite: 'lax',         // Good default for security
-            secure: process.env.NODE_ENV === 'production', // Only send over HTTPS in production
+            secure: false, // Only send over HTTPS in production
             maxAge: SESSION_DURATION_MS / 1000 // maxAge is in seconds
         });
 

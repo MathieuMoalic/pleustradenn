@@ -1,7 +1,7 @@
 <script lang="ts">
     import AddSetButton from "./AddSetButton.svelte";
     import SingleSet from "./SingleSet.svelte";
-    import { dndzone } from "svelte-dnd-action";
+    import { dndzone, dragHandleZone, dragHandle } from "svelte-dnd-action";
     import AddExercise from "./AddExercise.svelte";
     import Menu from "$components/Menu.svelte";
     import { flip } from "svelte/animate";
@@ -64,7 +64,7 @@
 
     {#if SEs && SEs.length > 0}
         <div
-            use:dndzone={{
+            use:dragHandleZone={{
                 items: SEs,
                 dropTargetStyle: {
                     border: "none",
@@ -80,6 +80,14 @@
                     animate:flip={{ duration: 200 }}
                 >
                     <div class="flex justify-between items-center mb-2">
+                        <div
+                            use:dragHandle
+                            aria-label="Drag handle for {SE.exercise.name}"
+                            class="cursor-move select-none text-thistle pr-2"
+                            title="Drag to reorder"
+                        >
+                            ⠿
+                        </div>
                         <h3 class="text-lg font-semibold text-thistle truncate">
                             {SE.exercise.name}
                         </h3>
