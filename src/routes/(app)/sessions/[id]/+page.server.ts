@@ -170,6 +170,7 @@ export const actions: Actions = {
         }
 
         const form = await request.formData();
+        console.log("form", form);
         const idString = form.get("id")?.toString();
         if (!idString) {
             return fail(400, { error: "Set ID is missing.", form: Object.fromEntries(form) });

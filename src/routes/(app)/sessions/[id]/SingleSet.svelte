@@ -1,35 +1,45 @@
 <script lang="ts">
     import PlusMinusButton from "./PlusMinusButton.svelte";
     import DeleteButton from "./DeleteButton.svelte";
-    import SubmitButton from "./SubmitButton.svelte";
     import NumberInput from "./NumberInput.svelte";
     import type { Set } from "@prisma/client";
     import { enhance } from "$app/forms";
+    import { tick } from "svelte";
 
     export let set: Set;
     export let unit: string;
 
-    let expended: boolean = true;
+    let expended: boolean = false;
 
-    function decrementReps() {
+    async function decrementReps() {
         set = { ...set, reps: Math.max(0, set.reps - 1) };
+        await tick();
+        form?.requestSubmit();
     }
 
-    function incrementReps() {
+    async function incrementReps() {
         set = { ...set, reps: set.reps + 1 };
+        await tick();
+        form?.requestSubmit();
     }
 
-    function incrementIntensity(step: number = 1.0) {
+    async function incrementIntensity(step: number = 1.0) {
         const newIntensity = parseFloat((set.intensity + step).toFixed(1));
         set = { ...set, intensity: Math.max(0, newIntensity) };
+        await tick();
+        form?.requestSubmit();
     }
 
-    function decrementIntensity(step: number = 1.0) {
+    async function decrementIntensity(step: number = 1.0) {
         set = { ...set, intensity: Math.max(0, set.intensity - step) };
+        await tick();
+        form?.requestSubmit();
     }
+    let form: HTMLFormElement;
 </script>
 
 <form
+    bind:this={form}
     method="POST"
     action="?/update_set"
     data-set-id={set.id}
@@ -40,8 +50,30 @@
     <input type="hidden" name="exercise_id" value={set.exercise_id} />
 
     <div
-        class="flex items-center justify-between px-3 py-2 w-full gap-4 bg-black-bean/40 rounded-md focus-within:ring-1 focus-within:ring-plum"
+        class="flex items-center justify-between px-3 py-2 w-full gap-4 bg-black-bean/40 rounded-md focus-within:ring-0 focus-within:ring-plum"
     >
+        <button
+            type="button"
+            on:click={() => (expended = !expended)}
+            class="p-1 rounded focus:outline-none"
+            aria-label="Toggle details"
+        >
+            <svg
+                class="w-4 h-4 transition-transform duration-200 {expended
+                    ? 'rotate-180'
+                    : ''} text-plum"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+            >
+                <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M19 9l-7 7-7-7"
+                />
+            </svg>
+        </button>
         <button
             type="button"
             on:click={() => (expended = !expended)}
@@ -54,28 +86,7 @@
             </span>
         </button>
 
-        {#if expended}
-            <div class="flex items-center gap-2">
-                <SubmitButton />
-                <DeleteButton />
-            </div>
-        {/if}
-
-        <svg
-            class="w-4 h-4 flex-shrink-0 transition-transform duration-200 {expended
-                ? 'rotate-180'
-                : ''} text-plum"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-        >
-            <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M19 9l-7 7-7-7"
-            ></path>
-        </svg>
+        <DeleteButton />
     </div>
 
     {#if expended}
@@ -96,6 +107,7 @@
                     <NumberInput
                         name="reps"
                         id={set.id}
+                        {form}
                         bind:value={set.reps}
                     />
                     <PlusMinusButton callback={incrementReps} />
@@ -115,6 +127,7 @@
                     <NumberInput
                         name="intensity"
                         id={set.id}
+                        {form}
                         bind:value={set.intensity}
                     />
                     <PlusMinusButton callback={incrementIntensity} />
