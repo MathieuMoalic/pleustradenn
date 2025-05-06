@@ -2,6 +2,9 @@
     import Menu from "$components/Menu.svelte";
     import type { PageData } from "./$types";
     import ExerciseForm from "./ExerciseForm.svelte";
+    import { page } from "$app/state";
+    import { onMount, tick } from "svelte";
+    import { goto } from "$app/navigation";
 
     export let data: PageData;
     $: categories = data.categories;
@@ -9,11 +12,45 @@
 
     let expandedExerciseId: number | null = null;
 
-    function toggleExpand(exerciseId: number) {
+    const params = page.url.searchParams;
+    const editId = params.get("edit");
+
+    if (editId) {
+        expandedExerciseId = parseInt(editId);
+    }
+
+    async function toggleExpand(exerciseId: number) {
         if (expandedExerciseId === exerciseId) {
             expandedExerciseId = null;
+
+            const url = new URL(page.url);
+            url.searchParams.delete("edit");
+            goto(url.pathname + url.search, {
+                replaceState: true,
+                noScroll: true,
+            });
         } else {
             expandedExerciseId = exerciseId;
+
+            const url = new URL(page.url);
+            url.searchParams.set("edit", exerciseId.toString());
+            goto(url.pathname + url.search, {
+                replaceState: true,
+                noScroll: true,
+            });
+
+            // Wait for DOM to update, then scroll
+            await tick();
+            const el = document.getElementById(`exercise-${exerciseId}`);
+            if (el) {
+                el.scrollIntoView({ behavior: "smooth", block: "start" });
+
+                // Optionally add some padding if the header obscures the top
+                // Use a short timeout to scroll slightly down after the first scroll
+                setTimeout(() => {
+                    window.scrollBy({ top: -20, behavior: "smooth" });
+                }, 300);
+            }
         }
     }
 
@@ -25,18 +62,35 @@
         notes: "",
     };
     let addingExercise = false;
+
+    onMount(async () => {
+        const params = page.url.searchParams;
+        const editId = params.get("edit");
+
+        if (editId) {
+            expandedExerciseId = parseInt(editId);
+
+            // Wait for DOM update, then scroll
+            await tick();
+            const el = document.getElementById(`exercise-${editId}`);
+            if (el) {
+                el.scrollIntoView({ behavior: "smooth", block: "start" });
+            }
+        }
+    });
 </script>
 
 <Menu name="Exercises" bind:addButtonToggle={addingExercise} />
 <section class="space-y-2 p-2">
     {#if addingExercise}
-        <ExerciseForm ex={new_ex} {categories} />
+        <ExerciseForm ex={new_ex} {categories} {toggleExpand} />
     {/if}
 
     {#if exercises && exercises.length > 0}
         <div class="flex flex-col gap-2">
             {#each exercises as ex (ex.id)}
                 <div
+                    id={`exercise-${ex.id}`}
                     class="bg-burnt-umber/95 rounded-md shadow-sm overflow-hidden"
                 >
                     <button
@@ -73,7 +127,7 @@
                     </button>
 
                     {#if expandedExerciseId === ex.id}
-                        <ExerciseForm {ex} {categories} />
+                        <ExerciseForm {ex} {categories} {toggleExpand} />
                     {/if}
                 </div>
             {/each}

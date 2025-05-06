@@ -1,25 +1,21 @@
 <script lang="ts">
     import type { ExerciseCategory, Exercise } from "@prisma/client";
-    import { invalidate } from "$app/navigation";
-    import { enhance, applyAction } from "$app/forms";
-    import type { SubmitFunction } from "./$types";
+    import { enhance } from "$app/forms";
 
     export let ex: Exercise;
     export let categories: ExerciseCategory[] = [];
+    export let toggleExpand: (exerciseId: number) => void;
 
     let selected_category_id: number =
         categories.find((c) => c.id === ex.category_id)?.id ?? 1;
-    //     ={({ formElement, formData, action, cancel }) => {
-    //     console.log("Form submitted", formElement, formData, action, cancel);
-    //     return async ({ result }) => {
-    //         console.log("Form result", result);
-    //         await applyAction(result);
-
-    //     };
-    // }}
 </script>
 
-<form method="POST" class="space-y-5 text-plum p-3 pt-0" use:enhance>
+<form
+    method="POST"
+    class="space-y-5 text-plum p-3 pt-0"
+    use:enhance
+    on:submit={() => toggleExpand(ex.id)}
+>
     <input type="hidden" name="id" value={ex.id} />
     <input type="hidden" name="category_id" value={selected_category_id} />
 

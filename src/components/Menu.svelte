@@ -4,7 +4,7 @@
 
     export let name: string;
     export let addButtonToggle: boolean;
-    export let clockButtonToggle: boolean;
+    export let clockButtonToggle: boolean | null = null;
     let menuOpen = false;
     let showLogoutConfirmation = false;
 </script>
@@ -38,7 +38,9 @@
 
         <div class="flex items-center gap-3">
             <AddExerciseButton bind:addButtonToggle />
-            <ClockButton bind:clockButtonToggle />
+            {#if clockButtonToggle !== null}
+                <ClockButton bind:clockButtonToggle />
+            {/if}
         </div>
     </div>
 

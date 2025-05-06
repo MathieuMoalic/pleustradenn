@@ -7,6 +7,7 @@
     import type { PageData } from "./$types";
     import { enhance } from "$app/forms";
     import Clock from "$components/Clock.svelte";
+    import EditExerciseButton from "./EditExerciseButton.svelte";
 
     export let data: PageData;
     if (data.session === null) {
@@ -97,18 +98,27 @@
                     animate:flip={{ duration: 200 }}
                 >
                     <div class="flex justify-between items-center mb-2">
-                        <div
-                            use:dragHandle
-                            aria-label="Drag handle for {SE.exercise.name}"
-                            class="cursor-move select-none text-thistle pr-2"
-                            title="Drag to reorder"
-                        >
-                            ⠿
+                        <!-- Left: Drag handle + Title -->
+                        <div class="flex items-center gap-2 min-w-0">
+                            <div
+                                use:dragHandle
+                                aria-label="Drag handle for {SE.exercise.name}"
+                                class="cursor-move select-none text-thistle"
+                                title="Drag to reorder"
+                            >
+                                ⠿
+                            </div>
+                            <h3
+                                class="text-lg font-semibold text-thistle truncate"
+                            >
+                                {SE.exercise.name}
+                            </h3>
                         </div>
-                        <h3 class="text-lg font-semibold text-thistle truncate">
-                            {SE.exercise.name}
-                        </h3>
-                        <div class="flex items-center gap-2">
+
+                        <!-- Right: Buttons -->
+                        <div class="flex items-center gap-2 flex-shrink-0">
+                            <EditExerciseButton exercise_id={SE.exercise.id} />
+
                             <form
                                 method="POST"
                                 action="?/create_set"
@@ -127,7 +137,7 @@
 
                                 <button
                                     type="submit"
-                                    class="flex-shrink-0 text-plum hover:text-thistle focus:outline-none focus:ring-1 focus:ring-plum rounded-sm p-1"
+                                    class="bg-seal-brown text-thistle p-2 rounded-md shadow-md hover:bg-burnt-umber transition duration-200"
                                     aria-label="Add set"
                                 >
                                     <svg
@@ -136,13 +146,14 @@
                                         stroke="currentColor"
                                         viewBox="0 0 24 24"
                                         xmlns="http://www.w3.org/2000/svg"
-                                        ><path
+                                    >
+                                        <path
                                             stroke-linecap="round"
                                             stroke-linejoin="round"
                                             stroke-width="2"
                                             d="M12 4v16m8-8H4"
-                                        ></path></svg
-                                    >
+                                        />
+                                    </svg>
                                 </button>
                             </form>
                         </div>
