@@ -68,11 +68,7 @@
 
                     <div class="flex flex-shrink-0 ml-auto gap-2 mr-2">
                         <form method="POST" use:enhance>
-                            <input
-                                type="hidden"
-                                name="session_id"
-                                value={session.id}
-                            />
+                            <input type="hidden" name="id" value={session.id} />
                             <button
                                 type="submit"
                                 formaction="?/clone"

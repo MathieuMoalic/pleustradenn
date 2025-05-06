@@ -29,6 +29,7 @@ CREATE TABLE "SessionExercise" (
     "session_id" INTEGER NOT NULL,
     "exercise_id" INTEGER NOT NULL,
     "position" INTEGER NOT NULL,
+    "completed" BOOLEAN NOT NULL DEFAULT false,
     CONSTRAINT "SessionExercise_session_id_fkey" FOREIGN KEY ("session_id") REFERENCES "Session" ("id") ON DELETE CASCADE ON UPDATE CASCADE,
     CONSTRAINT "SessionExercise_exercise_id_fkey" FOREIGN KEY ("exercise_id") REFERENCES "Exercise" ("id") ON DELETE CASCADE ON UPDATE CASCADE
 );

@@ -2,6 +2,7 @@ import type { Actions } from "./$types";
 import prisma from "$lib/server/prisma";
 import { redirect, fail } from "@sveltejs/kit";
 import type { PageServerLoad } from './$types';
+import { get_last_set } from "$lib/server/get_last_set";
 
 export const load: PageServerLoad = async ({ locals }) => {
     if (!locals.user) {
@@ -104,7 +105,66 @@ export const actions: Actions = {
         }
         await prisma.session.delete({ where: { id } });
     },
-    clone: async ({ request }) => {
-        console.log("todo");
+    clone: async ({ request, locals }) => {
+        if (!locals.user) {
+            return fail(401, { error: 'You must be logged in to clone a session.' });
+        }
+
+        const form = await request.formData();
+        const sessionIdString = form.get("id")?.toString();
+        if (!sessionIdString) {
+            return fail(400, { error: "Session ID is missing." });
+        }
+
+        const session_id = parseInt(sessionIdString);
+        if (isNaN(session_id)) {
+            return fail(400, { error: "Invalid session ID." });
+        }
+
+        // Fetch session and its exercises
+        const sessionToClone = await prisma.session.findUnique({
+            where: { id: session_id },
+            include: {
+                session_exercises: true
+            }
+        });
+
+        if (!sessionToClone) {
+            return fail(404, { error: "Session not found." });
+        }
+
+        // Create a new session with today's date and the same notes
+        const newSession = await prisma.session.create({
+            data: {
+                date: new Date(),
+                notes: sessionToClone.notes,
+                user_id: locals.user.id
+            }
+        });
+
+        // Clone each session_exercise and create an initial set using get_last_set
+        for (const se of sessionToClone.session_exercises) {
+            const newSessionExercise = await prisma.sessionExercise.create({
+                data: {
+                    session_id: newSession.id,
+                    exercise_id: se.exercise_id,
+                    position: se.position
+                }
+            });
+
+            const initialSet = await get_last_set(se.exercise_id, se.id);
+
+            await prisma.set.create({
+                data: {
+                    session_exercise_id: newSessionExercise.id,
+                    reps: initialSet.reps,
+                    intensity: initialSet.intensity,
+                    exercise_id: se.exercise_id
+                }
+            });
+        }
+
+        // Redirect to the newly created session
+        throw redirect(302, `/sessions/${newSession.id}`);
     }
 };

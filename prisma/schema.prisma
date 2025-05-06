@@ -47,7 +47,8 @@ model SessionExercise {
   exercise    Exercise @relation(fields: [exercise_id], references: [id], onDelete: Cascade)
   exercise_id Int
 
-  position Int
+  position  Int
+  completed Boolean @default(false)
 
   sets Set[]
 
