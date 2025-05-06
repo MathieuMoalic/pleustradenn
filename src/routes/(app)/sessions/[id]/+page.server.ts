@@ -21,7 +21,10 @@ export const load: PageServerLoad = async ({ params }) => {
     return { categories, exercises, session };
 };
 
-async function create_set(exercise_id: number, session_id: number) {
+async function create_session_exercise_if_not_exists(
+    session_id: number,
+    exercise_id: number
+) {
     let sessionExercise = await prisma.sessionExercise.findFirst({
         where: {
             session_id: session_id,
@@ -43,57 +46,83 @@ async function create_set(exercise_id: number, session_id: number) {
         });
     }
 
-    const currentSessionExerciseId = sessionExercise.id;
+    return sessionExercise;
+}
 
-    const lastSetForExercise = await prisma.set.findFirst({
+async function get_last_set_for_session_exercise(
+    session_exercise_id: number
+) {
+    return await prisma.set.findFirst({
         where: {
-            exercise_id: exercise_id
+            session_exercise_id: session_exercise_id,
         },
         orderBy: {
-            created_at: 'desc'
+            created_at: 'desc',
         },
         select: {
             reps: true,
             intensity: true
         }
     });
+}
 
-    let reps = 1;
-    let intensity = 0.0;
-
-    if (lastSetForExercise) {
-        reps = lastSetForExercise.reps;
-        intensity = lastSetForExercise.intensity;
-    } else {
-        const fallbackSet = await prisma.set.findFirst({
-            where: {
-                exercise_id: exercise_id,
-                reps: { gt: 5 }
-            },
-            orderBy: {
-                intensity: 'desc'
-            },
-            select: {
-                reps: true,
-                intensity: true
-            }
-        });
-
-        if (fallbackSet) {
-            reps = fallbackSet.reps;
-            intensity = fallbackSet.intensity;
+async function get_last_set_from_prev_session(exercise_id: number) {
+    let lastSet = await prisma.set.findFirst({
+        where: {
+            exercise_id: exercise_id,
+            reps: { gt: 5 }, // only consider sets with more than 5 reps
+        },
+        orderBy: {
+            created_at: 'desc',
+        },
+        select: {
+            reps: true,
+            intensity: true
         }
+    });
+    if (!lastSet) {
+        // if no set is found for the exercise, create a default set
+        lastSet = {
+            reps: 1,
+            intensity: 0.0
+        };
     }
 
+    return lastSet;
+}
+
+async function get_last_set(exercise_id: number, session_exercise_id: number) {
+    let lastSet = await get_last_set_for_session_exercise(
+        session_exercise_id
+    );
+    // if no set is found for the session exercise, get the last set for the exercise
+    // from previous sessions
+    if (!lastSet) {
+        lastSet = await get_last_set_from_prev_session(exercise_id);
+    }
+    return lastSet;
+}
+
+async function create_set(exercise_id: number, session_id: number) {
+    let sessionExercise = await create_session_exercise_if_not_exists(
+        session_id,
+        exercise_id
+    );
+
+    const lastSet = await get_last_set(
+        exercise_id,
+        sessionExercise.id
+    );
+
     const newSetData = {
-        session_exercise_id: currentSessionExerciseId,
+        session_exercise_id: sessionExercise.id,
         exercise_id: exercise_id,
-        reps: reps,
-        intensity: intensity,
+        reps: lastSet.reps,
+        intensity: lastSet.intensity,
     };
 
     try {
-        const newSet = await prisma.set.create({ data: newSetData });
+        await prisma.set.create({ data: newSetData });
     } catch (error) {
         throw error;
     }

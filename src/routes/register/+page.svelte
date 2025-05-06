@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { enhance } from "$app/forms";
     import type { ActionData } from "./$types";
     export let form: ActionData;
 </script>
@@ -9,7 +10,7 @@
             Register
         </h1>
 
-        <form method="POST" class="space-y-4">
+        <form method="POST" class="space-y-4" use:enhance>
             {#if form?.error}
                 <p class="rounded bg-red-300 p-3 text-red-900">{form.error}</p>
             {/if}

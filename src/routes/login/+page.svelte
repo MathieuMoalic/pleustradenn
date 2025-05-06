@@ -1,6 +1,7 @@
 <script lang="ts">
     import type { ActionData } from "./$types";
     import { page } from "$app/state";
+    import { enhance } from "$app/forms";
     export let form: ActionData;
 </script>
 
@@ -14,7 +15,7 @@
             </p>
         {/if}
 
-        <form method="POST" class="space-y-4">
+        <form method="POST" class="space-y-4" use:enhance>
             {#if form?.error}
                 <p class="rounded bg-red-300 p-3 text-red-900">{form.error}</p>
             {/if}

@@ -2,11 +2,11 @@
     type="submit"
     formaction="?/delete_set"
     formmethod="POST"
-    class="text-red-500 hover:text-red-400 p-1 rounded-sm"
+    class="text-red-500 hover:text-red-400 rounded-sm"
     aria-label="Delete set"
 >
     <svg
-        class="w-5 h-5"
+        class="w-10 h-4"
         fill="none"
         stroke="currentColor"
         viewBox="0 0 24 24"

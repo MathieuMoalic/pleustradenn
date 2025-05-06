@@ -4,8 +4,8 @@
     import ExerciseForm from "./ExerciseForm.svelte";
 
     export let data: PageData;
-    let categories = data.categories;
-    let exercises = data.exercises;
+    $: categories = data.categories;
+    $: exercises = data.exercises;
 
     let expandedExerciseId: number | null = null;
 

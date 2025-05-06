@@ -4,6 +4,7 @@
     import type { PageData } from "./$types";
     import SessionForm from "./SessionForm.svelte";
     import Menu from "$components/Menu.svelte";
+    import { enhance } from "$app/forms";
 
     export let data: PageData;
     let sessions = data.sessions;
@@ -66,7 +67,7 @@
                     </button>
 
                     <div class="flex flex-shrink-0 ml-auto gap-2 mr-2">
-                        <form method="POST">
+                        <form method="POST" use:enhance>
                             <input
                                 type="hidden"
                                 name="session_id"

@@ -1,20 +1,20 @@
 <script lang="ts">
-    import AddSetButton from "./AddSetButton.svelte";
     import SingleSet from "./SingleSet.svelte";
-    import { dndzone, dragHandleZone, dragHandle } from "svelte-dnd-action";
+    import { dragHandleZone, dragHandle } from "svelte-dnd-action";
     import AddExercise from "./AddExercise.svelte";
     import Menu from "$components/Menu.svelte";
     import { flip } from "svelte/animate";
     import type { PageData } from "./$types";
+    import { enhance } from "$app/forms";
+    import Clock from "$components/Clock.svelte";
 
     export let data: PageData;
     if (data.session === null) {
         throw new Error("Session not found");
     }
-    let SEs = data.session.session_exercises;
 
     function handleReorder(event: CustomEvent) {
-        SEs = event.detail.items;
+        data.session!.session_exercises = event.detail.items;
     }
     function finalizeReorder(event: CustomEvent) {
         const newOrder = event.detail.items.map(
@@ -25,8 +25,10 @@
         ) as HTMLInputElement;
         input.value = JSON.stringify(newOrder);
 
-        const form = document.getElementById("reorder-form") as HTMLFormElement;
-        form.submit();
+        const button = document.getElementById(
+            "hidden-submit",
+        ) as HTMLButtonElement;
+        button.click();
     }
 
     function formatSessionDate(date: Date): string {
@@ -44,28 +46,43 @@
         const mm = String(date.getMonth() + 1).padStart(2, "0");
         const dd = String(date.getDate()).padStart(2, "0");
 
-        return `Session of ${yyyy}.${mm}.${dd}`;
+        return `${yyyy}.${mm}.${dd}`;
     }
     let addingExercise = false;
+    let clockButtonToggle = false;
 </script>
 
 <Menu
     name={formatSessionDate(data.session!.date)}
     bind:addButtonToggle={addingExercise}
+    bind:clockButtonToggle
 />
 <section class="p-2">
-    <form method="POST" action="?/reorder_session_exercises" id="reorder-form">
+    <form
+        method="POST"
+        action="?/reorder_session_exercises"
+        id="reorder-form"
+        use:enhance
+    >
         <input type="hidden" name="exercise_ids" id="exercise-order-input" />
+        <button type="submit" id="hidden-submit" style="display: none;"
+            >Submit</button
+        >
     </form>
 
     {#if addingExercise}
         <AddExercise categories={data.categories} exercises={data.exercises} />
     {/if}
+    {#if clockButtonToggle}
+        <div class="flex justify-center items-center">
+            <Clock />
+        </div>
+    {/if}
 
-    {#if SEs && SEs.length > 0}
+    {#if data.session!.session_exercises && data.session!.session_exercises.length > 0}
         <div
             use:dragHandleZone={{
-                items: SEs,
+                items: data.session!.session_exercises,
                 dropTargetStyle: {
                     border: "none",
                 },
@@ -74,7 +91,7 @@
             on:consider={handleReorder}
             on:finalize={finalizeReorder}
         >
-            {#each SEs as SE (SE.id)}
+            {#each data.session!.session_exercises as SE (SE.id)}
                 <div
                     class="bg-seal-brown/90 rounded-md shadow-md p-3 border border-burnt-umber my-3"
                     animate:flip={{ duration: 200 }}
@@ -92,17 +109,49 @@
                             {SE.exercise.name}
                         </h3>
                         <div class="flex items-center gap-2">
-                            <AddSetButton
-                                session_id={data.session!.id}
-                                exercise_id={SE.exercise.id}
-                            />
+                            <form
+                                method="POST"
+                                action="?/create_set"
+                                use:enhance
+                            >
+                                <input
+                                    type="hidden"
+                                    name="session_id"
+                                    value={data.session!.id || ""}
+                                />
+                                <input
+                                    type="hidden"
+                                    name="exercise_id"
+                                    value={SE.exercise.id || ""}
+                                />
+
+                                <button
+                                    type="submit"
+                                    class="flex-shrink-0 text-plum hover:text-thistle focus:outline-none focus:ring-1 focus:ring-plum rounded-sm p-1"
+                                    aria-label="Add set"
+                                >
+                                    <svg
+                                        class="w-4 h-4"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        viewBox="0 0 24 24"
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        ><path
+                                            stroke-linecap="round"
+                                            stroke-linejoin="round"
+                                            stroke-width="2"
+                                            d="M12 4v16m8-8H4"
+                                        ></path></svg
+                                    >
+                                </button>
+                            </form>
                         </div>
                     </div>
 
                     <div class="flex flex-col gap-1">
                         {#each SE.sets as set (set.id)}
                             <SingleSet
-                                bind:set
+                                {set}
                                 unit={SE.exercise.intensity_unit}
                             />
                         {/each}

@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { enhance } from "$app/forms";
     import { Datepicker } from "flowbite-svelte";
     export let session: {
         id: number;
@@ -7,7 +8,7 @@
     };
 </script>
 
-<form method="POST" class="space-y-4">
+<form method="POST" class="space-y-4" use:enhance>
     <input type="hidden" name="id" value={session.id} />
 
     <div class="md:w-1/2 flex justify-center items-center">

@@ -1,11 +1,11 @@
 <button
     type="submit"
     formaction="?/update_set"
-    class="text-blue-500 hover:text-blue-400 p-1 rounded-sm"
+    class="text-blue-500 hover:text-blue-400 rounded-sm"
     aria-label="Save set"
 >
     <svg
-        class="w-5 h-5"
+        class="w-10 h-4"
         fill="none"
         stroke="currentColor"
         viewBox="0 0 24 24"

@@ -69,8 +69,6 @@ export const actions: Actions = {
         } catch (error) {
             return fail(500, { error: "Failed to create exercise. Please try again.", form: Object.fromEntries(form) });
         }
-
-        throw redirect(303, "/exercises");
     },
 
     update: async ({ request }) => {
@@ -100,8 +98,6 @@ export const actions: Actions = {
         } catch (error) {
             return fail(500, { error: "Failed to update exercise. Please try again.", form: Object.fromEntries(form) });
         }
-
-        throw redirect(303, "/exercises");
     },
 
     delete: async ({ request }) => {
@@ -124,7 +120,5 @@ export const actions: Actions = {
             }
             return fail(500, { error: "Failed to delete exercise. Please try again." });
         }
-
-        throw redirect(303, "/exercises");
     },
 };
