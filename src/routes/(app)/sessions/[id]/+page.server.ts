@@ -99,6 +99,21 @@ export const actions: Actions = {
         await create_set(exercise_id, session_id);
 
     },
+    update_session_exercise: async ({ request }) => {
+        const form = await request.formData();
+        console.log("Form data:", Object.fromEntries(form));
+
+        const SEID = parseInt(form.get("id") as string);
+        if (isNaN(SEID)) {
+            return fail(400, { error: "Invalid Session Exercise ID." });
+        }
+        await prisma.sessionExercise.update({
+            where: { id: SEID },
+            data: {
+                completed: form.get("completed") === "true",
+            },
+        });
+    },
     create_set: async ({ request, params }) => {
         const session_id = parseInt(params.id as string);
         if (isNaN(session_id)) {
@@ -117,7 +132,6 @@ export const actions: Actions = {
         }
 
         const form = await request.formData();
-        console.log("form", form);
         const idString = form.get("id")?.toString();
         if (!idString) {
             return fail(400, { error: "Set ID is missing.", form: Object.fromEntries(form) });

@@ -8,6 +8,7 @@
     import { enhance } from "$app/forms";
     import Clock from "$components/Clock.svelte";
     import EditExerciseButton from "./EditExerciseButton.svelte";
+    import EditSeButton from "./EditSEButton.svelte";
 
     export let data: PageData;
     if (data.session === null) {
@@ -118,6 +119,7 @@
                         <!-- Right: Buttons -->
                         <div class="flex items-center gap-2 flex-shrink-0">
                             <EditExerciseButton exercise_id={SE.exercise.id} />
+                            <EditSeButton id={SE.id} completed={SE.completed} />
 
                             <form
                                 method="POST"
