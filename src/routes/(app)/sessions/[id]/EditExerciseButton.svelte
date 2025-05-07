@@ -2,11 +2,16 @@
     import { goto } from "$app/navigation";
 
     export let exercise_id: number;
+    export let completed: boolean;
 </script>
 
 <button
     type="button"
-    class="bg-seal-brown text-thistle font-semibold p-2 rounded-md shadow-md hover:bg-burnt-umber transition duration-200"
+    class={`font-semibold p-2 rounded-md shadow-md transition duration-200 ${
+        completed
+            ? "bg-emerald-700 text-white hover:bg-emerald-600"
+            : "bg-seal-brown text-thistle hover:bg-burnt-umber"
+    }`}
     on:click={() => goto(`/exercises?edit=${exercise_id}`)}
     aria-label="Edit exercise"
 >

@@ -2,7 +2,7 @@
     import { enhance } from "$app/forms";
 
     export let id: number;
-    export let completed: boolean = false;
+    export let completed: boolean;
 </script>
 
 <form method="POST" action="?/update_session_exercise" use:enhance>
@@ -11,13 +11,17 @@
 
     <button
         type="submit"
-        class="bg-seal-brown text-thistle p-2 rounded-md shadow-md hover:bg-burnt-umber transition duration-200"
+        class={`p-2 rounded-md shadow-md transition duration-200 ${
+            completed
+                ? "bg-emerald-700 text-white hover:bg-emerald-600"
+                : "bg-seal-brown text-thistle hover:bg-burnt-umber"
+        }`}
         aria-label={completed ? "Mark as incomplete" : "Mark as complete"}
         on:click={() => (completed = !completed)}
     >
         {#if completed}
             <svg
-                class="w-5 h-5"
+                class="w-4 h-4"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -40,7 +44,7 @@
             </svg>
         {:else}
             <svg
-                class="w-5 h-5"
+                class="w-4 h-4"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"

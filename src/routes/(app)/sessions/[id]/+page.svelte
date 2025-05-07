@@ -95,7 +95,11 @@
         >
             {#each data.session!.session_exercises as SE (SE.id)}
                 <div
-                    class="bg-seal-brown/90 rounded-md shadow-md p-3 border border-burnt-umber my-3"
+                    class={`rounded-md shadow-md p-3 my-3 border animate-fade-in ${
+                        SE.completed
+                            ? "bg-emerald-900/90 border-emerald-400"
+                            : "bg-seal-brown/90 border-burnt-umber"
+                    }`}
                     animate:flip={{ duration: 200 }}
                 >
                     <div class="flex justify-between items-center mb-2">
@@ -118,7 +122,10 @@
 
                         <!-- Right: Buttons -->
                         <div class="flex items-center gap-2 flex-shrink-0">
-                            <EditExerciseButton exercise_id={SE.exercise.id} />
+                            <EditExerciseButton
+                                exercise_id={SE.exercise.id}
+                                completed={SE.completed}
+                            />
                             <EditSeButton id={SE.id} completed={SE.completed} />
 
                             <form
@@ -139,7 +146,11 @@
 
                                 <button
                                     type="submit"
-                                    class="bg-seal-brown text-thistle p-2 rounded-md shadow-md hover:bg-burnt-umber transition duration-200"
+                                    class={`p-2 rounded-md shadow-md transition duration-200 ${
+                                        SE.completed
+                                            ? "bg-emerald-700 text-white hover:bg-emerald-600"
+                                            : "bg-seal-brown text-thistle hover:bg-burnt-umber"
+                                    }`}
                                     aria-label="Add set"
                                 >
                                     <svg

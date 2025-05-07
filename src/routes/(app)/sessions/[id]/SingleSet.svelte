@@ -43,7 +43,7 @@
     method="POST"
     action="?/update_set"
     data-set-id={set.id}
-    class="flex flex-col bg-black-bean/40 text-plum rounded-md shadow-sm border border-burnt-umber text-sm overflow-hidden"
+    class="flex flex-col bg-black-bean/40 text-plum rounded-md shadow-sm text-sm overflow-hidden"
     use:enhance
 >
     <input type="hidden" name="id" value={set.id} />
