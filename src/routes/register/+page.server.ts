@@ -2,14 +2,13 @@ import type { Actions } from './$types';
 import { fail, redirect } from '@sveltejs/kit';
 import prisma from '$lib/server/prisma';
 import bcrypt from 'bcrypt';
-
-import { ALLOW_REGISTRATION } from '$env/static/private';
-
+import { env } from '$env/dynamic/private';
+const allowRegistration = env.ALLOW_REGISTRATION === 'true';
 
 export const actions: Actions = {
     default: async ({ request }) => {
 
-        if (ALLOW_REGISTRATION === 'false') {
+        if (!allowRegistration) {
             return fail(403, {
                 error: 'New user registration is currently disabled.'
             });

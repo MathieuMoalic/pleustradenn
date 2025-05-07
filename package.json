@@ -1,7 +1,7 @@
 {
 	"name": "frontend",
 	"private": true,
-	"version": "1.0.14",
+	"version": "2.0.0",
 	"type": "module",
 	"prisma": {
 		"seed": "tsx prisma/seed.ts",
@@ -12,11 +12,10 @@
 		"build": "vite build",
 		"preview": "vite preview",
 		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
-		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
-		"gen-api": "sta --add-readonly -p 'http://localhost:6001/openapi.json' -o ./src/lib/ -n api.ts"
+		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch"
 	},
 	"devDependencies": {
-		"@prisma/client": "5.22.0",
+		"@prisma/client": "6.6.0",
 		"@sveltejs/adapter-node": "^5.2.12",
 		"svelte-dnd-action": "^0.9.61",
 		"@sveltejs/kit": "^2.9.0",
@@ -29,7 +28,7 @@
 		"flowbite-svelte": "^0.47.4",
 		"flowbite-svelte-icons": "^2.0.2",
 		"fuse.js": "^7.0.0",
-		"prisma": "5.22.0",
+		"prisma": "6.6.0",
 		"svelte": "^5.0.0",
 		"svelte-check": "^4.0.0",
 		"swagger-typescript-api": "^13.0.23",

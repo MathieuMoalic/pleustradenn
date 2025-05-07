@@ -73,3 +73,11 @@ test:
     ADMIN_USERNAME=${ADMIN_USERNAME} \
     ADMIN_PASSWORD=${ADMIN_PASSWORD} \
     pytest -rP backend/tests
+
+migrate-db:
+    npx prisma generate
+    scp homeserver:podman/pleustradenn/db1.sqlite ./data/old.db
+    rm -rf data/new.db
+    rm -rf prisma/migrations
+    npx prisma migrate dev --name init
+    cd data && sh -c "sqlite3 new.db < migrate.sql"
