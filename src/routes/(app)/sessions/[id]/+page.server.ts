@@ -22,6 +22,45 @@ export const load: PageServerLoad = async ({ params }) => {
     return { categories, exercises, session };
 };
 
+async function reorder_session_exercises_by_completion(session_id: number) {
+    const session = await prisma.session.findUnique({
+        where: { id: session_id },
+        include: { session_exercises: true }
+    });
+
+    if (!session) {
+        throw new Error("Session not found.");
+    }
+
+    const active = session.session_exercises
+        .filter(se => !se.completed)
+        .sort((a, b) => a.position - b.position);
+
+    const done = session.session_exercises
+        .filter(se => se.completed)
+        .sort((a, b) => a.position - b.position);
+
+    const sorted = [...active, ...done];
+    const tempOffset = 1000;
+
+    const tempUpdates = sorted.map((se, index) =>
+        prisma.sessionExercise.update({
+            where: { id: se.id },
+            data: { position: index + tempOffset }
+        })
+    );
+
+    const finalUpdates = sorted.map((se, index) =>
+        prisma.sessionExercise.update({
+            where: { id: se.id },
+            data: { position: index }
+        })
+    );
+
+    await prisma.$transaction([...tempUpdates, ...finalUpdates]);
+}
+
+
 async function create_session_exercise_if_not_exists(
     session_id: number,
     exercise_id: number
@@ -99,21 +138,24 @@ export const actions: Actions = {
         await create_set(exercise_id, session_id);
 
     },
+
     update_session_exercise: async ({ request }) => {
         const form = await request.formData();
-        console.log("Form data:", Object.fromEntries(form));
-
         const SEID = parseInt(form.get("id") as string);
         if (isNaN(SEID)) {
             return fail(400, { error: "Invalid Session Exercise ID." });
         }
-        await prisma.sessionExercise.update({
+
+        const completed = form.get("completed") === "true";
+
+        const updatedSE = await prisma.sessionExercise.update({
             where: { id: SEID },
-            data: {
-                completed: form.get("completed") === "true",
-            },
+            data: { completed }
         });
+
+        await reorder_session_exercises_by_completion(updatedSE.session_id);
     },
+
     create_set: async ({ request, params }) => {
         const session_id = parseInt(params.id as string);
         if (isNaN(session_id)) {
@@ -125,6 +167,7 @@ export const actions: Actions = {
 
         await create_set(exercise_id, session_id);
     },
+
     update_set: async ({ request, params }) => {
         const session_id = parseInt(params.id as string);
         if (isNaN(session_id)) {
@@ -150,6 +193,7 @@ export const actions: Actions = {
             },
         });
     },
+
     delete_set: async ({ request, params }) => {
         const form = await request.formData();
         const session_id = parseInt(params.id as string);
@@ -180,57 +224,61 @@ export const actions: Actions = {
         }
 
     },
+
     reorder_session_exercises: async ({ request, params }) => {
         const session_id = parseInt(params.id as string);
-        const form = await request.formData();
-        let exercise_ids = form.get("exercise_ids");
-        let exerciseOrderArray: number[];
-
-        if (typeof exercise_ids === "string") {
-            exerciseOrderArray = JSON.parse(exercise_ids);
-        } else {
-            return fail(400, { error: "Invalid exercise order format" });
+        if (isNaN(session_id)) {
+            return fail(400, { error: "Invalid Session ID from URL." });
         }
+
+        const form = await request.formData();
+        const raw = form.get("exercise_ids");
+        if (typeof raw !== "string") {
+            return fail(400, { error: "Invalid exercise order format." });
+        }
+
+        const exerciseOrderArray: number[] = JSON.parse(raw);
 
         const session = await prisma.session.findUnique({
             where: { id: session_id },
-            include: {
-                session_exercises: true
-            }
+            include: { session_exercises: true }
         });
 
         if (!session) {
-            return fail(404, { error: "Session not found" });
+            return fail(404, { error: "Session not found." });
         }
 
-        // Create a map of exercise_id -> sessionExercise.id
-        const exerciseToSessionExerciseMap = new Map();
+        const exerciseToSE = new Map<number, typeof session.session_exercises[number]>();
         for (const se of session.session_exercises) {
-            exerciseToSessionExerciseMap.set(se.exercise_id, se.id);
+            exerciseToSE.set(se.exercise_id, se);
         }
 
+        const active: typeof session.session_exercises = [];
+        const done: typeof session.session_exercises = [];
+
+        for (const exercise_id of exerciseOrderArray) {
+            const se = exerciseToSE.get(exercise_id);
+            if (!se) continue;
+            (se.completed ? done : active).push(se);
+        }
+
+        const sorted = [...active, ...done];
         const tempOffset = 1000;
 
-        const tempUpdates = exerciseOrderArray.map((exercise_id, index) => {
-            const sessionExerciseId = exerciseToSessionExerciseMap.get(exercise_id);
-            if (!sessionExerciseId) {
-                throw new Error(`Exercise ID ${exercise_id} not found in session_exercises`);
-            }
-            return prisma.sessionExercise.update({
-                where: { id: sessionExerciseId },
+        const tempUpdates = sorted.map((se, index) =>
+            prisma.sessionExercise.update({
+                where: { id: se.id },
                 data: { position: index + tempOffset }
-            });
-        });
+            })
+        );
 
-        const finalUpdates = exerciseOrderArray.map((exercise_id, index) => {
-            const sessionExerciseId = exerciseToSessionExerciseMap.get(exercise_id);
-            return prisma.sessionExercise.update({
-                where: { id: sessionExerciseId },
+        const finalUpdates = sorted.map((se, index) =>
+            prisma.sessionExercise.update({
+                where: { id: se.id },
                 data: { position: index }
-            });
-        });
+            })
+        );
 
         await prisma.$transaction([...tempUpdates, ...finalUpdates]);
     }
-
 };
