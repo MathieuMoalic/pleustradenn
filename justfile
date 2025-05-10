@@ -30,16 +30,13 @@ release:
 
     
 staging:
-    podman build -t localhost/workouts-staging:latest .
+    podman build -t localhost/pleustradenn-staging:latest .
 
     podman run --rm --replace \
-        --name workouts-staging \
-        --network tmp-proxy \
+        --name pleustradenn-staging \
         -v ./data:/data \
-        -p 6001:6001 \
-        -e ADMIN_USERNAME=${ADMIN_USERNAME} \
-        -e ADMIN_PASSWORD=${ADMIN_PASSWORD} \
-        localhost/workouts-staging:latest 
+        -p 3000:3000 \
+        localhost/pleustradenn-staging:latest 
     
 caddy:
     podman run --rm -d --replace \
