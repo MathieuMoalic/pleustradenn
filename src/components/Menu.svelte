@@ -15,7 +15,7 @@
     >
         <div class="flex items-center gap-4">
             <button
-                class="text-plum hover:text-thistle focus:outline-none md:hidden"
+                class="text-plum hover:text-thistle focus:outline-none"
                 on:click={() => (menuOpen = !menuOpen)}
                 aria-label="Toggle menu"
             >
@@ -46,7 +46,7 @@
 
     {#if menuOpen}
         <div
-            class="flex flex-col px-6 py-4 md:hidden bg-black-bean border-t border-thistle"
+            class="flex flex-col px-6 py-4 bg-black-bean border-t border-thistle"
         >
             <a
                 href="/sessions"

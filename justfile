@@ -32,45 +32,12 @@ release:
 staging:
     podman build -t localhost/pleustradenn-staging:latest .
 
-    podman run --rm --replace \
+    podman run --init --rm --replace \
         --name pleustradenn-staging \
         -v ./data:/data \
-        -p 3000:3000 \
+        -p 4173:4173 \
         localhost/pleustradenn-staging:latest 
     
-caddy:
-    podman run --rm -d --replace \
-        --name caddy \
-        --network tmp-proxy \
-        -v ./Caddyfile:/etc/caddy/Caddyfile \
-        -p 80:80 \
-        -p 443:443 \
-        caddy:latest
-
-backend:
-    rm -f ./data/db1.sqlite
-    DATABASE_URL=sqlite:///./data/db1.sqlite \
-    ADMIN_USERNAME=${ADMIN_USERNAME} \
-    ADMIN_PASSWORD=${ADMIN_PASSWORD} \
-    uvicorn backend.main:app --proxy-headers --host 0.0.0.0 --port 6001 --reload
-
-migrate:
-    cd backend/migrations && \
-    DATABASE_URL=sqlite:///../../test1.db \
-    alembic upgrade head
-
-build-frontend:
-    cd frontend && \
-    npm install && \
-    npm run build && \
-    mv build ../backend/static
-
-test:
-    DATABASE_URL=sqlite:///./data/db1.sqlite \
-    ADMIN_USERNAME=${ADMIN_USERNAME} \
-    ADMIN_PASSWORD=${ADMIN_PASSWORD} \
-    pytest -rP backend/tests
-
 migrate-db:
     npx prisma generate
     scp homeserver:podman/pleustradenn/db1.sqlite ./data/old.db

@@ -2,6 +2,7 @@ import { PrismaClient } from '@prisma/client';
 import dotenv from 'dotenv';
 import bcrypt from 'bcrypt'; // Import bcrypt
 
+console.log('Seeding database...');
 dotenv.config();
 const prisma = new PrismaClient();
 
@@ -243,15 +244,15 @@ async function main() {
     return;
   }
 
-  // let categoryMap = await createExerciseCategory();
-  // await createExercises(categoryMap);
+  let categoryMap = await createExerciseCategory();
+  await createExercises(categoryMap);
   let defaultUser_id = await createDefaultUser();
-  // const firstSession_id = await createFirstSession(defaultUser_id);
-  // if (firstSession_id) {
-  //   const exercises = await prisma.exercise.findMany({ take: 3 });
-  //   const sessionExerciseLinks = await createSessionExercises(firstSession_id, exercises.map(e => e.id));
-  //   await createSets(sessionExerciseLinks);
-  // }
+  const firstSession_id = await createFirstSession(defaultUser_id);
+  if (firstSession_id) {
+    const exercises = await prisma.exercise.findMany({ take: 3 });
+    const sessionExerciseLinks = await createSessionExercises(firstSession_id, exercises.map(e => e.id));
+    await createSets(sessionExerciseLinks);
+  }
 }
 
 main()
