@@ -27,21 +27,3 @@ release:
     git push origin "v$NEW_VERSION"
 
     echo "Version bumped to v$NEW_VERSION and pushed with tag."
-
-    
-staging:
-    podman build -t localhost/pleustradenn-staging:latest .
-
-    podman run --init --rm --replace \
-        --name pleustradenn-staging \
-        -v ./data:/data \
-        -p 4173:4173 \
-        localhost/pleustradenn-staging:latest 
-    
-migrate-db:
-    npx prisma generate
-    scp homeserver:podman/pleustradenn/db1.sqlite ./data/old.db
-    rm -rf data/new.db
-    rm -rf prisma/migrations
-    npx prisma migrate dev --name init
-    cd data && sh -c "sqlite3 new.db < migrate.sql"

@@ -54,10 +54,6 @@ export const handle: Handle = async ({ event, resolve }) => {
     // Proceed with the request
     const response = await resolve(event);
 
-    // Add CORS headers for development
-    response.headers.set("Access-Control-Allow-Origin", "http://localhost:4173");
-    response.headers.set("Access-Control-Allow-Credentials", "true");
-
     return response;
 };
 
