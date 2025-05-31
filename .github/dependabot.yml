@@ -1,16 +1,5 @@
 version: 2
 updates:
-  - package-ecosystem: "pip"
-    directory: "/backend"
-    schedule:
-      interval: "monthly"
-    groups:
-      python-dependencies:
-        patterns:
-          - "*"
-    ignore:
-      - dependency-name: "bcrypt"
-
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:

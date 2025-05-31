@@ -1,0 +1,34 @@
+{
+	"name": "pleustradenn",
+	"private": true,
+	"version": "2.0.0",
+	"type": "module",
+	"prisma": {
+		"schema": "./prisma/schema.prisma"
+	},
+	"scripts": {
+		"dev": "vite dev",
+		"build": "vite build",
+		"preview": "vite preview"
+	},
+	"devDependencies": {
+		"@sveltejs/kit": "^2.9.0",
+		"@sveltejs/vite-plugin-svelte": "^5.0.0",
+		"@types/bcrypt": "^5.0.2",
+		"@types/node": "^22.14.0",
+		"svelte-check": "^4.0.0",
+		"tsx": "^4.19.3",
+		"typescript": "^5.0.0",
+		"vite": "^6.0.0"
+	},
+	"dependencies": {
+		"@prisma/client": "6.6.0",
+		"@sveltejs/adapter-node": "^5.2.12",
+		"bcrypt": "^5.1.1",
+		"dotenv": "^16.4.7",
+		"prisma": "6.6.0",
+		"svelte": "^5.0.0",
+		"svelte-dnd-action": "^0.9.61",
+		"tailwindcss": "^3.4.9"
+	}
+}

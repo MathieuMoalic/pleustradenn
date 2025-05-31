@@ -1,0 +1,89 @@
+generator client {
+  provider      = "prisma-client-js"
+  output        = "../node_modules/.prisma/client"
+  binaryTargets = ["native", "linux-musl-openssl-3.0.x"]
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model ExerciseCategory {
+  id Int @id @default(autoincrement())
+
+  name      String     @unique
+  exercises Exercise[]
+}
+
+model Exercise {
+  id Int @id @default(autoincrement())
+
+  category_id Int
+  category    ExerciseCategory @relation(fields: [category_id], references: [id])
+
+  intensity_unit String @default("kg")
+  name           String @unique
+  notes          String @default("")
+
+  session_exercises SessionExercise[]
+  sets              Set[]
+}
+
+model Session {
+  id      Int      @id @default(autoincrement())
+  user_id String   @map("user_id")
+  user    User     @relation(fields: [user_id], references: [id])
+  date    DateTime @default(now())
+  notes   String   @default("")
+
+  session_exercises SessionExercise[]
+}
+
+model SessionExercise {
+  id Int @id @default(autoincrement())
+
+  session    Session @relation(fields: [session_id], references: [id], onDelete: Cascade)
+  session_id Int
+
+  exercise    Exercise @relation(fields: [exercise_id], references: [id], onDelete: Cascade)
+  exercise_id Int
+
+  position  Int
+  completed Boolean @default(false)
+
+  sets Set[]
+
+  @@unique([session_id, position]) // Position must be unique per session
+}
+
+model Set {
+  id Int @id @default(autoincrement())
+
+  session_exercise_id Int             @map("sessionExercise_id")
+  session_exercise    SessionExercise @relation(fields: [session_exercise_id], references: [id], onDelete: Cascade)
+
+  exercise_id Int?
+  Exercise    Exercise? @relation(fields: [exercise_id], references: [id])
+
+  reps       Int      @default(1)
+  intensity  Float    @default(0.0)
+  created_at DateTime @default(now())
+}
+
+model User {
+  id            String        @id @default(cuid())
+  username      String        @unique
+  password_hash String
+  sessions      Session[]
+  user_sessions UserSession[]
+}
+
+model UserSession {
+  id        String   @id @default(cuid()) // Session ID stored in cookie
+  expiresAt DateTime
+  user_id   String
+  user      User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@index([user_id])
+}
