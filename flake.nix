@@ -11,12 +11,10 @@
       npmDepsHash = "sha256-qXEb92J1HLkPC6s7zwF+/Z/K1uUGNL8Bha08o8mVd+0=";
       src = ./.;
 
-      nativeBuildInputs = [pkgs.prisma-engines pkgs.openssl];
-
       PRISMA_QUERY_ENGINE_LIBRARY = "${pkgs.prisma-engines}/lib/libquery_engine.node";
       PRISMA_QUERY_ENGINE_BINARY = "${pkgs.prisma-engines}/bin/query-engine";
       PRISMA_SCHEMA_ENGINE_BINARY = "${pkgs.prisma-engines}/bin/schema-engine";
-      PRISMA_HIDE_UPDATE_MESSAGE = 1;
+      PRISMA_HIDE_UPDATE_MESSAGE = "1";
 
       postBuild = ''
         export HOME=$TMPDIR
@@ -29,32 +27,38 @@
         cp -r build prisma package.json node_modules $out/
         runHook postInstall
       '';
+      NODE_ENV = "production";
     };
-    startScript = pkgs.writeShellScript "pleustradenn" ''
-      exec ${pkgs.nodejs_24}/bin/node --env-file=.env ${package}/build/index.js "$@"
+
+    startScript = pkgs.writeShellScriptBin "pleustradenn" ''
+      export PRISMA_QUERY_ENGINE_LIBRARY="${pkgs.prisma-engines}/lib/libquery_engine.node"
+      export PRISMA_QUERY_ENGINE_BINARY="${pkgs.prisma-engines}/bin/query-engine"
+      export PRISMA_SCHEMA_ENGINE_BINARY="${pkgs.prisma-engines}/bin/schema-engine"
+      export PRISMA_HIDE_UPDATE_MESSAGE=1
+
+      if [ -f .env ]; then
+        exec ${pkgs.nodejs}/bin/node --env-file=.env ${package}/build/index.js "$@"
+      else
+        echo "⚠️  .env not found, starting without it"
+        exec ${pkgs.nodejs}/bin/node ${package}/build/index.js "$@"
+      fi
     '';
 
-    pleustradennOverlay = final: prev: {
+    overlay = final: prev: {
       pleustradenn = package;
     };
-  in {
-    packages.${system}.default = package;
-    apps.${system}.default = {
-      type = "app";
-      program = "${startScript}";
+
+    shell = pkgs.mkShell {
+      buildInputs = with pkgs; [nodejs sqlite];
+      shellHook = ''
+        export PRISMA_QUERY_ENGINE_LIBRARY="${pkgs.prisma-engines}/lib/libquery_engine.node"
+        export PRISMA_QUERY_ENGINE_BINARY="${pkgs.prisma-engines}/bin/query-engine"
+        export PRISMA_SCHEMA_ENGINE_BINARY="${pkgs.prisma-engines}/bin/schema-engine"
+        export PRISMA_HIDE_UPDATE_MESSAGE=1
+      '';
     };
 
-    devShells.${system}.default = pkgs.mkShell {
-      buildInputs = with pkgs; [nodejs_24 sqlite openssl prisma];
-      PRISMA_QUERY_ENGINE_LIBRARY = "${pkgs.prisma-engines}/lib/libquery_engine.node";
-      PRISMA_QUERY_ENGINE_BINARY = "${pkgs.prisma-engines}/bin/query-engine";
-      PRISMA_SCHEMA_ENGINE_BINARY = "${pkgs.prisma-engines}/bin/schema-engine";
-      PRISMA_HIDE_UPDATE_MESSAGE = 1;
-    };
-
-    overlays.default = pleustradennOverlay;
-
-    nixosModules.default = {
+    service = {
       lib,
       config,
       pkgs,
@@ -66,12 +70,6 @@
       in {
         options.services.pleustradenn = {
           enable = mkEnableOption "Pleustradenn community web application";
-
-          package = mkOption {
-            type = types.package;
-            default = pkgs.pleustradenn;
-            description = "Package providing the Pleustradenn executable.";
-          };
 
           databaseUrl = mkOption {
             type = types.str;
@@ -140,13 +138,12 @@
               PRISMA_QUERY_ENGINE_LIBRARY = "${pkgs.prisma-engines}/lib/libquery_engine.node";
               PRISMA_QUERY_ENGINE_BINARY = "${pkgs.prisma-engines}/bin/query-engine";
               PRISMA_SCHEMA_ENGINE_BINARY = "${pkgs.prisma-engines}/bin/schema-engine";
-              LD_LIBRARY_PATH = lib.makeLibraryPath [pkgs.openssl];
             };
 
             serviceConfig = {
               ExecStart = utils.escapeSystemdExecArgs [
                 "${pkgs.nodejs}/bin/node"
-                "${cfg.package}/build/index.js"
+                "${package}/build/index.js"
               ];
               WorkingDirectory = "/var/lib/pleustradenn";
               User = "pleustradenn";
@@ -158,5 +155,16 @@
           networking.firewall.allowedTCPPorts = mkIf cfg.openPort [cfg.port];
         };
       };
+
+    app = {
+      type = "app";
+      program = "${startScript}/bin/pleustradenn";
+    };
+  in {
+    packages.${system}.default = package;
+    apps.${system}.default = app;
+    devShells.${system}.default = shell;
+    overlays.default = overlay;
+    nixosModules.pleustradenn-service = service;
   };
 }
