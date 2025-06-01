@@ -141,6 +141,16 @@
             };
 
             serviceConfig = {
+              ExecStartPre = pkgs.writeShellScript "run-prisma-db-push" ''
+                export DATABASE_URL="${cfg.databaseUrl}"
+                export PRISMA_QUERY_ENGINE_LIBRARY="${pkgs.prisma-engines}/lib/libquery_engine.node"
+                export PRISMA_QUERY_ENGINE_BINARY="${pkgs.prisma-engines}/bin/query-engine"
+                export PRISMA_SCHEMA_ENGINE_BINARY="${pkgs.prisma-engines}/bin/schema-engine"
+                export PRISMA_HIDE_UPDATE_MESSAGE=1
+
+                ${package}/node_modules/.bin/prisma db push --accept-data-loss --schema ${package}/prisma/schema.prisma
+              '';
+
               ExecStart = utils.escapeSystemdExecArgs [
                 "${pkgs.nodejs}/bin/node"
                 "${package}/build/index.js"

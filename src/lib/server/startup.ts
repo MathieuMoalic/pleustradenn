@@ -237,32 +237,6 @@ async function createSessionExercises(session_id: number, exercise_ids: number[]
 }
 
 export async function runStartupTasks() {
-    // if db file exists, return
-    let path = process.env.DATABASE_URL;
-    if (!path) {
-        console.error('DATABASE_URL environment variable is not set. Exiting...');
-        process.exit(1);
-    }
-    // DATABASE_URL=file:/home/mat/gh/pleustradenn/data/new.db
-    // remove file: from path
-    if (path.startsWith('file:')) {
-        path = path.substring(5);
-    }
-    // check if file exists
-    if (fs.existsSync(path)) {
-        console.log('Database file already exists. Skipping Prisma schema push.');
-        return;
-    }
-
-    try {
-        console.log('📦 Pushing Prisma schema...');
-        execSync('npx prisma db push --accept-data-loss', { stdio: 'inherit' });
-        console.log('✅ Prisma schema pushed.');
-    } catch (e) {
-        console.error('❌ Failed to push Prisma schema:', e);
-        process.exit(1);
-    }
-
     const categoryMap = await createExerciseCategory();
     await createExercises(categoryMap);
     const defaultUser_id = await createDefaultUser();
