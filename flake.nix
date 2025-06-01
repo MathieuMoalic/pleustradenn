@@ -69,24 +69,12 @@
         cfg = config.services.pleustradenn;
       in {
         options.services.pleustradenn = {
-          enable = mkEnableOption "Pleustradenn community web application";
+          enable = mkEnableOption "Pleustradenn web application";
 
           databaseUrl = mkOption {
             type = types.str;
             default = "file:/var/lib/pleustradenn/data.db";
             description = "Database connection string.";
-          };
-
-          firstUserUsername = mkOption {
-            type = types.str;
-            default = "mat";
-            description = "Initial admin username.";
-          };
-
-          firstUserPassword = mkOption {
-            type = types.str;
-            default = "matmat";
-            description = "Initial admin password.";
           };
 
           allowRegistration = mkOption {
@@ -99,18 +87,6 @@
             type = types.port;
             default = 4173;
             description = "Port the server listens on.";
-          };
-
-          origin = mkOption {
-            type = types.str;
-            default = "http://localhost:4173";
-            description = "CORS origin.";
-          };
-
-          openPort = mkOption {
-            type = types.bool;
-            default = true;
-            description = "Open the port in the firewall.";
           };
         };
 
@@ -130,11 +106,8 @@
 
             environment = {
               DATABASE_URL = cfg.databaseUrl;
-              FIRST_USER_USERNAME = cfg.firstUserUsername;
-              FIRST_USER_PASSWORD = cfg.firstUserPassword;
               ALLOW_REGISTRATION = boolToString cfg.allowRegistration;
               PORT = toString cfg.port;
-              ORIGIN = cfg.origin;
               PRISMA_QUERY_ENGINE_LIBRARY = "${pkgs.prisma-engines}/lib/libquery_engine.node";
               PRISMA_QUERY_ENGINE_BINARY = "${pkgs.prisma-engines}/bin/query-engine";
               PRISMA_SCHEMA_ENGINE_BINARY = "${pkgs.prisma-engines}/bin/schema-engine";
@@ -159,10 +132,40 @@
               User = "pleustradenn";
               Group = "pleustradenn";
               StateDirectory = "pleustradenn";
+
+              # These are the security settings for the service
+              CapabilityBoundingSet = "";
+              RestrictAddressFamilies = "AF_UNIX AF_INET AF_INET6";
+              SystemCallFilter = "~@clock @cpu-emulation @keyring @module @obsolete @raw-io @reboot @swap @resources @privileged @mount @debug";
+              NoNewPrivileges = "yes";
+              ProtectClock = "yes";
+              ProtectKernelLogs = "yes";
+              ProtectControlGroups = "yes";
+              ProtectKernelModules = "yes";
+              SystemCallArchitectures = "native";
+              RestrictNamespaces = "yes";
+              RestrictSUIDSGID = "yes";
+              ProtectHostname = "yes";
+              ProtectKernelTunables = "yes";
+              RestrictRealtime = "yes";
+              ProtectProc = "invisible";
+              PrivateUsers = "yes";
+              LockPersonality = "yes";
+              UMask = "0077";
+              RemoveIPC = "yes";
+              LimitCORE = "0";
+              ProtectHome = "yes";
+              PrivateTmp = "yes";
+              ProtectSystem = "strict";
+              ProcSubset = "pid";
+              SocketBindAllow = ["tcp:${toString cfg.port}"];
+              SocketBindDeny = "any";
+
+              LimitNOFILE = 1024;
+              LimitNPROC = 64;
+              MemoryMax = "100M";
             };
           };
-
-          networking.firewall.allowedTCPPorts = mkIf cfg.openPort [cfg.port];
         };
       };
 
