@@ -15,6 +15,9 @@ const config = {
 		alias: {
 			$components: './src/components',
 		},
+		csrf: {
+			checkOrigin: false
+		}
 	},
 };
 export default config;
