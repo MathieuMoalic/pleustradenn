@@ -73,7 +73,7 @@
 
         databaseUrl = lib.mkOption {
           type = lib.types.str;
-          default = "file:/var/lib/pleustradenn/data.db";
+          default = "file:///var/lib/pleustradenn/prod.db";
           description = "Database connection string.";
         };
 
