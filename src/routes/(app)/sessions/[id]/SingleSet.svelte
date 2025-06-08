@@ -43,7 +43,7 @@
     method="POST"
     action="?/update_set"
     data-set-id={set.id}
-    class="flex flex-col bg-black-bean/40 text-plum rounded-md shadow-sm text-sm overflow-hidden"
+    class="flex flex-col flex-1 bg-black-bean/40 text-plum rounded-md shadow-sm text-sm overflow-hidden"
     use:enhance
 >
     <input type="hidden" name="id" value={set.id} />
@@ -52,6 +52,19 @@
     <div
         class="flex items-center justify-between px-3 py-2 w-full gap-4 bg-black-bean/40 rounded-md focus-within:ring-0 focus-within:ring-plum"
     >
+        <DeleteButton />
+        <button
+            type="button"
+            on:click={() => (expended = !expended)}
+            class="flex-1 text-left focus:outline-none"
+            aria-controls={`set-details-${set.id}`}
+            aria-label={`Toggle details for Set ${set.reps}x${set.intensity}`}
+        >
+            <span class="font-medium truncate block">
+                {set.reps} x {set.intensity}{unit}
+            </span>
+        </button>
+
         <button
             type="button"
             on:click={() => (expended = !expended)}
@@ -74,19 +87,6 @@
                 />
             </svg>
         </button>
-        <button
-            type="button"
-            on:click={() => (expended = !expended)}
-            class="flex-1 text-left focus:outline-none"
-            aria-controls={`set-details-${set.id}`}
-            aria-label={`Toggle details for Set ${set.reps}x${set.intensity}`}
-        >
-            <span class="font-medium truncate block">
-                {set.reps} x {set.intensity}{unit}
-            </span>
-        </button>
-
-        <DeleteButton />
     </div>
 
     {#if expended}
