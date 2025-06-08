@@ -9,32 +9,42 @@
     export let set: Set;
     export let unit: string;
 
+    let originalSet: Set = { ...set };
+
     let expended: boolean = false;
 
     async function decrementReps() {
         set = { ...set, reps: Math.max(0, set.reps - 1) };
-        await tick();
-        form?.requestSubmit();
     }
 
     async function incrementReps() {
         set = { ...set, reps: set.reps + 1 };
-        await tick();
-        form?.requestSubmit();
     }
 
     async function incrementIntensity(step: number = 1.0) {
         const newIntensity = parseFloat((set.intensity + step).toFixed(1));
         set = { ...set, intensity: Math.max(0, newIntensity) };
-        await tick();
-        form?.requestSubmit();
     }
 
     async function decrementIntensity(step: number = 1.0) {
         set = { ...set, intensity: Math.max(0, set.intensity - step) };
-        await tick();
-        form?.requestSubmit();
     }
+
+    function toggleExpended() {
+        const wasExpended = expended;
+        expended = !expended;
+
+        if (wasExpended && !expended) {
+            if (
+                originalSet.reps !== set.reps ||
+                originalSet.intensity !== set.intensity
+            ) {
+                originalSet = { ...set };
+                tick().then(() => form?.requestSubmit());
+            }
+        }
+    }
+
     let form: HTMLFormElement;
 </script>
 
@@ -48,6 +58,8 @@
 >
     <input type="hidden" name="id" value={set.id} />
     <input type="hidden" name="exercise_id" value={set.exercise_id} />
+    <input type="hidden" name="reps" value={set.reps} />
+    <input type="hidden" name="intensity" value={set.intensity} />
 
     <div
         class="flex items-center justify-between px-3 py-2 w-full gap-4 bg-black-bean/40 rounded-md focus-within:ring-0 focus-within:ring-plum"
@@ -55,7 +67,7 @@
         <DeleteButton />
         <button
             type="button"
-            on:click={() => (expended = !expended)}
+            on:click={toggleExpended}
             class="flex-1 text-left focus:outline-none"
             aria-controls={`set-details-${set.id}`}
             aria-label={`Toggle details for Set ${set.reps}x${set.intensity}`}
@@ -67,7 +79,7 @@
 
         <button
             type="button"
-            on:click={() => (expended = !expended)}
+            on:click={toggleExpended}
             class="p-1 rounded focus:outline-none"
             aria-label="Toggle details"
         >

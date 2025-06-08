@@ -186,7 +186,7 @@
                         <div class="flex flex-col gap-1">
                             {#each SE.sets as set, i (set.id)}
                                 <div
-                                    class="flex items-start gap-2 w-full"
+                                    class="flex items-start w-full"
                                     in:fly={{
                                         y: -20,
                                         opacity: 0,
@@ -194,10 +194,11 @@
                                     }}
                                 >
                                     <span
-                                        class="w-6 text-right text-thistle font-mono text-sm pt-2"
+                                        class="w-6 h-6 flex items-center justify-center text-thistle font-mono m-2 mr-1"
                                     >
                                         {i + 1}.
                                     </span>
+
                                     <SingleSet
                                         {set}
                                         unit={SE.exercise.intensity_unit}
