@@ -3,7 +3,6 @@
     import { dragHandleZone, dragHandle } from "svelte-dnd-action";
     import AddExercise from "./AddExercise.svelte";
     import Menu from "$components/Menu.svelte";
-    import { flip } from "svelte/animate";
     import type { PageData } from "./$types";
     import { enhance } from "$app/forms";
     import Clock from "$components/Clock.svelte";
@@ -15,6 +14,12 @@
     if (data.session === null) {
         throw new Error("Session not found");
     }
+
+    type PlaceholderSet = {
+        session_exercise_id: number;
+        reps: number;
+        intensity: number;
+    };
 
     function handleReorder(event: CustomEvent) {
         data.session!.session_exercises = event.detail.items;
@@ -122,14 +127,52 @@
                     <!-- Content Column -->
                     <div class="flex-1 flex flex-col gap-2">
                         <!-- Header Row -->
-                        <div class="flex justify-between items-center">
+                        <div
+                            class="flex justify-between items-center w-full overflow-hidden"
+                        >
                             <h3
-                                class="ml-4 text-lg font-semibold text-thistle truncate"
+                                class="ml-4 text-lg font-semibold text-thistle truncate whitespace-nowrap overflow-hidden max-w-[12rem]"
+                                title={SE.exercise.name}
                             >
                                 {SE.exercise.name}
                             </h3>
 
                             <div class="flex items-center gap-2 flex-shrink-0">
+                                <form
+                                    method="POST"
+                                    action="?/delete_session_exercise"
+                                    use:enhance
+                                >
+                                    <input
+                                        type="hidden"
+                                        name="id"
+                                        value={SE.id || ""}
+                                    />
+                                    <button
+                                        type="submit"
+                                        class={`p-2 rounded-md shadow-md transition duration-200 ${
+                                            SE.completed
+                                                ? "bg-emerald-700 text-white hover:bg-emerald-600"
+                                                : "bg-seal-brown text-thistle hover:bg-burnt-umber"
+                                        }`}
+                                        aria-label="Add set"
+                                    >
+                                        <svg
+                                            class="w-4 h-4"
+                                            fill="none"
+                                            stroke="currentColor"
+                                            viewBox="0 0 24 24"
+                                            xmlns="http://www.w3.org/2000/svg"
+                                            ><path
+                                                stroke-linecap="round"
+                                                stroke-linejoin="round"
+                                                stroke-width="2"
+                                                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m14 0H5m2 0V5a2 2 0 012-2h6a2 2 0 012 2v2"
+                                            ></path></svg
+                                        >
+                                    </button>
+                                </form>
+
                                 <EditExerciseButton
                                     exercise_id={SE.exercise.id}
                                     completed={SE.completed}
@@ -193,16 +236,39 @@
                                         duration: 200,
                                     }}
                                 >
-                                    <span
-                                        class="w-6 h-6 flex items-center justify-center text-thistle font-mono m-2 mr-1"
-                                    >
-                                        {i + 1}.
-                                    </span>
+                                    {#if set.id <= 0}
+                                        <div
+                                            class="flex items-center justify-between px-2 py-2 w-full bg-black-bean/70 rounded-md text-thistle ml-9 text-sm"
+                                        >
+                                            <div
+                                                class="flex items-center gap-4"
+                                            >
+                                                <svg
+                                                    xmlns="http://www.w3.org/2000/svg"
+                                                    class="w-5 h-5 text-thistle"
+                                                    fill="currentColor"
+                                                    viewBox="0 0 24 24"
+                                                >
+                                                    <path
+                                                        d="M17 2v2h1a2 2 0 012 2v2a5 5 0 01-4 4.9V15h2v2H8v-2h2v-2.1A5 5 0 016 8V6a2 2 0 012-2h1V2h8zm-1 2H8v2a3 3 0 006 0V4z"
+                                                    />
+                                                </svg>
 
-                                    <SingleSet
-                                        {set}
-                                        unit={SE.exercise.intensity_unit}
-                                    />
+                                                {set.reps} x {set.intensity}{SE
+                                                    .exercise.intensity_unit}
+                                            </div>
+                                        </div>
+                                    {:else}
+                                        <span
+                                            class="w-6 h-6 flex items-center justify-center text-thistle font-mono m-2 mr-1"
+                                        >
+                                            {i + 1}.
+                                        </span>
+                                        <SingleSet
+                                            {set}
+                                            unit={SE.exercise.intensity_unit}
+                                        />
+                                    {/if}
                                 </div>
                             {/each}
                         </div>

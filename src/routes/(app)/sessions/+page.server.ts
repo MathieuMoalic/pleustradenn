@@ -2,7 +2,6 @@ import type { Actions } from "./$types";
 import prisma from "$lib/server/prisma";
 import { redirect, fail } from "@sveltejs/kit";
 import type { PageServerLoad } from './$types';
-import { get_last_set } from "$lib/server/get_last_set";
 
 export const load: PageServerLoad = async ({ locals }) => {
     if (!locals.user) {
@@ -64,7 +63,6 @@ export const actions: Actions = {
             redirect(302, `/sessions/${session_id}`);
         }
     },
-
     update: async ({ request }) => {
         const form = await request.formData();
         const idString = form.get("id")?.toString();
@@ -142,24 +140,13 @@ export const actions: Actions = {
             }
         });
 
-        // Clone each session_exercise and create an initial set using get_last_set
+        // Clone each session_exercise and create an initial set
         for (const se of sessionToClone.session_exercises) {
-            const newSessionExercise = await prisma.sessionExercise.create({
+            await prisma.sessionExercise.create({
                 data: {
                     session_id: newSession.id,
                     exercise_id: se.exercise_id,
                     position: se.position
-                }
-            });
-
-            const initialSet = await get_last_set(se.exercise_id, se.id);
-
-            await prisma.set.create({
-                data: {
-                    session_exercise_id: newSessionExercise.id,
-                    reps: initialSet.reps,
-                    intensity: initialSet.intensity,
-                    exercise_id: se.exercise_id
                 }
             });
         }
