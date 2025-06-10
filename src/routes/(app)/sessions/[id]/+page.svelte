@@ -160,7 +160,9 @@
                     </div>
 
                     <div
-                        class="absolute right-3 -translate-y-1 flex items-center gap-2 z-20 bg-seal-brown p-1 rounded-md text-thistle text-sm"
+                        class={`absolute right-3 -translate-y-1 flex items-center gap-2 z-20  p-1 rounded-md text-thistle text-sm ${
+                            SE.completed ? "bg-emerald-900" : "bg-seal-brown"
+                        }`}
                     >
                         <DeleteSEButton {SE} />
                         <EditExerciseButton

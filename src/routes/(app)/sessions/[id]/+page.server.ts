@@ -86,22 +86,36 @@ async function get_best_set_for_exercise(exercise_id: number): Promise<{ reps: n
 async function reorder_session_exercises_by_completion(session_id: number) {
     const session = await prisma.session.findUnique({
         where: { id: session_id },
-        include: { session_exercises: true }
+        include: {
+            session_exercises: {
+                include: {
+                    sets: true
+                }
+            }
+        }
     });
 
     if (!session) {
         throw new Error("Session not found.");
     }
 
-    const active = session.session_exercises
-        .filter(se => !se.completed)
-        .sort((a, b) => a.position - b.position);
-
-    const done = session.session_exercises
+    // 1. Completed
+    const completed = session.session_exercises
         .filter(se => se.completed)
         .sort((a, b) => a.position - b.position);
 
-    const sorted = [...active, ...done];
+    // 2. Active with sets
+    const activeWithSets = session.session_exercises
+        .filter(se => !se.completed && se.sets.length > 0)
+        .sort((a, b) => a.position - b.position);
+
+    // 3. No sets
+    const noSets = session.session_exercises
+        .filter(se => se.sets.length === 0)
+        .sort((a, b) => a.position - b.position);
+
+    const sorted = [...activeWithSets, ...noSets, ...completed];
+    // const sorted = [...completed, ...activeWithSets, ...noSets];
     const tempOffset = 1000;
 
     const tempUpdates = sorted.map((se, index) =>
@@ -120,6 +134,7 @@ async function reorder_session_exercises_by_completion(session_id: number) {
 
     await prisma.$transaction([...tempUpdates, ...finalUpdates]);
 }
+
 
 export const actions: Actions = {
     create_session_exercise: async ({ request, params }) => {
@@ -283,6 +298,7 @@ export const actions: Actions = {
             where: { session_exercise_id: sessionExercise.id }
         });
         await prisma.sessionExercise.delete({ where: { id: id } });
+        reorder_session_exercises_by_completion(sessionExercise.session_id);
     },
 
     reorder_session_exercises: async ({ request, params }) => {
