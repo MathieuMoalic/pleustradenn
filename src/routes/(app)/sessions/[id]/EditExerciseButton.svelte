@@ -7,7 +7,7 @@
 
 <button
     type="button"
-    class={`font-semibold p-2 rounded-md shadow-md transition duration-200 ${
+    class={`font-semibold p-1.5 rounded-md shadow-md transition duration-200 ${
         completed
             ? "bg-emerald-700 text-white hover:bg-emerald-600"
             : "bg-seal-brown text-thistle hover:bg-burnt-umber"
@@ -16,7 +16,7 @@
     aria-label="Edit exercise"
 >
     <svg
-        class="w-4 h-4"
+        class="w-3 h-3"
         xmlns="http://www.w3.org/2000/svg"
         fill="none"
         viewBox="0 0 24 24"

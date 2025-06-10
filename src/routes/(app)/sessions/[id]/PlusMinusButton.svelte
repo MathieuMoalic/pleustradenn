@@ -6,17 +6,18 @@
 <button
     type="button"
     on:click={() => callback()}
-    class="p-3 rounded bg-burnt-umber text-thistle hover:bg-burnt-umber/90 focus:outline-none focus:ring-1 focus:ring-plum border-white border"
+    class="p-1 rounded bg-burnt-umber text-thistle hover:bg-burnt-umber/90 focus:outline-none focus:ring-1 focus:ring-plum"
     aria-label="Increase intensity"
 >
     {#if plusOrMinus === "plus"}
         <svg
-            class="w-4 h-4"
+            class="w-3 h-3"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
             xmlns="http://www.w3.org/2000/svg"
-            ><path
+        >
+            <path
                 stroke-linecap="round"
                 stroke-linejoin="round"
                 stroke-width="2"
@@ -25,7 +26,7 @@
         >
     {:else}
         <svg
-            class="w-4 h-4"
+            class="w-3 h-3"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"

@@ -12,7 +12,7 @@
     bind:value
     min="0"
     step="0.1"
-    class="w-16 bg-transparent border-plum focus:border-thistle focus:outline-none text-thistle text-center text-base rounded-md"
+    class="w-14 bg-transparent border-plum focus:border-thistle focus:outline-none text-thistle text-center text-base rounded-md"
     on:change={() => form?.requestSubmit()}
 />
 

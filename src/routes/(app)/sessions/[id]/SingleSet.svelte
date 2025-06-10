@@ -111,7 +111,7 @@
                     for={`reps-expanded-${set.id}`}
                     class="text-thistle font-medium">Reps:</label
                 >
-                <div class="flex items-center gap-2">
+                <div class="flex items-center gap-0">
                     <PlusMinusButton
                         callback={decrementReps}
                         plusOrMinus="minus"
@@ -129,9 +129,9 @@
             <div class="flex items-center justify-between">
                 <label
                     for={`intensity-expanded-${set.id}`}
-                    class="text-thistle font-medium">Intensity ({unit}):</label
+                    class="text-thistle font-medium">{unit}:</label
                 >
-                <div class="flex items-center gap-2">
+                <div class="flex items-center">
                     <PlusMinusButton
                         callback={decrementIntensity}
                         plusOrMinus="minus"

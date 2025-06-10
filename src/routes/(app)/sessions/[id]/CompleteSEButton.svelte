@@ -11,7 +11,7 @@
 
     <button
         type="submit"
-        class={`p-2 rounded-md shadow-md transition duration-200 ${
+        class={`p-1.5 rounded-sm shadow-md transition duration-200 ${
             completed
                 ? "bg-emerald-700 text-white hover:bg-emerald-600"
                 : "bg-seal-brown text-thistle hover:bg-burnt-umber"
@@ -21,7 +21,7 @@
     >
         {#if completed}
             <svg
-                class="w-4 h-4"
+                class="2-3 h-3"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -44,7 +44,7 @@
             </svg>
         {:else}
             <svg
-                class="w-4 h-4"
+                class="2-3 h-3"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
