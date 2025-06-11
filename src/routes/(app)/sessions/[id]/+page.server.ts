@@ -114,8 +114,7 @@ async function reorder_session_exercises_by_completion(session_id: number) {
         .filter(se => se.sets.length === 0)
         .sort((a, b) => a.position - b.position);
 
-    const sorted = [...activeWithSets, ...noSets, ...completed];
-    // const sorted = [...completed, ...activeWithSets, ...noSets];
+    const sorted = [...completed, ...activeWithSets, ...noSets];
     const tempOffset = 1000;
 
     const tempUpdates = sorted.map((se, index) =>
@@ -338,7 +337,7 @@ export const actions: Actions = {
             (se.completed ? done : active).push(se);
         }
 
-        const sorted = [...active, ...done];
+        const sorted = [...done, ...active];
         const tempOffset = 1000;
 
         const tempUpdates = sorted.map((se, index) =>
