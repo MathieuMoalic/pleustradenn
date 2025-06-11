@@ -1,9 +1,9 @@
 import type { Actions } from "./$types";
 import prisma from "$lib/server/prisma";
-import { fail, redirect, type ActionFailure } from "@sveltejs/kit";
+import { fail, type ActionFailure } from "@sveltejs/kit";
 
 export const load = async () => {
-    const exercises = await prisma.exercise.findMany();
+    const exercises = await prisma.exercise.findMany({ orderBy: { name: 'asc' } });
     const categories = await prisma.exerciseCategory.findMany();
     return { exercises, categories };
 };
