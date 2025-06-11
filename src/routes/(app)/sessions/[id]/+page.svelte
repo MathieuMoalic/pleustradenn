@@ -11,7 +11,6 @@
     import Menu from "$components/Menu.svelte";
     import type { PageData } from "./$types";
     import { enhance } from "$app/forms";
-    import Clock from "$components/Clock.svelte";
     import { fly } from "svelte/transition";
 
     export let data: PageData;
@@ -54,15 +53,14 @@
         return `${yyyy}.${mm}.${dd}`;
     }
     let addingExercise = false;
-    let clockButtonToggle = false;
 </script>
 
 <Menu
     name={formatSessionDate(data.session!.date)}
     bind:addButtonToggle={addingExercise}
-    bind:clockButtonToggle
+    isClockButtonVisible={true}
 />
-<section class="p-2">
+<section class="p-2 pt-0">
     <form
         method="POST"
         action="?/reorder_session_exercises"
@@ -70,18 +68,13 @@
         use:enhance
     >
         <input type="hidden" name="exercise_ids" id="exercise-order-input" />
-        <button type="submit" id="hidden-submit" style="display: none;"
-            >Submit</button
-        >
+        <button type="submit" id="hidden-submit" style="display: none;">
+            Submit
+        </button>
     </form>
 
     {#if addingExercise}
         <AddExercise categories={data.categories} exercises={data.exercises} />
-    {/if}
-    {#if clockButtonToggle}
-        <div class="flex justify-center items-center">
-            <Clock />
-        </div>
     {/if}
 
     {#if data.session!.session_exercises && data.session!.session_exercises.length > 0}
@@ -160,7 +153,7 @@
                     </div>
 
                     <div
-                        class={`absolute right-3 -translate-y-1 flex items-center gap-2 z-20  p-1 rounded-md text-thistle text-sm ${
+                        class={`absolute right-3 -translate-y-1 flex items-center gap-2 p-1 rounded-md text-thistle text-sm ${
                             SE.completed ? "bg-emerald-900" : "bg-seal-brown"
                         }`}
                     >

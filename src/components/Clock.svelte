@@ -1,7 +1,7 @@
 <script lang="ts">
     import { onMount } from "svelte";
 
-    let time = 0; // time in milliseconds
+    let time = 0;
     let interval: NodeJS.Timeout | null = null;
 
     function formatTime(t: number) {
@@ -28,7 +28,7 @@
 </script>
 
 <div
-    class="flex flex-col items-center justify-center bg-seal-brown/90 border border-burnt-umber rounded-md shadow-md p-6 w-full max-w-md mx-auto"
+    class="flex flex-col items-center justify-center bg-seal-brown border border-burnt-umber rounded-md shadow-md p-2 mx-2 my-2"
 >
     <div
         class="text-thistle text-5xl sm:text-6xl md:text-7xl font-bold tracking-wider"

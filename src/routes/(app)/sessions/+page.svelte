@@ -31,7 +31,7 @@
 
 <Menu name="Sessions" bind:addButtonToggle={addingSession} />
 
-<section>
+<section class="">
     <div class="flex flex-col gap-2 p-2">
         {#if addingSession}
             <SessionForm session={new_session} />
