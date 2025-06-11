@@ -158,12 +158,9 @@
                         }`}
                     >
                         <DeleteSEButton {SE} />
-                        <EditExerciseButton
-                            exercise_id={SE.exercise.id}
-                            completed={SE.completed}
-                        />
-                        <CompleteSEButton id={SE.id} completed={SE.completed} />
-                        <AddSetButton {SE} session_id={data.session!.id} />
+                        <EditExerciseButton {SE} />
+                        <CompleteSEButton {SE} />
+                        <AddSetButton {SE} />
                     </div>
                 </div>
             {/each}

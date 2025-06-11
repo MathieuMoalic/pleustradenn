@@ -1,18 +1,18 @@
 <script lang="ts">
     import { goto } from "$app/navigation";
+    import type { SessionExercise } from "@prisma/client";
 
-    export let exercise_id: number;
-    export let completed: boolean;
+    export let SE: SessionExercise;
 </script>
 
 <button
     type="button"
     class={`font-semibold p-1.5 rounded-md shadow-md transition duration-200 ${
-        completed
+        SE.completed
             ? "bg-emerald-700 text-white hover:bg-emerald-600"
             : "bg-seal-brown text-thistle hover:bg-burnt-umber"
     }`}
-    on:click={() => goto(`/exercises?edit=${exercise_id}`)}
+    on:click={() => goto(`/exercises?edit=${SE.id}`)}
     aria-label="Edit exercise"
 >
     <svg

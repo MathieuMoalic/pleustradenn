@@ -1,12 +1,12 @@
 <script lang="ts">
     import { enhance } from "$app/forms";
-    export let SE;
-    export let session_id: number;
+    import type { SessionExercise } from "@prisma/client";
+    export let SE: SessionExercise;
 </script>
 
 <form method="POST" action="?/create_set" use:enhance>
-    <input type="hidden" name="session_id" value={session_id} />
-    <input type="hidden" name="exercise_id" value={SE.exercise.id || ""} />
+    <input type="hidden" name="session_id" value={SE.session_id} />
+    <input type="hidden" name="exercise_id" value={SE.exercise_id || ""} />
     <input type="hidden" name="session_exercise_id" value={SE.id || ""} />
     <button
         type="submit"

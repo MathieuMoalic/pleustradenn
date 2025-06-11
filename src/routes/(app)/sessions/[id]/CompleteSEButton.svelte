@@ -1,25 +1,25 @@
 <script lang="ts">
     import { enhance } from "$app/forms";
+    import type { SessionExercise } from "@prisma/client";
 
-    export let id: number;
-    export let completed: boolean;
+    export let SE: SessionExercise;
 </script>
 
 <form method="POST" action="?/update_session_exercise" use:enhance>
-    <input type="hidden" name="id" value={id} />
-    <input type="hidden" name="completed" value={completed} />
+    <input type="hidden" name="id" value={SE.id} />
+    <input type="hidden" name="completed" value={SE.completed} />
 
     <button
         type="submit"
         class={`p-1.5 rounded-sm shadow-md transition duration-200 ${
-            completed
+            SE.completed
                 ? "bg-emerald-700 text-white hover:bg-emerald-600"
                 : "bg-seal-brown text-thistle hover:bg-burnt-umber"
         }`}
-        aria-label={completed ? "Mark as incomplete" : "Mark as complete"}
-        on:click={() => (completed = !completed)}
+        aria-label={SE.completed ? "Mark as incomplete" : "Mark as complete"}
+        on:click={() => (SE.completed = !SE.completed)}
     >
-        {#if completed}
+        {#if SE.completed}
             <svg
                 class="2-3 h-3"
                 fill="none"
