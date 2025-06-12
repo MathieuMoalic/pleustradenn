@@ -150,8 +150,6 @@ export const actions: Actions = {
                 }
             });
         }
-
-        // Redirect to the newly created session
-        throw redirect(302, `/sessions/${newSession.id}`);
+        console.log("Session cloned successfully.");
     }
 };

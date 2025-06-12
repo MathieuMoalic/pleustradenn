@@ -1,6 +1,8 @@
 <script lang="ts">
     import { enhance } from "$app/forms";
 
+    export let toggleExpand: (sessionId: number) => void;
+
     function toDateString(d: Date) {
         return d.toISOString().slice(0, 10);
     }
@@ -12,11 +14,25 @@
     };
 
     let dateStr = toDateString(session.date);
-
     $: session.date = new Date(dateStr);
+
+    function handleEnhance({}: {
+        action: URL;
+        formData: FormData;
+        formElement: HTMLFormElement;
+        controller: AbortController;
+        submitter: HTMLElement | null;
+        cancel: () => void;
+    }) {
+        return async ({ result }: { result: any }) => {
+            if (result.type === "success") {
+                toggleExpand(session.id);
+            }
+        };
+    }
 </script>
 
-<form method="POST" use:enhance>
+<form method="POST" use:enhance={handleEnhance}>
     <input type="hidden" name="id" value={session.id} />
     <div>
         <label for="date" class="block text-sm font-medium text-thistle mb-1">
