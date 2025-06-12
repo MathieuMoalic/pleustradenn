@@ -22,9 +22,11 @@ model Exercise {
   category_id Int
   category    ExerciseCategory @relation(fields: [category_id], references: [id])
 
-  intensity_unit String @default("kg")
-  name           String @unique
-  notes          String @default("")
+  intensity_unit String  @default("kg")
+  name           String  @unique
+  name_fr        String?
+  name_pl        String?
+  notes          String  @default("")
 
   session_exercises SessionExercise[]
   sets              Set[]
@@ -75,6 +77,7 @@ model User {
   id            String        @id @default(cuid())
   username      String        @unique
   password_hash String
+  language      String        @default("en")
   sessions      Session[]
   user_sessions UserSession[]
 }

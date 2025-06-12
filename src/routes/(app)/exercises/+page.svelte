@@ -59,6 +59,8 @@
         category_id: 0,
         intensity_unit: "kg",
         name: "",
+        name_pl: "",
+        name_fr: "",
         notes: "",
     };
     let addingExercise = false;

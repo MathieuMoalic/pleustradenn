@@ -4,25 +4,16 @@ import { redirect, fail } from "@sveltejs/kit";
 import type { PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async ({ locals }) => {
-    if (!locals.user) {
-        throw redirect(302, '/login?redirectTo=/sessions');
-    }
+    if (!locals.user) { throw redirect(302, '/login?redirectTo=/sessions'); }
 
     const user_id = locals.user.id;
 
     const sessions = await prisma.session.findMany({
-        where: {
-            user_id: user_id,
-        },
-        orderBy: {
-            date: 'desc',
-        },
+        where: { user_id: user_id },
+        orderBy: { date: 'desc' }
     });
 
-    return {
-        sessions: sessions,
-        user: locals.user
-    };
+    return { sessions, user: locals.user };
 };
 
 

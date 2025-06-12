@@ -10,6 +10,8 @@ export const load = async () => {
 
 type ExerciseFormData = {
     name: string;
+    name_pl: string;
+    name_fr: string;
     notes: string;
     intensity_unit: string;
     category_id: number;
@@ -17,6 +19,8 @@ type ExerciseFormData = {
 
 async function validateExerciseFormData(form: FormData): Promise<ExerciseFormData | ActionFailure<{ error: string, form?: any }>> {
     const name = form.get("name")?.toString();
+    const name_pl = form.get("name_pl")?.toString() ?? "";
+    const name_fr = form.get("name_fr")?.toString() ?? "";
     const notes = form.get("notes")?.toString() ?? "";
     const intensity_unit = form.get("intensity_unit")?.toString() ?? "";
     const categoryIdString = form.get("category_id")?.toString();
@@ -45,6 +49,8 @@ async function validateExerciseFormData(form: FormData): Promise<ExerciseFormDat
 
     return {
         name: name.trim(),
+        name_pl: name_pl.trim(),
+        name_fr: name_fr.trim(),
         notes: notes.trim(),
         intensity_unit: intensity_unit.trim(),
         category_id: category_id,
@@ -73,6 +79,7 @@ export const actions: Actions = {
 
     update: async ({ request }) => {
         const form = await request.formData();
+        console.log("Received form data for update:", Object.fromEntries(form));
         const idString = form.get("id")?.toString();
         if (!idString) {
             return fail(400, { error: "Exercise ID is missing.", form: Object.fromEntries(form) });
@@ -83,7 +90,6 @@ export const actions: Actions = {
         }
 
         const validationResult = await validateExerciseFormData(form);
-
         if ('status' in validationResult) {
             return validationResult;
         }

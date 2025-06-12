@@ -113,11 +113,11 @@
             };
 
           serviceConfig = {
-            ExecStartPre = pkgs.writeShellScript "run-prisma-db-push" ''
+            ExecStartPre = pkgs.writeShellScript "run-prisma-migrate-deploy" ''
               export DATABASE_URL="${cfg.databaseUrl}"
               ${exportPrismaEnv}
 
-              ${package}/node_modules/.bin/prisma db push --accept-data-loss --schema ${package}/prisma/schema.prisma
+              ${package}/node_modules/.bin/prisma migrate deploy --schema ${package}/prisma/schema.prisma
             '';
 
             ExecStart = utils.escapeSystemdExecArgs [

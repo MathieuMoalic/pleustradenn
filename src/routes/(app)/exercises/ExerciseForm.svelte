@@ -12,68 +12,108 @@
 
 <form
     method="POST"
-    class="space-y-5 text-plum p-3 pt-0"
+    class="space-y-2 text-plum p-3 pt-0"
     use:enhance
     on:submit={() => toggleExpand(ex.id)}
 >
     <input type="hidden" name="id" value={ex.id} />
     <input type="hidden" name="category_id" value={selected_category_id} />
 
-    <div>
-        <label for="name" class="block text-sm font-medium text-thistle mb-1"
-            >Name</label
+    <!-- English Name -->
+    <div class="flex items-center gap-2">
+        <label
+            for="name"
+            class="w-24 text-sm text-thistle text-center flex justify-center"
+            >🇬🇧</label
         >
+
         <input
-            type="text"
             id="name"
             name="name"
+            type="text"
             bind:value={ex.name}
             required
-            class="w-full rounded-md border border-burnt-umber bg-seal-brown text-thistle shadow-sm focus:border-plum focus:ring-plum sm:text-sm p-2"
+            class="flex-1 rounded border border-burnt-umber bg-seal-brown text-thistle p-1 sm:text-sm"
         />
     </div>
 
-    <div>
+    <!-- Polish Name -->
+    <div class="flex items-center gap-2">
         <label
-            for="intensity_unit"
-            class="block text-sm font-medium text-thistle mb-1"
-            >Intensity Unit</label
+            for="name_pl"
+            class="w-24 text-sm text-thistle text-center flex justify-center"
+            >🇵🇱</label
         >
         <input
+            id="name_pl"
+            name="name_pl"
             type="text"
-            id="intensity_unit"
-            name="intensity_unit"
-            bind:value={ex.intensity_unit}
-            required
-            class="w-full rounded-md border border-burnt-umber bg-seal-brown text-thistle shadow-sm focus:border-plum focus:ring-plum sm:text-sm p-2"
+            bind:value={ex.name_pl}
+            class="flex-1 rounded border border-burnt-umber bg-seal-brown text-thistle p-1 sm:text-sm"
         />
     </div>
 
-    <div>
-        <label for="notes" class="block text-sm font-medium text-thistle mb-1"
-            >Notes</label
+    <!-- French Name -->
+    <div class="flex items-center gap-2">
+        <label
+            for="name_fr"
+            class="w-24 text-sm text-thistle text-center flex justify-center"
+            >🇫🇷</label
         >
-        <textarea
-            id="notes"
-            name="notes"
-            bind:value={ex.notes}
-            rows="3"
-            class="w-full rounded-md border border-burnt-umber bg-seal-brown text-thistle shadow-sm focus:border-plum focus:ring-plum sm:text-sm p-2"
-        ></textarea>
+        <input
+            id="name_fr"
+            name="name_fr"
+            type="text"
+            bind:value={ex.name_fr}
+            class="flex-1 rounded border border-burnt-umber bg-seal-brown text-thistle p-1 sm:text-sm"
+        />
     </div>
 
-    <ul class="py-1 flex flex-wrap gap-1 justify-center">
+    <!-- Intensity Unit -->
+    <div class="flex items-center gap-2">
+        <label
+            for="intensity_unit"
+            class="w-24 text-sm text-thistle text-center flex justify-center"
+            >Unit</label
+        >
+        <input
+            id="intensity_unit"
+            name="intensity_unit"
+            type="text"
+            bind:value={ex.intensity_unit}
+            required
+            class="flex-1 rounded border border-burnt-umber bg-seal-brown text-thistle p-1 sm:text-sm"
+        />
+    </div>
+
+    <!-- Notes -->
+    <div class="flex items-center gap-2">
+        <label
+            for="notes"
+            class="w-24 text-sm text-thistle text-center flex justify-center"
+            >Notes</label
+        >
+        <input
+            id="notes"
+            name="notes"
+            type="text"
+            bind:value={ex.notes}
+            class="flex-1 rounded border border-burnt-umber bg-seal-brown text-thistle p-1 sm:text-sm"
+        />
+    </div>
+
+    <!-- Categories -->
+    <ul class="flex flex-wrap gap-1 pt-1 text-center justify-center">
         {#each categories as c (c.id)}
             <li>
                 <button
                     type="button"
                     on:click={() => (selected_category_id = c.id)}
-                    class={`text-left px-4 py-2 text-sm text-plum rounded
-                        ${
-                            selected_category_id === c.id
-                                ? "bg-seal-brown/40 text-thistle"
-                                : "bg-seal-brown hover:bg-seal-brown/50 hover:text-thistle"
-                        }`}
+                    class={`px-3 py-1 text-sm rounded ${
+                        selected_category_id === c.id
+                            ? "bg-seal-brown/40 text-thistle"
+                            : "bg-seal-brown hover:bg-seal-brown/50 hover:text-thistle"
+                    }`}
                 >
                     {c.name}
                 </button>
@@ -81,18 +121,19 @@
         {/each}
     </ul>
 
-    <div class="flex justify-between gap-2 pt-4">
+    <!-- Action Buttons -->
+    <div class="flex justify-between gap-2 pt-3">
         {#if ex.id >= 0}
             <button
                 type="submit"
                 formaction="?/update"
-                class="w-full rounded-md bg-green-400/60 py-2 px-4 text-thistle hover:bg-green-400/80 focus:outline-none focus:ring-2 focus:ring-burnt-umber focus:ring-offset-2 focus:ring-offset-seal-brown"
+                class="flex-1 rounded bg-green-400/60 py-1 px-3 text-thistle hover:bg-green-400/80"
             >
                 Save
             </button>
             <button
                 type="submit"
-                class="w-full rounded-md bg-red-500/60 py-2 px-4 text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 focus:ring-offset-seal-brown"
+                class="flex-1 rounded bg-red-500/60 py-1 px-3 text-white hover:bg-red-700"
                 formaction="?/delete"
                 formmethod="POST"
             >
@@ -102,7 +143,7 @@
             <button
                 type="submit"
                 formaction="?/create"
-                class="w-full rounded-md bg-plum py-2 px-4 text-seal-brown hover:bg-plum/90 focus:outline-none focus:ring-2 focus:ring-plum focus:ring-offset-2 focus:ring-offset-seal-brown"
+                class="w-full rounded bg-plum py-1 px-3 text-seal-brown hover:bg-plum/90"
             >
                 Add {ex.name || "Exercise"}
             </button>
