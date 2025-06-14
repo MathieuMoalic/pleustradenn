@@ -52,8 +52,13 @@ const categories = {
     },
     core: {
         en: 'Core',
-        pl: 'Mięśnie głębokie',
-        fr: 'Ceinture abdominale'
+        pl: 'Tułów',
+        fr: 'Tronc'
+    },
+    forearm: {
+        en: 'Forearm',
+        pl: 'Przedramię',
+        fr: 'Avant-bras'
     },
     other: {
         en: 'Other',
