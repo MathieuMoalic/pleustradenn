@@ -1,43 +1,34 @@
 <script lang="ts">
-    import type { Exercise, ExerciseCategory } from "@prisma/client";
-    import { exerciseNamei18n, t } from "$lib/stores/i18n";
+    import type { Exercise } from "@prisma/client";
+    import { exerciseNamei18n, t, cs } from "$lib/stores/i18n";
 
-    export let categories: ExerciseCategory[] = [];
     export let exercises: Exercise[] = [];
 
-    let category_id = 0;
+    let category: string = "other";
     let state: "pickCategory" | "pickExercise" = "pickCategory";
 
-    function filterExercisesByCategory(categoryId: number): Exercise[] {
-        return exercises.filter(
-            (exercise) => exercise.category_id === categoryId,
-        );
+    function filterExercisesByCategory(category: string): Exercise[] {
+        return exercises.filter((exercise) => exercise.category === category);
     }
 </script>
 
 <div class=" rounded p-4 shadow-lg max-w-md mx-auto mb-4">
     {#if state == "pickCategory"}
         <div class="flex flex-col items-center gap-4">
-            {#if categories.length === 0}
-                <p class="text-base text-plum">
-                    No categories available. Please add a category first.
-                </p>
-            {:else}
-                <div class="flex flex-col gap-2 w-full">
-                    {#each categories as category (category.id)}
-                        <button
-                            type="button"
-                            on:click={() => {
-                                state = "pickExercise";
-                                category_id = category.id;
-                            }}
-                            class="bg-seal-brown text-thistle font-semibold py-2 px-4 rounded-md shadow-md hover:bg-burnt-umber transition duration-200 w-full"
-                        >
-                            {category.name}
-                        </button>
-                    {/each}
-                </div>
-            {/if}
+            <div class="flex flex-col gap-2 w-full">
+                {#each Object.entries($cs) as [key, label]}
+                    <button
+                        type="button"
+                        on:click={() => {
+                            state = "pickExercise";
+                            category = key;
+                        }}
+                        class="bg-seal-brown text-thistle font-semibold py-2 px-4 rounded-md shadow-md hover:bg-burnt-umber transition duration-200 w-full"
+                    >
+                        {label}
+                    </button>
+                {/each}
+            </div>
         </div>
     {:else if state == "pickExercise"}
         <form
@@ -45,7 +36,7 @@
             method="POST"
             class="flex flex-col gap-4 w-full"
         >
-            {#each filterExercisesByCategory(category_id) as exercise (exercise.id)}
+            {#each filterExercisesByCategory(category) as exercise (exercise.id)}
                 <button
                     type="submit"
                     name="exercise_id"

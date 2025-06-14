@@ -79,7 +79,6 @@ export const actions: Actions = {
             where: { id },
             data: formData
         });
-
     },
     delete: async ({ request }) => {
         const form = await request.formData();
@@ -141,6 +140,5 @@ export const actions: Actions = {
                 }
             });
         }
-        console.log("Session cloned successfully.");
     }
 };

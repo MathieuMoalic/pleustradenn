@@ -4,8 +4,7 @@ import { fail, type ActionFailure } from "@sveltejs/kit";
 
 export const load = async () => {
     const exercises = await prisma.exercise.findMany({ orderBy: { name: 'asc' } });
-    const categories = await prisma.exerciseCategory.findMany();
-    return { exercises, categories };
+    return { exercises };
 };
 
 type ExerciseFormData = {
@@ -14,7 +13,7 @@ type ExerciseFormData = {
     name_fr: string;
     notes: string;
     intensity_unit: string;
-    category_id: number;
+    category: string;
 };
 
 async function validateExerciseFormData(form: FormData): Promise<ExerciseFormData | ActionFailure<{ error: string, form?: any }>> {
@@ -23,28 +22,10 @@ async function validateExerciseFormData(form: FormData): Promise<ExerciseFormDat
     const name_fr = form.get("name_fr")?.toString() ?? "";
     const notes = form.get("notes")?.toString() ?? "";
     const intensity_unit = form.get("intensity_unit")?.toString() ?? "";
-    const categoryIdString = form.get("category_id")?.toString();
+    const category = form.get("category")?.toString() ?? "other";
 
     if (!name || name.trim().length === 0) {
         return fail(400, { error: "Name is required.", form: Object.fromEntries(form) });
-    }
-
-    if (!categoryIdString) {
-        return fail(400, { error: "Category is required.", form: Object.fromEntries(form) });
-    }
-
-    const category_id = parseInt(categoryIdString);
-
-    if (isNaN(category_id)) {
-        return fail(400, { error: "Invalid category ID.", form: Object.fromEntries(form) });
-    }
-
-    const categoryExists = await prisma.exerciseCategory.findUnique({
-        where: { id: category_id }
-    });
-
-    if (!categoryExists) {
-        return fail(400, { error: "Selected category does not exist.", form: Object.fromEntries(form) });
     }
 
     return {
@@ -53,7 +34,7 @@ async function validateExerciseFormData(form: FormData): Promise<ExerciseFormDat
         name_fr: name_fr.trim(),
         notes: notes.trim(),
         intensity_unit: intensity_unit.trim(),
-        category_id: category_id,
+        category: category.trim(),
     };
 }
 

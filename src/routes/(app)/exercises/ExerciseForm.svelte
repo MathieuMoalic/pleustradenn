@@ -1,13 +1,11 @@
 <script lang="ts">
-    import type { ExerciseCategory, Exercise } from "@prisma/client";
+    import type { Exercise } from "@prisma/client";
     import { enhance } from "$app/forms";
-    import { t } from "$lib/stores/i18n";
+    import { t, cs } from "$lib/stores/i18n";
     export let ex: Exercise;
-    export let categories: ExerciseCategory[] = [];
     export let toggleExpand: (exerciseId: number) => void;
 
-    let selected_category_id: number =
-        categories.find((c) => c.id === ex.category_id)?.id ?? 1;
+    let selected_category: string = "other";
 </script>
 
 <form
@@ -17,7 +15,7 @@
     on:submit={() => toggleExpand(ex.id)}
 >
     <input type="hidden" name="id" value={ex.id} />
-    <input type="hidden" name="category_id" value={selected_category_id} />
+    <input type="hidden" name="category" value={selected_category} />
 
     <!-- English Name -->
     <div class="flex items-center gap-2">
@@ -104,18 +102,18 @@
 
     <!-- Categories -->
     <ul class="flex flex-wrap gap-1 pt-1 text-center justify-center">
-        {#each categories as c (c.id)}
+        {#each Object.entries($cs) as [key, label]}
             <li>
                 <button
                     type="button"
-                    on:click={() => (selected_category_id = c.id)}
+                    on:click={() => (selected_category = key)}
                     class={`px-3 py-1 text-sm rounded ${
-                        selected_category_id === c.id
+                        selected_category === key
                             ? "bg-seal-brown/40 text-thistle"
                             : "bg-seal-brown hover:bg-seal-brown/50 hover:text-thistle"
                     }`}
                 >
-                    {c.name}
+                    {label}
                 </button>
             </li>
         {/each}

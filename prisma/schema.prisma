@@ -9,19 +9,10 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model ExerciseCategory {
-  id Int @id @default(autoincrement())
-
-  name      String     @unique
-  exercises Exercise[]
-}
-
 model Exercise {
   id Int @id @default(autoincrement())
 
-  category_id Int
-  category    ExerciseCategory @relation(fields: [category_id], references: [id])
-
+  category       String  @default("other")
   intensity_unit String  @default("kg")
   name           String  @unique
   name_fr        String?

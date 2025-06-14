@@ -4,7 +4,6 @@ import type { PageServerLoad } from './$types';
 import { fail } from '@sveltejs/kit';
 
 export const load: PageServerLoad = async ({ params }) => {
-    const categories = await prisma.exerciseCategory.findMany();
     const exercises = await prisma.exercise.findMany({});
 
     const session = await prisma.session.findUnique({
@@ -39,7 +38,7 @@ export const load: PageServerLoad = async ({ params }) => {
             });
         }
     }
-    return { categories, exercises, session };
+    return { exercises, session };
 };
 
 
@@ -137,7 +136,6 @@ async function reorder_session_exercises_by_completion(session_id: number) {
 
 export const actions: Actions = {
     create_session_exercise: async ({ request, params }) => {
-        console.log("Creating session exercise");
         const session_id = parseInt(params.id as string);
         if (isNaN(session_id)) {
             return fail(400, { error: "Invalid Session ID from URL." });

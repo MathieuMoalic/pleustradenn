@@ -6,7 +6,7 @@
     import SingleSet from "./SingleSet.svelte";
     import AddExercise from "./AddExercise.svelte";
     import EditExerciseButton from "./EditExerciseButton.svelte";
-    import { exerciseNamei18n } from "$lib/stores/i18n";
+    import { exerciseNamei18n, t } from "$lib/stores/i18n";
 
     import { dragHandleZone, dragHandle } from "svelte-dnd-action";
     import Menu from "$components/Menu.svelte";
@@ -65,7 +65,7 @@
     </form>
 
     {#if addingExercise}
-        <AddExercise categories={data.categories} exercises={data.exercises} />
+        <AddExercise exercises={data.exercises} />
     {/if}
 
     {#if data.session!.session_exercises && data.session!.session_exercises.length > 0}
@@ -158,7 +158,7 @@
         </div>
     {:else}
         <p class="text-base text-plum">
-            No sets recorded for this session yet.
+            {$t("no_sets")}
         </p>
     {/if}
 </section>

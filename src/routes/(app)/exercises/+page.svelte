@@ -9,7 +9,6 @@
     import { t } from "$lib/stores/i18n";
 
     export let data: PageData;
-    $: categories = data.categories;
     $: exercises = data.exercises;
 
     let expandedExerciseId: number | null = null;
@@ -47,8 +46,6 @@
             if (el) {
                 el.scrollIntoView({ behavior: "smooth", block: "start" });
 
-                // Optionally add some padding if the header obscures the top
-                // Use a short timeout to scroll slightly down after the first scroll
                 setTimeout(() => {
                     window.scrollBy({ top: -20, behavior: "smooth" });
                 }, 300);
@@ -58,7 +55,7 @@
 
     let new_ex = {
         id: -1,
-        category_id: 0,
+        category: "other",
         intensity_unit: "kg",
         name: "",
         name_pl: "",
@@ -87,7 +84,7 @@
 <Menu name={$t("exercises")} bind:addButtonToggle={addingExercise} />
 <section class="space-y-2 p-2">
     {#if addingExercise}
-        <ExerciseForm ex={new_ex} {categories} {toggleExpand} />
+        <ExerciseForm ex={new_ex} {toggleExpand} />
     {/if}
 
     {#if exercises && exercises.length > 0}
@@ -131,7 +128,7 @@
                     </button>
 
                     {#if expandedExerciseId === ex.id}
-                        <ExerciseForm {ex} {categories} {toggleExpand} />
+                        <ExerciseForm {ex} {toggleExpand} />
                     {/if}
                 </div>
             {/each}

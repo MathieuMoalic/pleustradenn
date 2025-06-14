@@ -1,15 +1,8 @@
 import type { Handle } from "@sveltejs/kit";
 import prisma from "$lib/server/prisma";
-import { runStartupTasks } from '$lib/server/startup';
-let startupRan = false;
 const SESSION_COOKIE_NAME = "session_id";
 
 export const handle: Handle = async ({ event, resolve }) => {
-    if (!startupRan) {
-        await runStartupTasks();
-        startupRan = true;
-    }
-
     const sessionId = event.cookies.get(SESSION_COOKIE_NAME);
 
     // Clear user locals initially
