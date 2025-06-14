@@ -27,16 +27,25 @@ export const handle: Handle = async ({ event, resolve }) => {
         include: {
             user: {
                 // Include user data if session is valid
-                select: { id: true, username: true }, // Only select needed non-sensitive data
+                select: { id: true, username: true, language: true }, // Only select needed non-sensitive data
             },
         },
     });
 
+    const allowedLangs = ['en', 'fr', 'pl'] as const;
+    type Language = typeof allowedLangs[number];
+
     if (session && session.expiresAt > new Date()) {
         // Session is valid and not expired
-        if (session.user) {
-            event.locals.user = session.user; // Attach user to locals
-            event.locals.sessionId = session.id; // Attach session ID for potential refresh
+        if (
+            session.user &&
+            allowedLangs.includes(session.user.language as Language)
+        ) {
+            event.locals.user = {
+                ...session.user,
+                language: session.user.language as Language // safely narrowed
+            };
+            event.locals.sessionId = session.id;
         }
     } else {
         // Session invalid or expired, delete the cookie

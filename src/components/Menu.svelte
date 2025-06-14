@@ -2,13 +2,29 @@
     import AddExerciseButton from "./AddExerciseButton.svelte";
     import Clock from "./Clock.svelte";
     import ClockButton from "./ClockButton.svelte";
-
+    import { language, t } from "$lib/stores/i18n";
+    import { enhance } from "$app/forms";
     export let name: string;
     export let addButtonToggle: boolean;
     export let isClockButtonVisible: boolean = false;
     let clockButtonToggle: boolean = false;
     let menuOpen = false;
     let showLogoutConfirmation = false;
+
+    function handleEnhance({}: {
+        action: URL;
+        formData: FormData;
+        formElement: HTMLFormElement;
+        controller: AbortController;
+        submitter: HTMLElement | null;
+        cancel: () => void;
+    }) {
+        return async ({ result }: { result: any }) => {
+            if (result.success) {
+                language.set(result.lang);
+            }
+        };
+    }
 </script>
 
 <header class="sticky top-0 z-20">
@@ -54,19 +70,19 @@
                 <a
                     href="/sessions"
                     class="text-plum hover:text-thistle font-semibold text-lg mb-2 transition-transform duration-200"
-                    >Sessions</a
+                    >{$t("session")}</a
                 >
                 <a
                     href="/exercises"
                     class="text-plum hover:text-thistle font-semibold text-lg mb-2 transition-transform duration-200"
-                    >Exercises</a
+                    >{$t("exercise")}</a
                 >
 
                 {#if showLogoutConfirmation}
                     <div
                         class="flex items-center text-plum font-semibold text-lg mb-2"
                     >
-                        Logout?
+                        {$t("logout")} ?
                         <form
                             method="POST"
                             action="/logout"
@@ -76,14 +92,14 @@
                                 type="submit"
                                 class="ml-2 px-3 py-1 bg-thistle text-black-bean rounded text-sm hover:bg-plum hover:text-thistle transition-colors duration-200"
                             >
-                                Yes
+                                {$t("yes")}
                             </button>
                         </form>
                         <button
                             class="ml-2 px-3 py-1 bg-thistle text-black-bean rounded text-sm hover:bg-plum hover:text-thistle transition-colors duration-200"
                             on:click={() => (showLogoutConfirmation = false)}
                         >
-                            No
+                            {$t("no")}
                         </button>
                     </div>
                 {:else}
@@ -91,9 +107,38 @@
                         class="text-plum hover:text-thistle font-semibold text-lg mb-2 text-left transition-transform duration-200"
                         on:click={() => (showLogoutConfirmation = true)}
                     >
-                        Logout
+                        {$t("logout")}
                     </button>
                 {/if}
+
+                <form
+                    method="POST"
+                    action="/actions/set-language"
+                    class="flex items-center gap-3 my-2"
+                    use:enhance={handleEnhance}
+                >
+                    <button
+                        class="lang-flag"
+                        aria-label="English"
+                        type="submit"
+                        name="lang"
+                        value="en">🇬🇧</button
+                    >
+                    <button
+                        class="lang-flag"
+                        aria-label="Polski"
+                        type="submit"
+                        name="lang"
+                        value="pl">🇵🇱</button
+                    >
+                    <button
+                        class="lang-flag"
+                        aria-label="Français"
+                        type="submit"
+                        name="lang"
+                        value="fr">🇫🇷</button
+                    >
+                </form>
             </div>
         {/if}
     </div>

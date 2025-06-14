@@ -1,7 +1,7 @@
 <script lang="ts">
     import type { ExerciseCategory, Exercise } from "@prisma/client";
     import { enhance } from "$app/forms";
-
+    import { t } from "$lib/stores/i18n";
     export let ex: Exercise;
     export let categories: ExerciseCategory[] = [];
     export let toggleExpand: (exerciseId: number) => void;
@@ -74,7 +74,7 @@
         <label
             for="intensity_unit"
             class="w-24 text-sm text-thistle text-center flex justify-center"
-            >Unit</label
+            >{$t("unit")}</label
         >
         <input
             id="intensity_unit"
@@ -91,7 +91,7 @@
         <label
             for="notes"
             class="w-24 text-sm text-thistle text-center flex justify-center"
-            >Notes</label
+            >{$t("notes")}</label
         >
         <input
             id="notes"
@@ -129,7 +129,7 @@
                 formaction="?/update"
                 class="flex-1 rounded bg-green-400/60 py-1 px-3 text-thistle hover:bg-green-400/80"
             >
-                Save
+                {$t("save")}
             </button>
             <button
                 type="submit"
@@ -137,7 +137,7 @@
                 formaction="?/delete"
                 formmethod="POST"
             >
-                Delete
+                {$t("delete")}
             </button>
         {:else}
             <button
@@ -145,7 +145,8 @@
                 formaction="?/create"
                 class="w-full rounded bg-plum py-1 px-3 text-seal-brown hover:bg-plum/90"
             >
-                Add {ex.name || "Exercise"}
+                {$t("add")}
+                {ex.name || "Exercise"}
             </button>
         {/if}
     </div>

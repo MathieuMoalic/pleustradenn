@@ -5,6 +5,8 @@
     import { page } from "$app/state";
     import { onMount, tick } from "svelte";
     import { goto } from "$app/navigation";
+    import { exerciseNamei18n } from "$lib/stores/i18n";
+    import { t } from "$lib/stores/i18n";
 
     export let data: PageData;
     $: categories = data.categories;
@@ -82,7 +84,7 @@
     });
 </script>
 
-<Menu name="Exercises" bind:addButtonToggle={addingExercise} />
+<Menu name={$t("exercises")} bind:addButtonToggle={addingExercise} />
 <section class="space-y-2 p-2">
     {#if addingExercise}
         <ExerciseForm ex={new_ex} {categories} {toggleExpand} />
@@ -105,7 +107,7 @@
                         <div class="flex justify-between items-center">
                             <div class="flex flex-col">
                                 <h3 class="text-lg font-semibold text-thistle">
-                                    {ex.name}
+                                    {exerciseNamei18n(ex)}
                                 </h3>
                             </div>
                             <svg
@@ -136,7 +138,7 @@
         </div>
     {:else}
         <p class="text-base text-plum">
-            No exercises yet. Click "Add New Exercise" to get started!
+            {$t("no_exercises")}
         </p>
     {/if}
 </section>

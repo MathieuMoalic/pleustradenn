@@ -5,6 +5,7 @@
     import type { Set } from "@prisma/client";
     import { enhance } from "$app/forms";
     import { tick } from "svelte";
+    import { t } from "$lib/stores/i18n";
 
     export let set: Set;
     export let unit: string;
@@ -109,7 +110,7 @@
             <div class="flex items-center justify-between">
                 <label
                     for={`reps-expanded-${set.id}`}
-                    class="text-thistle font-medium">Reps:</label
+                    class="text-thistle font-medium">{$t("reps")}:</label
                 >
                 <div class="flex items-center gap-0">
                     <PlusMinusButton
@@ -117,7 +118,7 @@
                         plusOrMinus="minus"
                     />
                     <NumberInput
-                        name="reps"
+                        name={$t("reps")}
                         id={set.id}
                         {form}
                         bind:value={set.reps}
@@ -137,7 +138,7 @@
                         plusOrMinus="minus"
                     />
                     <NumberInput
-                        name="intensity"
+                        name={$t("intensity")}
                         id={set.id}
                         {form}
                         bind:value={set.intensity}

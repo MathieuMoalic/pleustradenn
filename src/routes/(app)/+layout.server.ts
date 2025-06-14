@@ -5,4 +5,7 @@ export const load: LayoutServerLoad = async ({ locals, url }) => {
     if (!locals.user) {
         throw redirect(303, `/login?redirectTo=${url.pathname}`);
     }
+    return {
+        language: locals.user?.language ?? 'en'
+    };
 };

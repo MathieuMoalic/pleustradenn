@@ -1,11 +1,12 @@
 <script lang="ts">
     import type { Exercise, ExerciseCategory } from "@prisma/client";
+    import { exerciseNamei18n, t } from "$lib/stores/i18n";
 
     export let categories: ExerciseCategory[] = [];
     export let exercises: Exercise[] = [];
 
     let category_id = 0;
-    let state = "pickCategory"; // pickCategory, pickExercise
+    let state: "pickCategory" | "pickExercise" = "pickCategory";
 
     function filterExercisesByCategory(categoryId: number): Exercise[] {
         return exercises.filter(
@@ -51,7 +52,7 @@
                     value={exercise.id}
                     class="bg-seal-brown text-thistle font-semibold py-2 px-4 rounded-md shadow-md hover:bg-burnt-umber transition duration-200 w-full"
                 >
-                    {exercise.name}
+                    {exerciseNamei18n(exercise)}
                 </button>
             {/each}
             <button
@@ -59,7 +60,7 @@
                 on:click={() => (state = "pickCategory")}
                 class="text-plum hover:underline mt-2 text-sm"
             >
-                ← Back to categories
+                ← {$t("back_to_categories")}
             </button>
         </form>
     {/if}

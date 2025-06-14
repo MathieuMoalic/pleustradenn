@@ -6,6 +6,7 @@
     import SingleSet from "./SingleSet.svelte";
     import AddExercise from "./AddExercise.svelte";
     import EditExerciseButton from "./EditExerciseButton.svelte";
+    import { exerciseNamei18n } from "$lib/stores/i18n";
 
     import { dragHandleZone, dragHandle } from "svelte-dnd-action";
     import Menu from "$components/Menu.svelte";
@@ -36,16 +37,6 @@
     }
 
     function formatSessionDate(date: Date): string {
-        const today = new Date();
-        const isToday =
-            date.getFullYear() === today.getFullYear() &&
-            date.getMonth() === today.getMonth() &&
-            date.getDate() === today.getDate();
-
-        if (isToday) {
-            return "Today's session";
-        }
-
         const yyyy = date.getFullYear();
         const mm = String(date.getMonth() + 1).padStart(2, "0");
         const dd = String(date.getDate()).padStart(2, "0");
@@ -118,7 +109,7 @@
                             class="ml-2 truncate whitespace-nowrap overflow-hidden text-sm font-medium text-thistle min-w-0"
                             title={SE.exercise.name}
                         >
-                            {SE.exercise.name}
+                            {exerciseNamei18n(SE.exercise)}
                         </h3>
 
                         <div class="flex flex-col gap-1">

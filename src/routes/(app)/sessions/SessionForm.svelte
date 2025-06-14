@@ -1,6 +1,6 @@
 <script lang="ts">
     import { enhance } from "$app/forms";
-
+    import { t } from "$lib/stores/i18n";
     export let toggleExpand: (sessionId: number) => void;
 
     function toDateString(d: Date) {
@@ -36,7 +36,7 @@
     <input type="hidden" name="id" value={session.id} />
     <div>
         <label for="date" class="block text-sm font-medium text-thistle mb-1">
-            Session date
+            {$t("session_date")}
         </label>
 
         <input
@@ -52,7 +52,7 @@
 
     <div>
         <label for="notes" class="block text-sm font-medium text-thistle mb-1">
-            Notes
+            {$t("notes")}
         </label>
         <textarea
             id="notes"
@@ -69,7 +69,7 @@
                 type="submit"
                 formaction="?/update"
                 class="w-full rounded-md bg-plum py-2 px-4 text-black-bean hover:bg-plum/90 focus:outline-none focus:ring-2 focus:ring-burnt-umber focus:ring-offset-2 focus:ring-offset-seal-brown"
-                >Save</button
+                >{$t("save")}</button
             >
             <button
                 type="submit"
@@ -77,7 +77,7 @@
                 formaction="?/delete"
                 formmethod="POST"
             >
-                Delete
+                {$t("delete")}
             </button>
         {:else}
             <button
@@ -85,7 +85,7 @@
                 formaction="?/create"
                 class="w-full rounded-md bg-plum py-2 px-4 text-black-bean hover:bg-plum/90 focus:outline-none focus:ring-2 focus:ring-plum focus:ring-offset-2 focus:ring-offset-seal-brown"
             >
-                Add Session
+                {$t("save")}
             </button>
         {/if}
     </div>

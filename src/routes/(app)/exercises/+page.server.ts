@@ -79,7 +79,6 @@ export const actions: Actions = {
 
     update: async ({ request }) => {
         const form = await request.formData();
-        console.log("Received form data for update:", Object.fromEntries(form));
         const idString = form.get("id")?.toString();
         if (!idString) {
             return fail(400, { error: "Exercise ID is missing.", form: Object.fromEntries(form) });

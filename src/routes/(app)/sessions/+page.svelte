@@ -7,6 +7,7 @@
     import CloneButton from "./CloneButton.svelte";
     import SessionForm from "./SessionForm.svelte";
     import Menu from "$components/Menu.svelte";
+    import { t } from "$lib/stores/i18n";
 
     export let data: PageData;
 
@@ -32,7 +33,7 @@
     let addingSession = false;
 </script>
 
-<Menu name="Sessions" bind:addButtonToggle={addingSession} />
+<Menu name={$t("sessions")} bind:addButtonToggle={addingSession} />
 
 <section class="">
     <div class="flex flex-col gap-2 p-2">
