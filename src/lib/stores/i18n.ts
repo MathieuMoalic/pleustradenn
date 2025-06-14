@@ -55,9 +55,9 @@ const categories = {
         pl: 'Tułów',
         fr: 'Tronc'
     },
-    forearm: {
-        en: 'Forearm',
-        pl: 'Przedramię',
+    forearms: {
+        en: 'Forearms',
+        pl: 'Przedramiona',
         fr: 'Avant-bras'
     },
     other: {
