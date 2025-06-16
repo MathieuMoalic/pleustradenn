@@ -32,6 +32,11 @@ const dict = {
     back_to_categories: { en: 'Back to Categories', pl: 'Powrót do kategorii', fr: 'Retour aux catégories' },
     no_exercises: { en: 'No exercises found', pl: 'Brak ćwiczeń', fr: 'Aucun exercice trouvé' },
     no_sets: { en: 'No sets recorded for this session yet.', pl: 'Brak zapisanych serii dla tego treningu.', fr: 'Aucun set enregistré pour cette séance.' },
+    log: {
+        en: 'Log',
+        pl: 'Dziennik',
+        fr: 'Journal'
+    },
 };
 
 const categories = {

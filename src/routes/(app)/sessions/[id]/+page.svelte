@@ -13,6 +13,7 @@
     import type { PageData } from "./$types";
     import { enhance } from "$app/forms";
     import { fly } from "svelte/transition";
+    import ExerciseLogButton from "./ExerciseLogButton.svelte";
 
     export let data: PageData;
     if (data.session === null) {
@@ -149,6 +150,7 @@
                         }`}
                     >
                         <DeleteSEButton {SE} />
+                        <ExerciseLogButton {SE} />
                         <EditExerciseButton {SE} />
                         <CompleteSEButton {SE} />
                         <AddSetButton {SE} />

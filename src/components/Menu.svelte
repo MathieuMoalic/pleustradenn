@@ -5,7 +5,7 @@
     import { language, t } from "$lib/stores/i18n";
     import { enhance } from "$app/forms";
     export let name: string;
-    export let addButtonToggle: boolean;
+    export let addButtonToggle: boolean = false;
     export let isClockButtonVisible: boolean = false;
     let clockButtonToggle: boolean = false;
     let menuOpen = false;
