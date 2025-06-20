@@ -9,13 +9,14 @@ export const actions: Actions = {
         if ('status' in data) {
             return data;
         }
+        let exercise;
         try {
-            await prisma.exercise.create({
+            exercise = await prisma.exercise.create({
                 data: data,
             });
         } catch (error) {
             return fail(500, { error: "Failed to create exercise. Please try again.", form: Object.fromEntries(form) });
         }
-        return { success: true, message: "Exercise created successfully." };
+        return { success: true, message: "Exercise created successfully.", exercise: exercise };
     },
 };

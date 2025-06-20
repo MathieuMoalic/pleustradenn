@@ -3,6 +3,7 @@
     import type { ActionData } from "./[id]/$types";
     import { t, cs } from "$lib/stores/i18n";
     import { addAlert } from "$lib/client/alert";
+    import { onMount } from "svelte";
 
     export let form: ActionData;
     export let ex: {
@@ -41,6 +42,17 @@
     $: if (!form?.error) {
         errorHandled = false;
     }
+    onMount(() => {
+        ex = {
+            id: -1,
+            category: "other",
+            intensity_unit: "kg",
+            name: "",
+            name_pl: "",
+            name_fr: "",
+            notes: "",
+        };
+    });
 </script>
 
 <form
