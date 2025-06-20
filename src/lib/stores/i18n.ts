@@ -37,6 +37,31 @@ const dict = {
         pl: 'Dziennik',
         fr: 'Journal'
     },
+    confirm_delete: {
+        en: 'Are you sure you want to delete this Exercise?, All past session exercises associated with this exercise will be deleted.',
+        pl: 'Czy na pewno chcesz usunąć to ćwiczenie? Wszystkie przeszłe sesje związane z tym ćwiczeniem zostaną usunięte.',
+        fr: 'Êtes-vous sûr de vouloir supprimer cet exercice ? Tous les exercices  de session associés à cette exercise seront supprimés.'
+    },
+    new_exercise: {
+        en: 'New Exercise',
+        pl: 'Nowe ćwiczenie',
+        fr: 'Nouvel exercice'
+    },
+    no_sets_found: {
+        en: 'No sets found for this exercise.',
+        pl: 'Brak serii dla tego ćwiczenia.',
+        fr: 'Aucun set trouvé pour cet exercice.'
+    },
+    exercise_saved: {
+        en: 'Exercise saved successfully.',
+        pl: 'Ćwiczenie zapisane pomyślnie.',
+        fr: 'Exercice enregistré avec succès.'
+    },
+    saved: {
+        en: 'Saved',
+        pl: 'Zapisano',
+        fr: 'Enregistré'
+    },
 };
 
 const categories = {
@@ -81,6 +106,7 @@ export const t = derived(language, ($lang) => (key: keyof typeof dict) =>
 export const c = derived(language, ($lang) => (key: keyof typeof categories) =>
     categories[key][$lang] ?? categories[key].en
 );
+
 export const cs = derived(language, ($lang) => {
     return Object.fromEntries(
         Object.entries(categories).map(([key, value]) => [key, value[$lang] ?? value.en])

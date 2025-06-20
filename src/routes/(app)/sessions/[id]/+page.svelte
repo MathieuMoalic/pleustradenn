@@ -5,7 +5,8 @@
     import CompleteSEButton from "./CompleteSEButton.svelte";
     import SingleSet from "./SingleSet.svelte";
     import AddExercise from "./AddExercise.svelte";
-    import EditExerciseButton from "./EditExerciseButton.svelte";
+    import ExerciseLogButton from "./ExerciseLogButton.svelte";
+
     import { exerciseNamei18n, t } from "$lib/stores/i18n";
 
     import { dragHandleZone, dragHandle } from "svelte-dnd-action";
@@ -13,7 +14,6 @@
     import type { PageData } from "./$types";
     import { enhance } from "$app/forms";
     import { fly } from "svelte/transition";
-    import ExerciseLogButton from "./ExerciseLogButton.svelte";
 
     export let data: PageData;
     if (data.session === null) {
@@ -151,7 +151,6 @@
                     >
                         <DeleteSEButton {SE} />
                         <ExerciseLogButton {SE} />
-                        <EditExerciseButton {SE} />
                         <CompleteSEButton {SE} />
                         <AddSetButton {SE} />
                     </div>

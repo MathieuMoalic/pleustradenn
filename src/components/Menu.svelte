@@ -4,9 +4,13 @@
     import ClockButton from "./ClockButton.svelte";
     import { language, t } from "$lib/stores/i18n";
     import { enhance } from "$app/forms";
+    import { goto } from "$app/navigation";
+
     export let name: string;
-    export let addButtonToggle: boolean = false;
+    export let addButtonCallback: (() => void) | null = null;
+    export let addButtonToggle = false;
     export let isClockButtonVisible: boolean = false;
+
     let clockButtonToggle: boolean = false;
     let menuOpen = false;
     let showLogoutConfirmation = false;
@@ -20,6 +24,7 @@
         cancel: () => void;
     }) {
         return async ({ result }: { result: any }) => {
+            menuOpen = false; // Close the menu after form submission
             if (result.success) {
                 language.set(result.lang);
             }
@@ -52,11 +57,20 @@
                         />
                     </svg>
                 </button>
-                <div class="text-plum font-bold text-lg">{name}</div>
+
+                <div class="text-plum font-bold text-lg">
+                    {#if !menuOpen}
+                        {name}
+                    {:else}
+                        Menu
+                    {/if}
+                </div>
             </div>
 
             <div class="flex items-center gap-3">
-                <AddExerciseButton bind:addButtonToggle />
+                {#if !(addButtonCallback === null)}
+                    <AddExerciseButton {addButtonCallback} {addButtonToggle} />
+                {/if}
                 {#if isClockButtonVisible}
                     <ClockButton bind:clockButtonToggle />
                 {/if}
@@ -67,16 +81,18 @@
             <div
                 class="flex flex-col px-6 py-4 bg-black-bean border-t border-thistle z-50"
             >
-                <a
-                    href="/sessions"
+                <button
                     class="text-plum hover:text-thistle font-semibold text-lg mb-2 transition-transform duration-200"
-                    >{$t("session")}</a
+                    on:click={() => (goto("/sessions"), (menuOpen = false))}
                 >
-                <a
-                    href="/exercises"
+                    {$t("session")}
+                </button>
+                <button
                     class="text-plum hover:text-thistle font-semibold text-lg mb-2 transition-transform duration-200"
-                    >{$t("exercise")}</a
+                    on:click={() => (goto("/exercises"), (menuOpen = false))}
                 >
+                    {$t("exercise")}
+                </button>
 
                 {#if showLogoutConfirmation}
                     <div
@@ -104,7 +120,7 @@
                     </div>
                 {:else}
                     <button
-                        class="text-plum hover:text-thistle font-semibold text-lg mb-2 text-left transition-transform duration-200"
+                        class="text-plum hover:text-thistle font-semibold text-lg mb-2 transition-transform duration-200"
                         on:click={() => (showLogoutConfirmation = true)}
                     >
                         {$t("logout")}
@@ -114,7 +130,7 @@
                 <form
                     method="POST"
                     action="/actions/set-language"
-                    class="flex items-center gap-3 my-2"
+                    class="flex justify-center items-center gap-3 my-2"
                     use:enhance={handleEnhance}
                 >
                     <button

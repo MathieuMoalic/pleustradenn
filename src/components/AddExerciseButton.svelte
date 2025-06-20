@@ -1,11 +1,12 @@
 <script lang="ts">
-    export let addButtonToggle: boolean;
+    export let addButtonCallback: (() => void) | null = null;
+    export let addButtonToggle = false;
 </script>
 
 <button
     type="button"
     aria-label="Add Exercise"
-    on:click={() => (addButtonToggle = !addButtonToggle)}
+    on:click={addButtonCallback}
     class="flex items-center justify-center bg-emerald-400/50 text-white font-semibold rounded-md shadow hover:bg-emerald-700 transition duration-200 h-7 w-7"
 >
     {#if !addButtonToggle}

@@ -1,9 +1,10 @@
 import prisma from '$lib/server/prisma';
+import { fail, type Actions } from "@sveltejs/kit";
 import type { PageServerLoad } from './$types';
+import { validateExerciseFormData } from '$lib/server/validate_exercise';
 
 export const load: PageServerLoad = async ({ params }) => {
     const { id } = params;
-    // convert to number and validate
     const exercise_id = Number(id);
     if (isNaN(exercise_id)) {
         throw new Error('Invalid exercise ID');
@@ -51,3 +52,57 @@ export const load: PageServerLoad = async ({ params }) => {
 
     return { sets: groupedSets, exercise };
 }
+
+export const actions: Actions = {
+    update: async ({ request }) => {
+        const form = await request.formData();
+        const idString = form.get("id")?.toString();
+        if (!idString) {
+            return fail(400, { error: "Exercise ID is missing.", form: Object.fromEntries(form) });
+        }
+        const id = parseInt(idString);
+        if (isNaN(id)) {
+            return fail(400, { error: "Invalid exercise ID.", form: Object.fromEntries(form) });
+        }
+
+        const validationResult = await validateExerciseFormData(form);
+        if ('status' in validationResult) {
+            return validationResult;
+        }
+
+        const validatedData = validationResult;
+
+        let exercise;
+        try {
+            exercise = await prisma.exercise.update({
+                where: { id },
+                data: validatedData,
+            });
+        } catch (error) {
+            return fail(500, { error: "Failed to update exercise.", form: Object.fromEntries(form) });
+        }
+        return { success: true, message: "Exercise updated successfully.", exercise: exercise };
+    },
+
+    delete: async ({ request }) => {
+        const form = await request.formData();
+        console.log("Form data for deletion:", Object.fromEntries(form));
+        const idString = form.get("id")?.toString();
+        if (!idString) {
+            return fail(400, { error: "Exercise ID is missing for deletion." });
+        }
+        const id = parseInt(idString);
+        if (isNaN(id)) {
+            return fail(400, { error: "Invalid exercise ID for deletion." });
+        }
+
+        try {
+            await prisma.exercise.delete({ where: { id } });
+        } catch (error) {
+            if (error instanceof Error && 'code' in error && error.code === 'P2025') {
+                return fail(404, { error: "Exercise not found for deletion." });
+            }
+            return fail(500, { error: "Failed to delete exercise. Please try again." });
+        }
+    },
+};
