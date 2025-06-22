@@ -1,8 +1,8 @@
 <script lang="ts">
     import type { PageData } from "./$types";
-
     import { language } from "$lib/stores/i18n";
     import Alert from "$components/Alert.svelte";
+    import ConfirmPopup from "$components/ConfirmPopup.svelte";
     export let data: PageData;
     language.set(data.language);
 </script>
@@ -11,5 +11,6 @@
     class="min-h-screen bg-seal-brown bg-[url('/bg.avif')] bg-cover bg-center bg-fixed font-['Segoe_UI',sans-serif]"
 >
     <Alert />
+    <ConfirmPopup />
     <slot />
 </main>

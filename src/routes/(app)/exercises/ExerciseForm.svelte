@@ -5,6 +5,10 @@
     import type { SubmitFunction } from "@sveltejs/kit";
     import { goto } from "$app/navigation";
 
+    import { confirmable } from "$lib/client/confirm";
+    let formEl: HTMLFormElement;
+    let deleteBtn: HTMLButtonElement; // the real submitter
+
     export let ex: {
         notes: string;
         id: number;
@@ -52,18 +56,16 @@
             }
         };
     };
-
-    let redirectTo: string = "";
 </script>
 
 <form
     method="POST"
     class="space-y-2 text-plum bg-burnt-umber/80 border border-seal-brown rounded-md p-4 mb-4 shadow-sm m-2"
     use:enhance={handleEnhance}
+    bind:this={formEl}
 >
     <input type="hidden" name="id" value={ex.id} />
     <input type="hidden" name="category" value={selected_category} />
-    <input type="hidden" name="redirectTo" value={redirectTo} />
     <!-- English Name -->
     <div class="input-div">
         <label for="name">🇬🇧</label>
@@ -156,11 +158,24 @@
             >
                 {$t("save")}
             </button>
+            <!-- hidden real submit button -->
             <button
+                bind:this={deleteBtn}
                 type="submit"
-                class="flex-1 rounded bg-red-500/60 py-1 px-3 text-white hover:bg-red-700"
                 formaction="?/delete"
                 formmethod="POST"
+                class="hidden"
+                aria-hidden="true"
+            >
+            </button>
+            <!-- visible delete button that only *asks* -->
+            <button
+                type="button"
+                use:confirmable={{
+                    message: `Are you sure you want to delete '${ex.name}'?`,
+                    onConfirm: () => formEl.requestSubmit(deleteBtn),
+                }}
+                class="flex-1 rounded bg-red-500/60 py-1 px-3 text-white hover:bg-red-700"
             >
                 {$t("delete")}
             </button>

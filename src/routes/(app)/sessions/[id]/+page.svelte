@@ -169,7 +169,9 @@
             {/each}
         </div>
     {:else}
-        <p class="text-base text-plum">
+        <p
+            class="text-plum p-3 text-xl shadow-sm rounded-md bg-seal-brown/50 m-2"
+        >
             {$t("no_sets")}
         </p>
     {/if}

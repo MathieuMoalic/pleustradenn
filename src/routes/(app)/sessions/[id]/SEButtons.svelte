@@ -8,8 +8,21 @@
     import UntickedBox from "$components/icons/UntickedBox.svelte";
     import Add from "$components/icons/Plus.svelte";
 
+    import { confirmable } from "$lib/client/confirm";
+    import { exerciseNamei18n } from "$lib/stores/i18n";
+    let formEl: HTMLFormElement;
+    let deleteBtn: HTMLButtonElement; // the real submitter
+
     export let SE: {
-        exercise: { id: number };
+        exercise: {
+            id: number;
+            name: string;
+            name_fr: string | null;
+            name_pl: string | null;
+            notes: string;
+            category: string;
+            intensity_unit: string;
+        };
         completed: boolean;
         id: number;
         session_id: number;
@@ -65,9 +78,33 @@
         <Log {className} />
     </button>
 
-    <form method="POST" action="?/delete_session_exercise" use:enhance>
-        <input type="hidden" name="id" value={SE.id || ""} />
-        <button type="submit" class={buttonClass} aria-label="Add set">
+    <form
+        method="POST"
+        action="?/delete_session_exercise"
+        use:enhance
+        bind:this={formEl}
+    >
+        <!-- hidden real submit button -->
+        <button
+            bind:this={deleteBtn}
+            type="submit"
+            formaction="?/delete_session_exercise"
+            formmethod="POST"
+            class="hidden"
+            aria-hidden="true"
+            name="id"
+            value={SE.id}
+        >
+        </button>
+        <button
+            type="button"
+            use:confirmable={{
+                message: `Are you sure you want to delete '${exerciseNamei18n(SE.exercise)}'?`,
+                onConfirm: () => formEl.requestSubmit(deleteBtn),
+            }}
+            class={buttonClass}
+            aria-label="Add set"
+        >
             <Bin {className} />
         </button>
     </form>
