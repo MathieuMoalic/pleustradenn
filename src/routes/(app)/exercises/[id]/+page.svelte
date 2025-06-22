@@ -1,19 +1,18 @@
 <script lang="ts">
     import Navbar from "$components/Navbar.svelte";
     import { t, exerciseNamei18n } from "$lib/stores/i18n";
-    import type { PageData, ActionData } from "./$types";
+    import type { PageData } from "./$types";
     import ExerciseForm from "../ExerciseForm.svelte";
     import NewExerciseButton from "../NewExerciseButton.svelte";
 
-    export let form: ActionData;
     export let data: PageData;
     let ex = data.exercise ?? {
         id: -1,
         category: "other",
         intensity_unit: "kg",
-        name: "",
-        name_pl: "",
-        name_fr: "",
+        name: "sdad",
+        name_pl: "sdad",
+        name_fr: "sdad",
         notes: "",
     };
 
@@ -41,7 +40,7 @@
     </div>
 </Navbar>
 
-<ExerciseForm {form} {ex} />
+<ExerciseForm {ex} />
 
 <h2 class="text-2xl font-bold text-thistle m-4">
     {$t("log")}

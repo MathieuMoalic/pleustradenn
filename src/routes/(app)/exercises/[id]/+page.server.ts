@@ -49,7 +49,6 @@ export const load: PageServerLoad = async ({ params }) => {
             id: exercise_id,
         },
     });
-
     return { sets: groupedSets, exercise };
 }
 
@@ -103,5 +102,6 @@ export const actions: Actions = {
             }
             return fail(500, { error: "Failed to delete exercise. Please try again." });
         }
+        return { success: true, message: "Exercise deleted successfully." };
     },
 };

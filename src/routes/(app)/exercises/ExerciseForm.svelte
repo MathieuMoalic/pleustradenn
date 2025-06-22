@@ -1,11 +1,10 @@
 <script lang="ts">
     import { enhance } from "$app/forms";
-    import type { ActionData } from "./[id]/$types";
     import { t, cs } from "$lib/stores/i18n";
     import { addAlert } from "$lib/client/alert";
-    import { onMount } from "svelte";
+    import type { SubmitFunction } from "@sveltejs/kit";
+    import { goto } from "$app/navigation";
 
-    export let form: ActionData;
     export let ex: {
         notes: string;
         id: number;
@@ -15,54 +14,56 @@
         name_fr: string | null;
         name_pl: string | null;
     };
+
     let selected_category: string = ex.category || "other";
 
-    let updateHandled = false;
+    const handleEnhance: SubmitFunction = ({ submitter }) => {
+        return async ({ result }) => {
+            const action = submitter?.getAttribute("formaction");
+            switch (result.type) {
+                case "success": {
+                    if (action?.includes("update")) {
+                        addAlert(
+                            `Exercise '${ex.name}' updated successfully`,
+                            "success",
+                        );
+                        ex = result.data?.exercise ?? ex;
+                        goto("/exercises");
+                    } else if (action?.includes("delete")) {
+                        addAlert(
+                            `Exercise '${ex.name}' deleted successfully`,
+                            "success",
+                        );
+                        goto("/exercises");
+                    }
+                    if (history.length > 1) {
+                        history.back();
+                        return;
+                    }
+                    break;
+                }
 
-    $: if (form?.success && form.exercise && !updateHandled) {
-        ex = { ...ex, ...form.exercise };
-        addAlert(`${$t("saved")}`, "success");
-        updateHandled = true;
-    }
+                // if server returns`fail(...)`
+                case "failure": {
+                    addAlert(result.data?.error ?? "Unknown error", "error");
 
-    // Reset flag if form is reset (e.g. due to a new submission or error)
-    $: if (!form?.success) {
-        updateHandled = false;
-    }
-
-    let errorHandled = false;
-
-    $: if (form?.error && !errorHandled) {
-        const msg = form.error || ""; // fallback if no message
-        addAlert(msg, "error");
-        errorHandled = true;
-    }
-
-    // Reset error flag if form changes again
-    $: if (!form?.error) {
-        errorHandled = false;
-    }
-    onMount(() => {
-        ex = {
-            id: -1,
-            category: "other",
-            intensity_unit: "kg",
-            name: "",
-            name_pl: "",
-            name_fr: "",
-            notes: "",
+                    break;
+                }
+            }
         };
-    });
+    };
+
+    let redirectTo: string = "";
 </script>
 
 <form
     method="POST"
     class="space-y-2 text-plum bg-burnt-umber/80 border border-seal-brown rounded-md p-4 mb-4 shadow-sm m-2"
-    use:enhance
+    use:enhance={handleEnhance}
 >
     <input type="hidden" name="id" value={ex.id} />
     <input type="hidden" name="category" value={selected_category} />
-
+    <input type="hidden" name="redirectTo" value={redirectTo} />
     <!-- English Name -->
     <div class="input-div">
         <label for="name">🇬🇧</label>
