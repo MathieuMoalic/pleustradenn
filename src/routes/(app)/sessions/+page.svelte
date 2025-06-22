@@ -43,7 +43,9 @@
                 toggleExpand(-1);
             }}
         >
-            <Plus className="w-4 h-4" />
+            <Plus
+                className={`w-4 h-4 transition-transform duration-300 ${addingSession ? "rotate-45" : ""}`}
+            />
         </button>
     </div>
 </Navbar>

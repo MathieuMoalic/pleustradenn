@@ -79,6 +79,11 @@
             >
                 {$t("delete")}
             </button>
+            <button
+                type="button"
+                class="w-full rounded-md bg-plum py-2 px-4 text-black-bean hover:bg-plum/90 focus:outline-none focus:ring-2 focus:ring-burnt-umber focus:ring-offset-2 focus:ring-offset-seal-brown"
+                on:click={() => toggleExpand(session.id)}>{$t("close")}</button
+            >
         {:else}
             <button
                 type="submit"
