@@ -1,12 +1,12 @@
 <script lang="ts">
     import PlusMinusButton from "./PlusMinusButton.svelte";
-    import DeleteButton from "./DeleteButton.svelte";
     import NumberInput from "./NumberInput.svelte";
     import type { Set } from "@prisma/client";
     import { enhance } from "$app/forms";
     import { tick } from "svelte";
     import { t } from "$lib/stores/i18n";
     import Chevron from "$components/icons/Chevron.svelte";
+    import Bin from "$components/icons/Bin.svelte";
 
     export let set: Set;
     export let unit: string;
@@ -66,7 +66,16 @@
     <div
         class="flex items-center justify-between px-3 py-2 w-full gap-4 bg-black-bean/40 rounded-md focus-within:ring-0 focus-within:ring-plum"
     >
-        <DeleteButton />
+        <button
+            type="submit"
+            formaction="?/delete_set"
+            formmethod="POST"
+            class="text-red-500 hover:text-red-400 rounded-sm"
+            aria-label="Delete set"
+        >
+            <Bin />
+        </button>
+
         <button
             type="button"
             on:click={toggleExpended}
