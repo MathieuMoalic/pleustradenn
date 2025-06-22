@@ -19,6 +19,9 @@
     let className = "h-3 w-3";
     let buttonClass =
         "p-1.5 rounded-md shadow-xl transition duration-200 bg-seal-brown text-thistle";
+    $: buttonClass = SE.completed
+        ? "p-1.5 rounded-md shadow-xl transition duration-200 bg-emerald-800 text-thistle"
+        : "p-1.5 rounded-md shadow-xl transition duration-200 bg-seal-brown text-thistle";
 </script>
 
 <div class="px-1 ml-1 py-1 bg-white/5 rounded-r-md flex flex-col gap-1">
