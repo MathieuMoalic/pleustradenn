@@ -22,7 +22,6 @@ export const actions: Actions = {
         if (!locals.user) {
             return fail(401, { error: 'You must be logged in to create a session.' });
         }
-
         const form = await request.formData();
         const rawDate = form.get("date")?.toString();
         const notes = form.get("notes")?.toString() ?? "";
@@ -33,16 +32,14 @@ export const actions: Actions = {
 
         const user_id = locals.user.id;
 
-        let session_id: number | null = null;
         try {
-            const session = await prisma.session.create({
+            await prisma.session.create({
                 data: {
                     date: new Date(rawDate),
                     notes: notes,
                     user_id: user_id,
                 },
             });
-            session_id = session.id;
         } catch (err) {
             return fail(500, {
                 date: rawDate,
@@ -50,13 +47,18 @@ export const actions: Actions = {
                 error: 'Failed to create session. Please try again.'
             });
         }
-        if (session_id !== null) {
-            redirect(302, `/sessions/${session_id}`);
-        }
+
+        const sessions = await prisma.session.findMany({
+            where: { user_id: locals.user.id },
+            orderBy: { date: 'desc' }
+        });
+        return { sessions };
     },
-    update: async ({ request }) => {
+
+    update: async ({ request, locals }) => {
         const form = await request.formData();
         const idString = form.get("id")?.toString();
+        console.log("Update form data:", Object.fromEntries(form));
         if (!idString) {
             return fail(400, { error: "Session ID is missing.", form: Object.fromEntries(form) });
         }
@@ -75,12 +77,22 @@ export const actions: Actions = {
             notes: form.get('notes')?.toString() ?? '',
         };
 
-        await prisma.session.update({
+        let session = await prisma.session.update({
             where: { id },
             data: formData
         });
+        console.log("Updated session:", session);
+        if (!locals.user) {
+            return fail(401, { error: 'You must be logged in to update a session.' });
+        }
+        const sessions = await prisma.session.findMany({
+            where: { user_id: locals.user.id },
+            orderBy: { date: 'desc' }
+        });
+        return { sessions };
     },
-    delete: async ({ request }) => {
+
+    delete: async ({ request, locals }) => {
         const form = await request.formData();
 
         const idString = form.get("id")?.toString();
@@ -92,6 +104,14 @@ export const actions: Actions = {
             return fail(400, { error: "Invalid Session ID for deletion." });
         }
         await prisma.session.delete({ where: { id } });
+        if (!locals.user) {
+            return fail(401, { error: 'You must be logged in to update a session.' });
+        }
+        const sessions = await prisma.session.findMany({
+            where: { user_id: locals.user.id },
+            orderBy: { date: 'desc' }
+        });
+        return { sessions };
     },
     clone: async ({ request, locals }) => {
         if (!locals.user) {
@@ -116,7 +136,6 @@ export const actions: Actions = {
                 session_exercises: true
             }
         });
-
         if (!sessionToClone) {
             return fail(404, { error: "Session not found." });
         }
@@ -140,6 +159,13 @@ export const actions: Actions = {
                 }
             });
         }
-        return { success: true, newSession: newSession };
+        if (!locals.user) {
+            return fail(401, { error: 'You must be logged in to update a session.' });
+        }
+        const sessions = await prisma.session.findMany({
+            where: { user_id: locals.user.id },
+            orderBy: { date: 'desc' }
+        });
+        return { sessions };
     }
 };
