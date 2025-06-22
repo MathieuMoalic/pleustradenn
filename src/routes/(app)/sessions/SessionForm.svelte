@@ -5,6 +5,10 @@
         id: number;
         date: Date;
         notes: string;
+    } = {
+        id: -1,
+        date: new Date(),
+        notes: "",
     };
     export let toggleExpand: (sessionId: number) => void;
 

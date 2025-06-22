@@ -26,14 +26,6 @@
         }
     }
 
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-
-    let new_session = {
-        id: -1,
-        date: today,
-        notes: "",
-    };
     let addingSession = false;
 
     const handleEnhance: SubmitFunction = () => {
@@ -41,6 +33,7 @@
             switch (result.type) {
                 case "success": {
                     sessions = result.data?.sessions ?? [];
+                    addingSession = false;
                     break;
                 }
 
@@ -75,7 +68,7 @@
         <div class="flex flex-col gap-2 p-2">
             {#if addingSession}
                 <div in:slide={{ duration: 200 }} out:slide={{ duration: 150 }}>
-                    <SessionForm session={new_session} {toggleExpand} />
+                    <SessionForm {toggleExpand} />
                 </div>
             {/if}
 
