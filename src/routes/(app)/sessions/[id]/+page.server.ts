@@ -48,9 +48,10 @@ async function get_best_set_for_exercise(exercise_id: number): Promise<{ reps: n
             exercise_id: exercise_id,
             reps: { gt: 5 }, // only consider sets with more than 5 reps
         },
-        orderBy: {
-            intensity: 'desc',
-        },
+        orderBy: [
+            { intensity: 'desc' },
+            { reps: 'desc' }
+        ],
         select: {
             reps: true,
             intensity: true
@@ -62,9 +63,10 @@ async function get_best_set_for_exercise(exercise_id: number): Promise<{ reps: n
             where: {
                 exercise_id: exercise_id
             },
-            orderBy: {
-                intensity: 'desc'
-            },
+            orderBy: [
+                { intensity: 'desc' },
+                { reps: 'desc' }
+            ],
             select: {
                 reps: true,
                 intensity: true
