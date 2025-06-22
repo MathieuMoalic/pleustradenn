@@ -6,8 +6,9 @@
     import EditButton from "./EditButton.svelte";
     import CloneButton from "./CloneButton.svelte";
     import SessionForm from "./SessionForm.svelte";
-    import Menu from "$components/Menu.svelte";
+    import Navbar from "$components/Navbar.svelte";
     import { t } from "$lib/stores/i18n";
+    import Plus from "$components/icons/Plus.svelte";
 
     export let data: PageData;
 
@@ -33,7 +34,19 @@
     let addingSession = false;
 </script>
 
-<Menu name={$t("sessions")} bind:addButtonToggle={addingSession} />
+<Navbar name={$t("sessions")}>
+    <div slot="actions" class="flex gap-2">
+        <button
+            class="bg-green-700 p-1 rounded text-thistle border border-thistle/40"
+            on:click={() => {
+                addingSession = !addingSession;
+                toggleExpand(-1);
+            }}
+        >
+            <Plus className="w-4 h-4" />
+        </button>
+    </div>
+</Navbar>
 
 <section class="">
     <div class="flex flex-col gap-2 p-2">

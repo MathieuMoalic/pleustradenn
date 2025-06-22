@@ -1,5 +1,5 @@
 <script lang="ts">
-    import Menu from "$components/Menu.svelte";
+    import Menu from "$components/Navbar.svelte";
     import { t } from "$lib/stores/i18n";
     import type { ActionData } from "./$types";
     import ExerciseForm from "../ExerciseForm.svelte";

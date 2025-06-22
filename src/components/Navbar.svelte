@@ -1,20 +1,12 @@
 <script lang="ts">
-    import AddExerciseButton from "./AddExerciseButton.svelte";
-    import Clock from "./Clock.svelte";
-    import ClockButton from "./ClockButton.svelte";
     import { language, t } from "$lib/stores/i18n";
     import { enhance } from "$app/forms";
     import { goto } from "$app/navigation";
+    import Hamburger from "./icons/Hamburger.svelte";
 
     export let name: string;
-    export let addButtonCallback: (() => void) | null = null;
-    export let addButtonToggle = false;
-    export let isClockButtonVisible: boolean = false;
-
-    let clockButtonToggle: boolean = false;
     let menuOpen = false;
     let showLogoutConfirmation = false;
-
     function handleEnhance({}: {
         action: URL;
         formData: FormData;
@@ -43,19 +35,7 @@
                     on:click={() => (menuOpen = !menuOpen)}
                     aria-label="Toggle menu"
                 >
-                    <svg
-                        class="w-6 h-6"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                    >
-                        <path
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                            stroke-width="2"
-                            d="M4 6h16M4 12h16M4 18h16"
-                        />
-                    </svg>
+                    <Hamburger className="w-6 h-6" />
                 </button>
 
                 <div class="text-plum font-bold text-lg">
@@ -67,14 +47,7 @@
                 </div>
             </div>
 
-            <div class="flex items-center gap-3">
-                {#if !(addButtonCallback === null)}
-                    <AddExerciseButton {addButtonCallback} {addButtonToggle} />
-                {/if}
-                {#if isClockButtonVisible}
-                    <ClockButton bind:clockButtonToggle />
-                {/if}
-            </div>
+            <slot name="actions" />
         </div>
 
         {#if menuOpen}
@@ -159,8 +132,4 @@
         {/if}
     </div>
     <hr />
-
-    {#if clockButtonToggle}
-        <Clock />
-    {/if}
 </header>

@@ -86,7 +86,6 @@ export const actions: Actions = {
 
     delete: async ({ request }) => {
         const form = await request.formData();
-        console.log("Form data for deletion:", Object.fromEntries(form));
         const idString = form.get("id")?.toString();
         if (!idString) {
             return fail(400, { error: "Exercise ID is missing for deletion." });

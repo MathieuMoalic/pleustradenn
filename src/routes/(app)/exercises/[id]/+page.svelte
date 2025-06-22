@@ -1,8 +1,9 @@
 <script lang="ts">
-    import Menu from "$components/Menu.svelte";
+    import Navbar from "$components/Navbar.svelte";
     import { t, exerciseNamei18n } from "$lib/stores/i18n";
     import type { PageData, ActionData } from "./$types";
     import ExerciseForm from "../ExerciseForm.svelte";
+    import NewExerciseButton from "../NewExerciseButton.svelte";
 
     export let form: ActionData;
     export let data: PageData;
@@ -34,7 +35,11 @@
     }
 </script>
 
-<Menu name={exerciseNamei18n(ex)} />
+<Navbar name={exerciseNamei18n(ex)}>
+    <div slot="actions" class="flex gap-2">
+        <NewExerciseButton />
+    </div>
+</Navbar>
 
 <ExerciseForm {form} {ex} />
 

@@ -62,6 +62,11 @@ const dict = {
         pl: 'Zapisano',
         fr: 'Enregistré'
     },
+    close: {
+        en: 'Close',
+        pl: 'Zamknij',
+        fr: 'Fermer'
+    },
 };
 
 const categories = {

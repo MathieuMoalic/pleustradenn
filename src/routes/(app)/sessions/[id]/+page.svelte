@@ -1,19 +1,19 @@
 <script lang="ts">
     import PBSet from "./PBSet.svelte";
-    import DeleteSEButton from "./DeleteSEButton.svelte";
-    import AddSetButton from "./AddSetButton.svelte";
-    import CompleteSEButton from "./CompleteSEButton.svelte";
     import SingleSet from "./SingleSet.svelte";
-    import AddExercise from "./AddExercise.svelte";
-    import ExerciseLogButton from "./ExerciseLogButton.svelte";
+    import Navbar from "$components/Navbar.svelte";
 
     import { exerciseNamei18n, t } from "$lib/stores/i18n";
 
     import { dragHandleZone, dragHandle } from "svelte-dnd-action";
-    import Menu from "$components/Menu.svelte";
     import type { PageData } from "./$types";
     import { enhance } from "$app/forms";
-    import { fly } from "svelte/transition";
+    import { fade, fly } from "svelte/transition";
+    import Plus from "$components/icons/Plus.svelte";
+    import ClockIcon from "$components/icons/Clock.svelte";
+    import AddExercise from "./AddExercise.svelte";
+    import Clock from "$components/Clock.svelte";
+    import SeButtons from "./SEButtons.svelte";
 
     export let data: PageData;
     if (data.session === null) {
@@ -44,14 +44,39 @@
 
         return `${yyyy}.${mm}.${dd}`;
     }
-    let addingExercise = false;
+    let showClock = false;
+    let showAddExercise = false;
 </script>
 
-<Menu
-    name={formatSessionDate(data.session!.date)}
-    bind:addButtonToggle={addingExercise}
-    isClockButtonVisible={true}
-/>
+<Navbar name={formatSessionDate(data.session!.date)}>
+    <div slot="actions" class="flex gap-2">
+        <button
+            class="bg-green-700 p-1 rounded text-thistle border border-thistle/40"
+            on:click={() => (showClock = !showClock)}
+        >
+            <ClockIcon className="w-4 h-4" />
+        </button>
+        <button
+            class="bg-green-700 p-1 rounded text-thistle border border-thistle/40"
+            on:click={() => (showAddExercise = !showAddExercise)}
+        >
+            <Plus className="w-4 h-4" />
+        </button>
+    </div>
+</Navbar>
+
+{#if showAddExercise || showClock}
+    <div class="fixed inset-x-0 z-40 space-y-2" in:fade>
+        {#if showAddExercise}
+            <AddExercise exercises={data.exercises} />
+        {/if}
+
+        {#if showClock}
+            <Clock />
+        {/if}
+    </div>
+{/if}
+
 <section class="p-2 pt-0">
     <form
         method="POST"
@@ -64,10 +89,6 @@
             Submit
         </button>
     </form>
-
-    {#if addingExercise}
-        <AddExercise exercises={data.exercises} />
-    {/if}
 
     {#if data.session!.session_exercises && data.session!.session_exercises.length > 0}
         <div
@@ -143,17 +164,7 @@
                             {/each}
                         </div>
                     </div>
-
-                    <div
-                        class={`absolute right-3 -translate-y-1 flex items-center gap-2 p-1 rounded-md text-thistle text-sm ${
-                            SE.completed ? "bg-emerald-900" : "bg-seal-brown"
-                        }`}
-                    >
-                        <DeleteSEButton {SE} />
-                        <ExerciseLogButton {SE} />
-                        <CompleteSEButton {SE} />
-                        <AddSetButton {SE} />
-                    </div>
+                    <SeButtons {SE} />
                 </div>
             {/each}
         </div>

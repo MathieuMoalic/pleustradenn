@@ -140,5 +140,6 @@ export const actions: Actions = {
                 }
             });
         }
+        return { success: true, newSession: newSession };
     }
 };

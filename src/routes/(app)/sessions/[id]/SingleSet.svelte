@@ -6,6 +6,7 @@
     import { enhance } from "$app/forms";
     import { tick } from "svelte";
     import { t } from "$lib/stores/i18n";
+    import Chevron from "$components/icons/Chevron.svelte";
 
     export let set: Set;
     export let unit: string;
@@ -84,21 +85,11 @@
             class="p-1 rounded focus:outline-none"
             aria-label="Toggle details"
         >
-            <svg
-                class="w-4 h-4 transition-transform duration-200 {expended
+            <Chevron
+                className="w-4 h-4 transition-transform duration-200 {expended
                     ? 'rotate-180'
                     : ''} text-plum"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-            >
-                <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M19 9l-7 7-7-7"
-                />
-            </svg>
+            />
         </button>
     </div>
 
