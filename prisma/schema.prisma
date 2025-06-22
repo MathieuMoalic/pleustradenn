@@ -12,6 +12,9 @@ datasource db {
 model Exercise {
   id Int @id @default(autoincrement())
 
+  user_id String @map("user_id")
+  user    User   @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
   category       String  @default("other")
   intensity_unit String  @default("kg")
   name           String  @unique
@@ -71,6 +74,7 @@ model User {
   language      String        @default("en")
   sessions      Session[]
   user_sessions UserSession[]
+  Exercise      Exercise[]
 }
 
 model UserSession {

@@ -2,9 +2,15 @@ import prisma from '$lib/server/prisma';
 import type { Actions } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
 import { fail } from '@sveltejs/kit';
+import { redirect } from '@sveltejs/kit';
 
-export const load: PageServerLoad = async ({ params }) => {
-    const exercises = await prisma.exercise.findMany({});
+export const load: PageServerLoad = async ({ params, locals, url }) => {
+    if (!locals.user) {
+        throw redirect(303, `/login?redirectTo=${url.pathname}`);
+    }
+    const exercises = await prisma.exercise.findMany({
+        where: { user_id: locals.user.id }
+    });
 
     const session = await prisma.session.findUnique({
         where: { id: parseInt(params.id) },
@@ -20,6 +26,9 @@ export const load: PageServerLoad = async ({ params }) => {
 
     if (!session) {
         throw new Error('Session not found.');
+    }
+    if (session.user_id !== locals.user.id) {
+        throw new Error('You do not have permission to view this session.');
     }
 
     for (const se of session.session_exercises) {
@@ -175,7 +184,7 @@ export const actions: Actions = {
         await reorder_session_exercises_by_completion(session_id);
     },
 
-    update_session_exercise: async ({ request }) => {
+    update_session_exercise: async ({ request, locals }) => {
         const form = await request.formData();
         const SEID = parseInt(form.get("id") as string);
         if (isNaN(SEID)) {
@@ -184,6 +193,20 @@ export const actions: Actions = {
 
         const completed = form.get("completed") === "true";
 
+        // check that the session belongs to the current user
+        const sessionExercise = await prisma.sessionExercise.findUnique({
+            where: { id: SEID },
+            include: { session: true }
+        });
+        if (!locals.user) {
+            return fail(401, { error: "You must be logged in to update a session exercise." });
+        }
+        if (!sessionExercise) {
+            return fail(404, { error: "Session Exercise not found." });
+        }
+        if (sessionExercise.session.user_id !== locals.user.id) {
+            return fail(403, { error: "You do not have permission to update this session exercise." });
+        }
         const updatedSE = await prisma.sessionExercise.update({
             where: { id: SEID },
             data: { completed }
@@ -235,12 +258,10 @@ export const actions: Actions = {
         }
     },
 
-    update_set: async ({ request, params }) => {
-        const session_id = parseInt(params.id as string);
-        if (isNaN(session_id)) {
-            return fail(400, { error: "Invalid Session ID from URL." });
+    update_set: async ({ request, params, locals }) => {
+        if (!locals.user) {
+            return fail(401, { error: "You must be logged in to update a set." });
         }
-
         const form = await request.formData();
         const idString = form.get("id")?.toString();
         if (!idString) {
@@ -250,6 +271,22 @@ export const actions: Actions = {
         if (isNaN(id)) {
             return fail(400, { error: "Invalid Set ID.", form: Object.fromEntries(form) });
         }
+        const session = await prisma.session.findUnique({
+            where: { id: id },
+            include: { session_exercises: true }
+        });
+        if (!session) {
+            return fail(404, { error: "Session not found." });
+        }
+        if (session.user_id !== locals.user.id) {
+            return fail(403, { error: "You do not have permission to update this session." });
+        }
+        const session_id = parseInt(params.id as string);
+        if (isNaN(session_id)) {
+            return fail(400, { error: "Invalid Session ID from URL." });
+        }
+
+
 
         await prisma.set.update({
             where: { id: id },
@@ -261,7 +298,10 @@ export const actions: Actions = {
         });
     },
 
-    delete_set: async ({ request, params }) => {
+    delete_set: async ({ request, params, locals }) => {
+        if (!locals.user) {
+            return fail(401, { error: "You must be logged in to delete a set." });
+        }
         const form = await request.formData();
         const session_id = parseInt(params.id as string);
         if (isNaN(session_id)) {
@@ -276,22 +316,38 @@ export const actions: Actions = {
         if (isNaN(id)) {
             return fail(400, { error: "Invalid Set ID for deletion." });
         }
+        const session = await prisma.session.findUnique({
+            where: { id: session_id },
+            include: { session_exercises: true }
+        });
+        if (!session) {
+            return fail(404, { error: "Session not found." });
+        }
+
+        if (session.user_id !== locals.user.id) {
+            return fail(403, { error: "You do not have permission to delete this set." });
+        }
         await prisma.set.delete({ where: { id } });
     },
 
-    delete_session_exercise: async ({ request, params }) => {
+    delete_session_exercise: async ({ request, locals }) => {
+        if (!locals.user) {
+            return fail(401, { error: "You must be logged in to delete a session exercise." });
+        }
         const form = await request.formData();
         let id = parseInt(form.get("id") as string);
-
         if (isNaN(id)) {
-            return fail(400, { error: "Invalid Session Exercise ID for deletion." });
+            return fail(400, { error: "Session Exercise ID is missing for deletion." });
         }
         const sessionExercise = await prisma.sessionExercise.findUnique({
             where: { id: id },
-            include: { sets: true }
+            include: { sets: true, session: true }
         });
         if (!sessionExercise) {
             return fail(404, { error: "Session Exercise not found." });
+        }
+        if (sessionExercise.session.user_id !== locals.user.id) {
+            return fail(403, { error: "You do not have permission to delete this session exercise." });
         }
         await prisma.set.deleteMany({
             where: { session_exercise_id: sessionExercise.id }
@@ -300,7 +356,10 @@ export const actions: Actions = {
         reorder_session_exercises_by_completion(sessionExercise.session_id);
     },
 
-    reorder_session_exercises: async ({ request, params }) => {
+    reorder_session_exercises: async ({ request, params, locals }) => {
+        if (!locals.user) {
+            return fail(401, { error: "You must be logged in to reorder session exercises." });
+        }
         const session_id = parseInt(params.id as string);
         if (isNaN(session_id)) {
             return fail(400, { error: "Invalid Session ID from URL." });
@@ -321,6 +380,9 @@ export const actions: Actions = {
 
         if (!session) {
             return fail(404, { error: "Session not found." });
+        }
+        if (session.user_id !== locals.user.id) {
+            return fail(403, { error: "You do not have permission to reorder this session." });
         }
 
         const exerciseToSE = new Map<number, typeof session.session_exercises[number]>();

@@ -2,8 +2,12 @@ import prisma from '$lib/server/prisma';
 import { fail, type Actions } from "@sveltejs/kit";
 import type { PageServerLoad } from './$types';
 import { validateExerciseFormData } from '$lib/server/validate_exercise';
+import { redirect } from '@sveltejs/kit';
 
-export const load: PageServerLoad = async ({ params }) => {
+export const load: PageServerLoad = async ({ locals, url, params }) => {
+    if (!locals.user) {
+        throw redirect(303, `/login?redirectTo=${url.pathname}`);
+    }
     const { id } = params;
     const exercise_id = Number(id);
     if (isNaN(exercise_id)) {
@@ -49,19 +53,45 @@ export const load: PageServerLoad = async ({ params }) => {
             id: exercise_id,
         },
     });
+
+    if (!exercise) {
+        throw new Error('Exercise not found');
+    }
+    if (exercise.user_id !== locals.user.id) {
+        throw new Error('You do not have permission to view this exercise.');
+    }
     return { sets: groupedSets, exercise };
 }
 
 export const actions: Actions = {
-    update: async ({ request }) => {
+    update: async ({ request, locals }) => {
+        if (!locals.user) {
+            return fail(401, { error: 'You must be logged in to update an exercise.' });
+        }
+
         const form = await request.formData();
         const idString = form.get("id")?.toString();
         if (!idString) {
             return fail(400, { error: "Exercise ID is missing.", form: Object.fromEntries(form) });
         }
+
         const id = parseInt(idString);
         if (isNaN(id)) {
             return fail(400, { error: "Invalid exercise ID.", form: Object.fromEntries(form) });
+        }
+
+        // 🔐 Check that the exercise belongs to the current user
+        const existing = await prisma.exercise.findUnique({
+            where: { id },
+            select: { user_id: true },
+        });
+
+        if (!existing) {
+            return fail(404, { error: "Exercise not found.", form: Object.fromEntries(form) });
+        }
+
+        if (existing.user_id !== locals.user.id) {
+            return fail(403, { error: "You do not have permission to update this exercise.", form: Object.fromEntries(form) });
         }
 
         const validationResult = await validateExerciseFormData(form);
@@ -71,37 +101,55 @@ export const actions: Actions = {
 
         const validatedData = validationResult;
 
-        let exercise;
         try {
-            exercise = await prisma.exercise.update({
+            const exercise = await prisma.exercise.update({
                 where: { id },
                 data: validatedData,
             });
+            return { success: true, message: "Exercise updated successfully.", exercise };
         } catch (error) {
             return fail(500, { error: "Failed to update exercise.", form: Object.fromEntries(form) });
         }
-        return { success: true, message: "Exercise updated successfully.", exercise: exercise };
     },
 
-    delete: async ({ request }) => {
+
+    delete: async ({ request, locals }) => {
+        if (!locals.user) {
+            return fail(401, { error: 'You must be logged in to delete an exercise.' });
+        }
+
         const form = await request.formData();
         const idString = form.get("id")?.toString();
         if (!idString) {
             return fail(400, { error: "Exercise ID is missing for deletion." });
         }
+
         const id = parseInt(idString);
         if (isNaN(id)) {
             return fail(400, { error: "Invalid exercise ID for deletion." });
         }
 
+        // First, fetch the exercise to ensure it exists and belongs to the user
+        const existing = await prisma.exercise.findUnique({
+            where: { id },
+            select: { user_id: true },
+        });
+
+        if (!existing) {
+            return fail(404, { error: "Exercise not found for deletion." });
+        }
+
+        if (existing.user_id !== locals.user.id) {
+            return fail(403, { error: "You do not have permission to delete this exercise." });
+        }
+
         try {
             await prisma.exercise.delete({ where: { id } });
         } catch (error) {
-            if (error instanceof Error && 'code' in error && error.code === 'P2025') {
-                return fail(404, { error: "Exercise not found for deletion." });
-            }
             return fail(500, { error: "Failed to delete exercise. Please try again." });
         }
+
         return { success: true, message: "Exercise deleted successfully." };
     },
+
 };

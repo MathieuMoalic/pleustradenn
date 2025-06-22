@@ -3,8 +3,10 @@ import prisma from "$lib/server/prisma";
 import { redirect, fail } from "@sveltejs/kit";
 import type { PageServerLoad } from './$types';
 
-export const load: PageServerLoad = async ({ locals }) => {
-    if (!locals.user) { throw redirect(302, '/login?redirectTo=/sessions'); }
+export const load: PageServerLoad = async ({ locals, url }) => {
+    if (!locals.user) {
+        throw redirect(303, `/login?redirectTo=${url.pathname}`);
+    }
 
     const user_id = locals.user.id;
 
@@ -30,14 +32,12 @@ export const actions: Actions = {
             return fail(400, { notes: notes, error: "Invalid or missing date" });
         }
 
-        const user_id = locals.user.id;
-
         try {
             await prisma.session.create({
                 data: {
                     date: new Date(rawDate),
                     notes: notes,
-                    user_id: user_id,
+                    user_id: locals.user.id,
                 },
             });
         } catch (err) {
@@ -56,9 +56,11 @@ export const actions: Actions = {
     },
 
     update: async ({ request, locals }) => {
+        if (!locals.user) {
+            return fail(401, { error: 'You must be logged in to update a session.' });
+        }
         const form = await request.formData();
         const idString = form.get("id")?.toString();
-        console.log("Update form data:", Object.fromEntries(form));
         if (!idString) {
             return fail(400, { error: "Session ID is missing.", form: Object.fromEntries(form) });
         }
@@ -76,15 +78,23 @@ export const actions: Actions = {
             date: new Date(rawDate),
             notes: form.get('notes')?.toString() ?? '',
         };
+        // Check if the session belongs to the user
+        const session = await prisma.session.findUnique({
+            where: { id },
+            select: { user_id: true }
+        });
+        if (!session) {
+            return fail(404, { error: "Session not found." });
+        }
+        if (session.user_id !== locals.user.id) {
+            return fail(403, { error: "You do not have permission to update this session." });
+        }
 
-        let session = await prisma.session.update({
+        await prisma.session.update({
             where: { id },
             data: formData
         });
-        console.log("Updated session:", session);
-        if (!locals.user) {
-            return fail(401, { error: 'You must be logged in to update a session.' });
-        }
+
         const sessions = await prisma.session.findMany({
             where: { user_id: locals.user.id },
             orderBy: { date: 'desc' }
@@ -93,6 +103,9 @@ export const actions: Actions = {
     },
 
     delete: async ({ request, locals }) => {
+        if (!locals.user) {
+            return fail(401, { error: 'You must be logged in to delete a session.' });
+        }
         const form = await request.formData();
 
         const idString = form.get("id")?.toString();
@@ -103,10 +116,19 @@ export const actions: Actions = {
         if (isNaN(id)) {
             return fail(400, { error: "Invalid Session ID for deletion." });
         }
-        await prisma.session.delete({ where: { id } });
-        if (!locals.user) {
-            return fail(401, { error: 'You must be logged in to update a session.' });
+        // Check if the session belongs to the user
+        const session = await prisma.session.findUnique({
+            where: { id },
+            select: { user_id: true }
+        });
+        if (!session) {
+            return fail(404, { error: "Session not found." });
         }
+        if (session.user_id !== locals.user.id) {
+            return fail(403, { error: "You do not have permission to delete this session." });
+        }
+        await prisma.session.delete({ where: { id } });
+
         const sessions = await prisma.session.findMany({
             where: { user_id: locals.user.id },
             orderBy: { date: 'desc' }
@@ -158,9 +180,6 @@ export const actions: Actions = {
                     position: se.position
                 }
             });
-        }
-        if (!locals.user) {
-            return fail(401, { error: 'You must be logged in to update a session.' });
         }
         const sessions = await prisma.session.findMany({
             where: { user_id: locals.user.id },

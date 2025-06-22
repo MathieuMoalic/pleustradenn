@@ -8,6 +8,7 @@
     export let data: PageData;
     let ex = data.exercise ?? {
         id: -1,
+        user_id: "",
         category: "other",
         intensity_unit: "kg",
         name: "sdad",
