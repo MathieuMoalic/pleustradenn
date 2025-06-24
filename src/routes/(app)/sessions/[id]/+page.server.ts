@@ -262,17 +262,12 @@ export const actions: Actions = {
         if (!locals.user) {
             return fail(401, { error: "You must be logged in to update a set." });
         }
-        const form = await request.formData();
-        const idString = form.get("id")?.toString();
-        if (!idString) {
-            return fail(400, { error: "Set ID is missing.", form: Object.fromEntries(form) });
-        }
-        const id = parseInt(idString);
-        if (isNaN(id)) {
-            return fail(400, { error: "Invalid Set ID.", form: Object.fromEntries(form) });
+        const session_id = parseInt(params.id as string);
+        if (isNaN(session_id)) {
+            return fail(400, { error: "Invalid Session ID from URL." });
         }
         const session = await prisma.session.findUnique({
-            where: { id: id },
+            where: { id: session_id },
             include: { session_exercises: true }
         });
         if (!session) {
@@ -281,21 +276,26 @@ export const actions: Actions = {
         if (session.user_id !== locals.user.id) {
             return fail(403, { error: "You do not have permission to update this session." });
         }
-        const session_id = parseInt(params.id as string);
-        if (isNaN(session_id)) {
-            return fail(400, { error: "Invalid Session ID from URL." });
+
+        const form = await request.formData();
+        const SetIdString = form.get("id")?.toString();
+        if (!SetIdString) {
+            return fail(400, { error: "Set ID is missing.", form: Object.fromEntries(form) });
+        }
+        const SetId = parseInt(SetIdString);
+        if (isNaN(SetId)) {
+            return fail(400, { error: "Invalid Set ID.", form: Object.fromEntries(form) });
         }
 
-
-
-        await prisma.set.update({
-            where: { id: id },
+        let new_set = await prisma.set.update({
+            where: { id: SetId },
             data: {
                 exercise_id: parseInt(form.get("exercise_id") as string),
                 reps: parseInt(form.get("reps") as string),
                 intensity: parseFloat(form.get("intensity") as string),
             },
         });
+        return { success: true, set: new_set };
     },
 
     delete_set: async ({ request, params, locals }) => {

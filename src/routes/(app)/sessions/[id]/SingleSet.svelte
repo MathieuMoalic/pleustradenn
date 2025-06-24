@@ -7,6 +7,8 @@
     import { t } from "$lib/stores/i18n";
     import Chevron from "$components/icons/Chevron.svelte";
     import Bin from "$components/icons/Bin.svelte";
+    import type { SubmitFunction } from "@sveltejs/kit";
+    import { addAlert } from "$lib/client/alert";
 
     export let set: Set;
     export let unit: string;
@@ -48,6 +50,17 @@
     }
 
     let form: HTMLFormElement;
+
+    const handleEnhance: SubmitFunction = () => {
+        return async ({ result }) => {
+            switch (result.type) {
+                case "failure": {
+                    addAlert(result.data?.error ?? "Unknown error", "error");
+                    break;
+                }
+            }
+        };
+    };
 </script>
 
 <form
@@ -56,8 +69,9 @@
     action="?/update_set"
     data-set-id={set.id}
     class="flex flex-col flex-1 bg-black-bean/40 text-plum rounded-md shadow-sm text-sm overflow-hidden"
-    use:enhance
+    use:enhance={handleEnhance}
 >
+    <input type="hidden" name="session_id" value={set.id} />
     <input type="hidden" name="id" value={set.id} />
     <input type="hidden" name="exercise_id" value={set.exercise_id} />
     <input type="hidden" name="reps" value={set.reps} />
