@@ -3,6 +3,7 @@
     import { exerciseNamei18n, t, cs } from "$lib/stores/i18n";
 
     export let exercises: Exercise[] = [];
+    export let onClose: () => void = () => {};
 
     let category: string = "other";
     let state: "pickCategory" | "pickExercise" = "pickCategory";
@@ -29,6 +30,14 @@
                     {label}
                 </button>
             {/each}
+            <button
+                type="button"
+                on:click={onClose}
+                class="text-plum hover:underline my-2 text-sm"
+                aria-label="Close"
+            >
+                Close
+            </button>
         </div>
     {:else if state == "pickExercise"}
         <form

@@ -46,13 +46,22 @@
     }
     let showClock = false;
     let showAddExercise = false;
+    import { browser } from "$app/environment";
+
+    $: if (browser) {
+        if (showAddExercise || showClock) {
+            document.body.style.overflow = "hidden";
+        } else {
+            document.body.style.overflow = "";
+        }
+    }
 </script>
 
 <Navbar name={formatSessionDate(data.session!.date)}>
     <div slot="actions" class="flex gap-2">
         <button
-            class="bg-green-700 p-1 rounded text-thistle border border-thistle/40"
             on:click={() => (showClock = !showClock)}
+            class="bg-green-700 p-1 rounded text-thistle border border-thistle/40"
         >
             <ClockIcon className="w-4 h-4" />
         </button>
@@ -66,13 +75,19 @@
 </Navbar>
 
 {#if showAddExercise || showClock}
-    <div class="fixed inset-x-0 z-40 space-y-2" in:fade>
+    <div
+        class="fixed inset-x-0 top-0 bottom-0 z-40 space-y-2 overflow-y-auto bg-seal-brown/55 p-4"
+        in:fade
+    >
         {#if showAddExercise}
-            <AddExercise exercises={data.exercises} />
+            <AddExercise
+                exercises={data.exercises}
+                onClose={() => (showAddExercise = false)}
+            />
         {/if}
 
         {#if showClock}
-            <Clock />
+            <Clock onclick={() => (showClock = !showClock)} />
         {/if}
     </div>
 {/if}

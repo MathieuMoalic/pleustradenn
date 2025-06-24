@@ -3,6 +3,7 @@
 
     let time = 0;
     let interval: NodeJS.Timeout | null = null;
+    export let onclick: () => void = () => {};
 
     function formatTime(t: number) {
         const minutes = String(Math.floor(t / 60000)).padStart(2, "0");
@@ -27,12 +28,13 @@
     });
 </script>
 
-<div
-    class="flex flex-col items-center justify-center bg-seal-brown border border-burnt-umber rounded-md shadow-md p-2 mx-2 my-2"
+<button
+    on:click={onclick}
+    class="flex flex-col items-center justify-center bg-seal-brown border border-burnt-umber rounded-md shadow-md p-2 w-full"
 >
     <div
         class="text-thistle text-5xl sm:text-6xl md:text-7xl font-bold tracking-wider"
     >
         {formatTime(time)}
     </div>
-</div>
+</button>
