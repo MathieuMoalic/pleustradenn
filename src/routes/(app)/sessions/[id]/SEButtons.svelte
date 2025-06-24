@@ -41,6 +41,14 @@
 </script>
 
 <div class="px-1 ml-1 py-1 bg-white/5 rounded-r-md flex flex-col gap-1">
+    <form method="POST" action="?/create_set" use:enhance>
+        <input type="hidden" name="session_id" value={SE.session_id} />
+        <input type="hidden" name="exercise_id" value={SE.exercise.id || ""} />
+        <input type="hidden" name="session_exercise_id" value={SE.id || ""} />
+        <button type="submit" class={buttonClass} aria-label="Add set">
+            <Add className={svgIconClass} />
+        </button>
+    </form>
     <!-- Toggle Button -->
     <button
         type="button"
@@ -54,22 +62,6 @@
     {#if showMenu}
         <div class="flex flex-col gap-1 mt-1">
             <!-- Add Set Button -->
-            <form method="POST" action="?/create_set" use:enhance>
-                <input type="hidden" name="session_id" value={SE.session_id} />
-                <input
-                    type="hidden"
-                    name="exercise_id"
-                    value={SE.exercise.id || ""}
-                />
-                <input
-                    type="hidden"
-                    name="session_exercise_id"
-                    value={SE.id || ""}
-                />
-                <button type="submit" class={buttonClass} aria-label="Add set">
-                    <Add className={svgIconClass} />
-                </button>
-            </form>
 
             <!-- Mark Complete/Incomplete -->
             {#if !(SE.sets[0].id <= 0)}

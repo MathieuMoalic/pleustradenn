@@ -1,6 +1,14 @@
-import type { Exercise } from '@prisma/client';
 import { get, writable, derived } from 'svelte/store';
 
+type Exercise = {
+    id: number;
+    name: string;
+    name_fr: string | null;
+    name_pl: string | null;
+    notes: string;
+    category: string;
+    intensity_unit: string;
+};
 export function exerciseNamei18n(exercise: Exercise): string {
     const lang = get(language);
     if (lang === 'pl' && exercise.name_pl?.trim()) {
