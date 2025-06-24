@@ -55,6 +55,18 @@
             document.body.style.overflow = "";
         }
     }
+
+    function onDeleteSet(id: number) {
+        data.session = {
+            ...data.session,
+            session_exercises: data.session.session_exercises
+                .map((se) => ({
+                    ...se,
+                    sets: se.sets.filter((s) => s.id !== id),
+                }))
+                .filter((se) => se.sets.length), // remove empty exercises
+        };
+    }
 </script>
 
 <Navbar name={formatSessionDate(data.session!.date)}>
@@ -173,6 +185,7 @@
                                         <SingleSet
                                             {set}
                                             unit={SE.exercise.intensity_unit}
+                                            onDelete={onDeleteSet}
                                         />
                                     {/if}
                                 </div>

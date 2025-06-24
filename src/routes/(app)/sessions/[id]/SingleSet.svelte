@@ -12,6 +12,7 @@
 
     export let set: Set;
     export let unit: string;
+    export let onDelete: (id: number) => void;
 
     let originalSet: Set = { ...set };
 
@@ -54,6 +55,10 @@
     const handleEnhance: SubmitFunction = () => {
         return async ({ result }) => {
             switch (result.type) {
+                case "success": {
+                    onDelete(set.id);
+                    break;
+                }
                 case "failure": {
                     addAlert(result.data?.error ?? "Unknown error", "error");
                     break;
