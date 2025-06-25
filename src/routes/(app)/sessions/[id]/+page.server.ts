@@ -328,7 +328,7 @@ export const actions: Actions = {
             return fail(403, { error: "You do not have permission to delete this set." });
         }
         await prisma.set.delete({ where: { id } });
-        return { success: true };
+        return { success: true, message: "Set deleted successfully." };
     },
 
     delete_session_exercise: async ({ request, locals }) => {

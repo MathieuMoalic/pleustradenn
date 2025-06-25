@@ -56,7 +56,12 @@
         return async ({ result }) => {
             switch (result.type) {
                 case "success": {
-                    onDelete(set.id);
+                    // if "delete" in the message, it means the set was deleted
+                    if (
+                        result.data?.message?.toLowerCase().includes("delete")
+                    ) {
+                        onDelete(set.id);
+                    }
                     break;
                 }
                 case "failure": {
